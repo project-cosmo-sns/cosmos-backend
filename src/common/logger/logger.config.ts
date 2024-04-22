@@ -1,4 +1,5 @@
-import winston, { createLogger } from "winston";
+import { createLogger } from "winston";
+import * as winston from "winston";
 import { utilities as nestWinstonModuleUtilities } from "nest-winston/dist/winston.utilities";
 const getLoggerInstance = () =>
   createLogger({
