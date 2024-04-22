@@ -3,19 +3,42 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import * as session from 'express-session';
+import * as passport from 'passport';
+import { ConfigService } from '@nestjs/config';
 
 declare const module: any;
 
 async function bootstrap() {
-
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
+  const configService = app.get(ConfigService);
 
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
+  app.use(
+    session({
+      name: configService.get('COOKIE_NAME'),
+      secret: configService.get('COOKIE_SECRET'),
+      // store: redisStore,
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        maxAge: 1000 * 60 * 60 * 24,
+        domain: configService.get('SESSION_COOKIE_DOMAIN'),
+        path: '/',
+        httpOnly: false,
+        secure: true,
+      },
+    }),
+  );
+
+  app.use(passport.initialize());
+  app.use(passport.session());
+
   app.enableCors({
-    origin: ['http://localhost', 'http://127.0.0.1'],
+    origin: ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://alpha.cosmo-sns.com'],
     credentials: true,
   });
 
