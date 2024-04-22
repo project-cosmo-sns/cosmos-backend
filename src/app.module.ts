@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { AppController } from './controller/app.controller';
 import { AppService } from './service/app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -14,6 +14,6 @@ import { TypeORMConfigService } from './database/database.config';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [Logger, AppService],
 })
 export class AppModule {}
