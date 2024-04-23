@@ -38,9 +38,6 @@ export class Member {
   @Column({ name: 'external_id', length: 100, nullable: true, type: 'varchar' })
   externalId: string | null;
 
-  @Column({ name: 'gauge', type: 'float', nullable: false, default: 0 })
-  gauge: number;
-
   @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deletedAt?: Date;
 
