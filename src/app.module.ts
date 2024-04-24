@@ -25,6 +25,8 @@ import { PostHashTag } from './entity/post_hash_tag.entity';
 import { HashTag } from './entity/hash_tag.entity';
 import { PostService } from './service/post.service';
 import { PostController } from './controller/post.controller';
+import { Follow } from './entity/follow.entity';
+import { PostQueryRepository } from './repository/post.query-repository';
 
 @Module({
   imports: [
@@ -40,6 +42,7 @@ import { PostController } from './controller/post.controller';
       Post,
       PostHashTag,
       HashTag,
+      Follow
     ]),
     PassportModule.register({
       session: true,
@@ -62,6 +65,7 @@ import { PostController } from './controller/post.controller';
     // QueryRepository
     MemberQueryRepository,
     FeedQueryRepository,
+    PostQueryRepository,
 
     // Strategy
     GithubStrategy,
