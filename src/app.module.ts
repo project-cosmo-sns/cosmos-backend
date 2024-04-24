@@ -20,6 +20,11 @@ import { FeedService } from './service/feed.service';
 import { FeedController } from './controller/feed.controller';
 import { Feed } from './entity/feed.entity';
 import { FeedQueryRepository } from './repository/feed.query-repository';
+import { Post } from './entity/post.entity';
+import { PostHashTag } from './entity/post_hash_tag.entity';
+import { HashTag } from './entity/hash_tag.entity';
+import { PostService } from './service/post.service';
+import { PostController } from './controller/post.controller';
 
 @Module({
   imports: [
@@ -29,18 +34,30 @@ import { FeedQueryRepository } from './repository/feed.query-repository';
       imports: [ConfigModule],
       useClass: TypeORMConfigService,
     }),
-    TypeOrmModule.forFeature([Member, Feed]),
+    TypeOrmModule.forFeature([
+      Member,
+      Feed,
+      Post,
+      PostHashTag,
+      HashTag,
+    ]),
     PassportModule.register({
       session: true,
     }),
   ],
-  controllers: [AppController, OauthAuthenticationController, FeedController],
+  controllers: [
+    AppController,
+    OauthAuthenticationController,
+    FeedController,
+    PostController,
+  ],
   providers: [
     // Service
     AppService,
     SessionSerializerService,
     OauthAuthenticationService,
     FeedService,
+    PostService,
 
     // QueryRepository
     MemberQueryRepository,
@@ -57,4 +74,4 @@ import { FeedQueryRepository } from './repository/feed.query-repository';
     Logger,
   ],
 })
-export class AppModule {}
+export class AppModule { }
