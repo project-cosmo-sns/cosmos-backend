@@ -6,7 +6,7 @@ export class PostHashTag {
   id!: number;
 
   @Column({ name: 'post_id', nullable: false })
-  commentId!: number;
+  postId!: number;
 
   @Column({ name: 'hash_tag_id', nullable: false })
   hashTagId!: number;
