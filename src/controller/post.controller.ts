@@ -27,7 +27,7 @@ export class PostController {
     @Req() req,
     @Query() sortPostList: SortPostList
   ): Promise<PaginationResponse<PostListResponse>> {
-    const { postInfo, totalCount } = await this.postService.getPostList(2, sortPostList);
+    const { postInfo, totalCount } = await this.postService.getPostList(req.user.id, sortPostList);
     return PaginationResponse.of({
       data: PostListResponse.from(postInfo),
       options: sortPostList,
