@@ -1,8 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { ApiProperty } from '@nestjs/swagger';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
-import { GetFeedListResponseDto } from 'src/dto/response/get-feed-list.response.dto';
+import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
 import { Feed } from 'src/entity/feed.entity';
 import { FeedQueryRepository } from 'src/repository/feed.query-repository';
 import { Repository } from 'typeorm';
@@ -25,7 +24,7 @@ export class FeedService {
 
   async getFeedList(
     paginationRequest: PaginationRequest,
-  ): Promise<{ feedList: GetFeedListResponseDto[]; totalCount: number }> {
+  ): Promise<{ feedList: GetFeedResponseDto[]; totalCount: number }> {
     const getFeedListTuple = await this.feedQueryRepository.getFeedList(paginationRequest);
     const totalCount = await this.feedQueryRepository.getFeedListCount();
 
@@ -46,10 +45,35 @@ export class FeedService {
         createdAt: item.feedCreatedAt,
       };
 
-      return GetFeedListResponseDto.from({ writer, feed });
+      return GetFeedResponseDto.from({ writer, feed });
     });
 
     return { feedList, totalCount };
+  }
+
+  async getFeedDetail(feedId: number) {
+    const feed = await this.feedQueryRepository.getFeedDetail(feedId);
+
+    if (!feed) {
+      throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
+    }
+
+    return new GetFeedResponseDto(
+      {
+        id: feed.writerId,
+        nickname: feed.writerNickname,
+        generation: feed.writerGeneration,
+        profileImageUrl: feed.writerProfileImageUrl,
+      },
+      {
+        id: feed.feedId,
+        content: feed.feedContent,
+        viewCount: feed.feedViewCount,
+        commentCount: feed.feedCommentCount,
+        emojiCount: feed.feedEmojiCount,
+        createdAt: feed.feedCreatedAt,
+      },
+    );
   }
 }
 
