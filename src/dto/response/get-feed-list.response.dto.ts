@@ -28,10 +28,26 @@ export class FeedResponseDto {
 }
 
 export class GetFeedListResponseDto {
-  @ApiProperty()
-  writer: FeedWriterResponseDto;
-  @ApiProperty()
-  feed: FeedResponseDto;
+  @ApiProperty({
+    type: {
+      id: { type: 'number' },
+      nickname: { type: 'string' },
+      generation: { type: 'number' },
+      profileImageUrl: { type: 'string' },
+    },
+  })
+  writer: FeedWriterDto;
+  @ApiProperty({
+    type: {
+      id: { type: 'number' },
+      content: { type: 'string' },
+      viewCount: { type: 'number' },
+      commentCount: { type: 'number' },
+      emojiCount: { type: 'number' },
+      createdAt: { type: 'string' },
+    },
+  })
+  feed: FeedDto;
 
   constructor(writer: FeedWriterDto, feed: FeedDto) {
     this.writer = writer;
