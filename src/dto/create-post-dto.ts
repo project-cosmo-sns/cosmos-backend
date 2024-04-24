@@ -3,7 +3,7 @@ import { IsArray, IsString, ValidateNested } from 'class-validator';
 import { HashTagDto } from './hash-tag-dto';
 import { Type } from 'class-transformer';
 
-export class PostPostInfoDto {
+export class CreatePostInfoDto {
   @ApiProperty()
   @IsString()
   category: string;

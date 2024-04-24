@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashTagDto } from 'src/dto/hash-tag-dto';
-import { PostPostInfoDto } from 'src/dto/post-post-dto';
+import { CreatePostInfoDto } from 'src/dto/create-post-dto';
 import { HashTag } from 'src/entity/hash_tag.entity';
 import { Member } from 'src/entity/member.entity';
 import { Post } from 'src/entity/post.entity';
@@ -17,7 +17,7 @@ export class PostService {
     @InjectRepository(PostHashTag) private readonly postHashTagRepository: Repository<PostHashTag>,
   ) { }
 
-  async postPost(memberId: number, dto: PostPostInfoDto): Promise<void> {
+  async createPost(memberId: number, dto: CreatePostInfoDto): Promise<void> {
     const member = await this.memberRepository.findOneBy({ id: memberId });
     if (member === null) {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
@@ -41,7 +41,6 @@ export class PostService {
           color: hashTagDto.color,
         });
       }
-      console.log(`postId: ${postId}`);
       await this.postHashTagRepository.save({
         postId: postId,
         hashTagId: hashTagInfo.id,
