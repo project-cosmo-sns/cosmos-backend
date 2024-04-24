@@ -19,6 +19,7 @@ import { Member } from './entity/member.entity';
 import { FeedService } from './service/feed.service';
 import { FeedController } from './controller/feed.controller';
 import { Feed } from './entity/feed.entity';
+import { FeedQueryRepository } from './repository/feed.query-repository';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { Feed } from './entity/feed.entity';
 
     // QueryRepository
     MemberQueryRepository,
+    FeedQueryRepository,
 
     // Strategy
     GithubStrategy,
