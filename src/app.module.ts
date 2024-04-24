@@ -16,6 +16,10 @@ import { GithubStrategy } from './strategy/github-strategy';
 import { OauthAuthenticationController } from './controller/oauth.controller';
 import { OauthAuthenticationService } from './service/oauth-authentication.service';
 import { Member } from './entity/member.entity';
+import { FeedService } from './service/feed.service';
+import { FeedController } from './controller/feed.controller';
+import { Feed } from './entity/feed.entity';
+import { FeedQueryRepository } from './repository/feed.query-repository';
 
 @Module({
   imports: [
@@ -25,20 +29,22 @@ import { Member } from './entity/member.entity';
       imports: [ConfigModule],
       useClass: TypeORMConfigService,
     }),
-    TypeOrmModule.forFeature([Member]),
+    TypeOrmModule.forFeature([Member, Feed]),
     PassportModule.register({
       session: true,
     }),
   ],
-  controllers: [AppController, OauthAuthenticationController],
+  controllers: [AppController, OauthAuthenticationController, FeedController],
   providers: [
     // Service
     AppService,
     SessionSerializerService,
     OauthAuthenticationService,
+    FeedService,
 
     // QueryRepository
     MemberQueryRepository,
+    FeedQueryRepository,
 
     // Strategy
     GithubStrategy,
