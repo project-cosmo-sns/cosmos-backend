@@ -3,6 +3,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
+import { Roles } from 'src/common/roles/roles.decorator';
 import { PostFeedRequestDto } from 'src/dto/request/post-feed.request.dto';
 import { GetFeedListResponseDto } from 'src/dto/response/get-feed-list.response.dto';
 import { RolesGuard } from 'src/guard/roles.guard';
@@ -23,6 +24,7 @@ export class FeedController {
     return this.feedService.postFeed(req.user.id, body.content);
   }
 
+  @Roles('anyone')
   @ApiOperation({ summary: '피드 목록' })
   @ApiPaginatedResponse(GetFeedListResponseDto)
   @Get('/list')
