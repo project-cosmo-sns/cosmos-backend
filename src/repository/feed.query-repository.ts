@@ -10,8 +10,8 @@ import { DataSource } from 'typeorm';
 export class FeedQueryRepository {
   constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
 
-  async getFeedList(paginationRequest: PaginationRequest): Promise<GetFeedListTuple[]> {
-    const feedList = await this.getFeedListBaseQuery()
+  async getFeedList(paginationRequest: PaginationRequest): Promise<GetFeedTuple[]> {
+    const feedList = await this.getFeedBaseQuery()
       .select([
         'member.id as writerId',
         'member.nickname as writerNickname',
@@ -29,14 +29,34 @@ export class FeedQueryRepository {
       .orderBy('feed.createdAt', paginationRequest.order)
       .getRawMany();
 
-    return plainToInstance(GetFeedListTuple, feedList);
+    return plainToInstance(GetFeedTuple, feedList);
   }
 
   async getFeedListCount(): Promise<number> {
-    return await this.getFeedListBaseQuery().getCount();
+    return await this.getFeedBaseQuery().getCount();
   }
 
-  private getFeedListBaseQuery() {
+  async getFeedDetail(feedId: number): Promise<GetFeedTuple> {
+    const feed = await this.getFeedBaseQuery()
+      .andWhere('feed.id = :feedId', { feedId })
+      .select([
+        'member.id as writerId',
+        'member.nickname as writerNickname',
+        'member.generation as writerGeneration',
+        'member.profileImageUrl as writerProfileImageUrl',
+        'feed.id as feedId',
+        'feed.content as feedContent',
+        'feed.viewCount as feedViewCount',
+        'feed.commentCount as feedCommentCount',
+        'feed.emojiCount as feedEmojiCount',
+        'feed.createdAt as feedCreatedAt',
+      ])
+      .getRawOne();
+
+    return plainToInstance(GetFeedTuple, feed);
+  }
+
+  private getFeedBaseQuery() {
     return this.dataSource
       .createQueryBuilder()
       .from(Feed, 'feed')
@@ -46,7 +66,7 @@ export class FeedQueryRepository {
   }
 }
 
-export class GetFeedListTuple {
+export class GetFeedTuple {
   writerId: number;
   writerNickname: string;
   writerGeneration: number;

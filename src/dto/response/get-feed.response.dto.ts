@@ -1,33 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { FeedDto, FeedWriterDto } from 'src/service/feed.service';
 
-export class FeedWriterResponseDto {
-  @ApiProperty()
-  id: number;
-  @ApiProperty()
-  nickname: string;
-  @ApiProperty()
-  generation: number;
-  @ApiProperty()
-  profileImageUrl: string;
-}
-
-export class FeedResponseDto {
-  @ApiProperty()
-  id: number;
-  @ApiProperty()
-  content: string;
-  @ApiProperty()
-  viewCount: number;
-  @ApiProperty()
-  commentCount: number;
-  @ApiProperty()
-  emojiCount: number;
-  @ApiProperty()
-  createdAt: Date;
-}
-
-export class GetFeedListResponseDto {
+export class GetFeedResponseDto {
   @ApiProperty({
     type: {
       id: { type: 'number' },
@@ -55,6 +29,6 @@ export class GetFeedListResponseDto {
   }
 
   static from({ writer, feed }: { writer: FeedWriterDto; feed: FeedDto }) {
-    return new GetFeedListResponseDto(writer, feed);
+    return new GetFeedResponseDto(writer, feed);
   }
 }
