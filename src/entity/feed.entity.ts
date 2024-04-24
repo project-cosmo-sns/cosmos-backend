@@ -14,6 +14,12 @@ export class Feed {
   @Column({ name: 'view_count', nullable: false })
   viewCount!: number;
 
+  @Column({name:'emoji_count', nullable: false})
+  emojiCount!: number;
+
+  @Column({name:'comment_count', nullable: false})
+  commentCount!: number;
+
   @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deletedAt?: Date;
 
