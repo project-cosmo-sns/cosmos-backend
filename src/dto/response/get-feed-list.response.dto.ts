@@ -57,5 +57,4 @@ export class GetFeedListResponseDto {
   static from({ writer, feed }: { writer: FeedWriterDto; feed: FeedDto }) {
     return new GetFeedListResponseDto(writer, feed);
   }
-  // 테스트
 }
