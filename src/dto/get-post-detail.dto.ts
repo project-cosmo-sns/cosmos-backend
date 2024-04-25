@@ -1,3 +1,14 @@
+export class GetPostDetailDto {
+  postDetail!: GetPostDetail;
+  hashTag!: GetHashTagInfo[];
+
+  constructor(postDetail: GetPostDetail, hashTag: GetHashTagInfo[]) {
+    this.postDetail = postDetail;
+    this.hashTag = hashTag;
+  }
+}
+
+
 export class GetPostDetail {
   memberId!: number;
   nickname!: string;
@@ -34,4 +45,13 @@ export class GetPostDetail {
     this.viewCount = viewCount;
   }
 
+}
+
+export class GetHashTagInfo {
+  tagName?: string;
+  color?: string;
+  constructor(tagName: string, color: string) {
+    this.tagName = tagName;
+    this.color = color;
+  }
 }

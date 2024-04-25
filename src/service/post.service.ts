@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
 import { GetPostList } from 'src/dto/get-post-list.dto';
-import { GetPostDetail } from 'src/dto/get-post-detail.dto';
+import { GetPostDetail, GetPostDetailDto } from 'src/dto/get-post-detail.dto';
 
 @Injectable()
 export class PostService {
@@ -52,7 +52,7 @@ export class PostService {
     return { postInfo, totalCount };
   }
 
-  async getPostDetail(postId: number): Promise<GetPostDetail> {
+  async getPostDetail(postId: number): Promise<GetPostDetailDto> {
     const isDeletedPost = await this.postRepository.findOneBy({ id: postId });
     if (!isDeletedPost) {
       throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
@@ -65,7 +65,18 @@ export class PostService {
     if (postDetailInfo.memberDeletedAt !== null) {
       throw new GoneException('해당 글 작성자가 존재하지 않습니다.');
     }
-    return postDetailInfo;
+
+    const postHashTagInfo = await this.postHashTagRepository.findBy({ postId });
+    const hashTagInfo = await Promise.all(
+      postHashTagInfo.map(async (postHashTag) => {
+        const hashTag = await this.hashTagRepository.findOneBy({ id: postHashTag.hashTagId });
+        if (hashTag) {
+          return { tagName: hashTag.tagName, color: hashTag.color };
+        }
+        return {};
+      })
+    );
+    return new GetPostDetailDto(postDetailInfo, hashTagInfo);
   }
 
 

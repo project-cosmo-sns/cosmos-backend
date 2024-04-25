@@ -37,16 +37,12 @@ export class PostController {
       totalCount,
     })
   }
-
-  @Roles('anyone')
+  
   @ApiOperation({ summary: '포스트 상세' })
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
   @ApiResponse({ type: PostDetailResponse })
   @Get(':postId/detail')
-  async getPostDetail(
-    @Req() req,
-    @Param('postId', ParseIntPipe) postId: number
-  ): Promise<PostDetailResponse> {
+  async getPostDetail(@Param('postId', ParseIntPipe) postId: number): Promise<PostDetailResponse> {
     const postDetail = await this.postService.getPostDetail(postId);
     return PostDetailResponse.from(postDetail);
   }

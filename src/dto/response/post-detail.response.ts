@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { GetPostDetail } from '../get-post-detail.dto';
+import { GetPostDetail, GetPostDetailDto } from '../get-post-detail.dto';
 
-export class PostDetailResponse {
+export class PostDetail {
   @ApiProperty()
   memberId!: number;
   @ApiProperty()
@@ -47,19 +47,43 @@ export class PostDetailResponse {
     this.viewCount = viewCount;
   }
 
-  static from(getPostDetail: GetPostDetail) {
-    const postDetail = new PostDetailResponse(
-      getPostDetail.memberId,
-      getPostDetail.nickname,
-      getPostDetail.profileImageUrl,
-      getPostDetail.createdAt,
-      getPostDetail.postId,
-      getPostDetail.title,
-      getPostDetail.content,
-      getPostDetail.emojiCount,
-      getPostDetail.commentCount,
-      getPostDetail.viewCount,
+
+}
+export class PostDetailHashTag {
+  @ApiProperty()
+  tagName?: string;
+  @ApiProperty()
+  color?: string;
+  constructor(tagName: string, color: string) {
+    this.tagName = tagName;
+    this.color = color;
+  }
+}
+
+export class PostDetailResponse {
+  @ApiProperty({ type: PostDetail })
+  postDetail!: PostDetail;
+  @ApiProperty({ type: [PostDetailHashTag] })
+  postDetailHashTag!: PostDetailHashTag[];
+
+  constructor(postDetail: PostDetail, postDetailHashTag: PostDetailHashTag[]) {
+    this.postDetail = postDetail;
+    this.postDetailHashTag = postDetailHashTag;
+  }
+
+  static from(getPostDetail: GetPostDetailDto) {
+    const postDetail = new PostDetail(
+      getPostDetail.postDetail.memberId,
+      getPostDetail.postDetail.nickname,
+      getPostDetail.postDetail.profileImageUrl,
+      getPostDetail.postDetail.createdAt,
+      getPostDetail.postDetail.postId,
+      getPostDetail.postDetail.title,
+      getPostDetail.postDetail.content,
+      getPostDetail.postDetail.emojiCount,
+      getPostDetail.postDetail.commentCount,
+      getPostDetail.postDetail.viewCount
     );
-    return postDetail;
+    return new PostDetailResponse(postDetail, getPostDetail.hashTag)
   }
 }
