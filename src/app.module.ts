@@ -27,6 +27,11 @@ import { PostService } from './service/post.service';
 import { PostController } from './controller/post.controller';
 import { Follow } from './entity/follow.entity';
 import { PostQueryRepository } from './repository/post.query-repository';
+import { FeedComment } from './entity/feed_comment.entity';
+import { FeedCommentController } from './controller/feed-comment.controller';
+import { FeedCommentService } from './service/feed-comment.service';
+import { FeedCommentQueryRepository } from './repository/feed-comment.query-repository';
+import { FeedCommentHeart } from './entity/feed_comment_heart';
 
 @Module({
   imports: [
@@ -39,6 +44,8 @@ import { PostQueryRepository } from './repository/post.query-repository';
     TypeOrmModule.forFeature([
       Member,
       Feed,
+      FeedComment,
+      FeedCommentHeart,
       Post,
       PostHashTag,
       HashTag,
@@ -52,6 +59,7 @@ import { PostQueryRepository } from './repository/post.query-repository';
     AppController,
     OauthAuthenticationController,
     FeedController,
+    FeedCommentController,
     PostController,
   ],
   providers: [
@@ -60,11 +68,13 @@ import { PostQueryRepository } from './repository/post.query-repository';
     SessionSerializerService,
     OauthAuthenticationService,
     FeedService,
+    FeedCommentService,
     PostService,
 
     // QueryRepository
     MemberQueryRepository,
     FeedQueryRepository,
+    FeedCommentQueryRepository,
     PostQueryRepository,
 
     // Strategy

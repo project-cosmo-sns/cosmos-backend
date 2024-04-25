@@ -15,7 +15,6 @@ import { FeedService } from 'src/service/feed.service';
 export class FeedController {
   constructor(
     private readonly feedService: FeedService,
-    // private readonly configService: ConfigService,
   ) {}
 
   @ApiOperation({ summary: '피드 작성' })
