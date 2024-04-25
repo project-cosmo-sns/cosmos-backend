@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { GoneException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashTagDto } from 'src/dto/hash-tag-dto';
 import { CreatePostInfoDto } from 'src/dto/create-post-dto';
@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
 import { GetPostList } from 'src/dto/get-post-list.dto';
+import { GetPostDetail } from 'src/dto/get-post-detail.dto';
 
 @Injectable()
 export class PostService {
@@ -51,6 +52,21 @@ export class PostService {
     return { postInfo, totalCount };
   }
 
+  async getPostDetail(postId: number): Promise<GetPostDetail> {
+    const isDeletedPost = await this.postRepository.findOneBy({ id: postId });
+    if (!isDeletedPost) {
+      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+    }
+    if (isDeletedPost.deletedAt !== null) {
+      throw new GoneException('해당 포스트는 삭제되었습니다.');
+    }
+    const postDetailInfo = await this.postQueryRepository.getPostDetail(postId);
+
+    if (postDetailInfo.memberDeletedAt !== null) {
+      throw new GoneException('해당 글 작성자가 존재하지 않습니다.');
+    }
+    return postDetailInfo;
+  }
 
 
   private async saveHashTags(postId: number, hashTags: HashTagDto[]): Promise<void> {

@@ -79,6 +79,28 @@ export class PostQueryRepository {
 
     return query;
   }
+
+  async getPostDetail(postId: number): Promise<GetPostDetailTuple> {
+    const postDetail = await this.dataSource
+      .createQueryBuilder()
+      .from(Post, 'post')
+      .innerJoin(Member, 'member', 'post.member_id = member.id')
+      .where('post.id = :postId', { postId })
+      .select([
+        'member.id as memberId',
+        'member.nickname as nickname',
+        'member.profile_image_url as profileImageUrl',
+        'post.id as postId',
+        'post.title as title',
+        'post.content as content',
+        'post.emoji_count as emojiCount',
+        'post.comment_count as commentCount',
+        'post.view_count as viewCount',
+        'member.deleted_at as memberDeletedAt'
+      ])
+      .getRawOne()
+    return plainToInstance(GetPostDetailTuple, postDetail);
+  }
 }
 
 export class GetPostListTuple {
@@ -93,4 +115,18 @@ export class GetPostListTuple {
   emojiCount!: number;
   commentCount!: number;
   viewCount!: number;
+}
+
+export class GetPostDetailTuple {
+  memberId!: number;
+  nickname!: string;
+  profileImageUrl!: string;
+  createdAt!: Date;
+  postId!: number;
+  title!: string;
+  content!: string;
+  emojiCount!: number;
+  commentCount!: number;
+  viewCount!: number;
+  memberDeletedAt!: Date;
 }
