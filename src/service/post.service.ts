@@ -7,6 +7,9 @@ import { Member } from 'src/entity/member.entity';
 import { Post } from 'src/entity/post.entity';
 import { PostHashTag } from 'src/entity/post_hash_tag.entity';
 import { Repository } from 'typeorm';
+import { SortPostList } from 'src/dto/request/sort-post-list.request';
+import { PostQueryRepository } from 'src/repository/post.query-repository';
+import { GetPostList } from 'src/dto/get-post-list.dto';
 
 @Injectable()
 export class PostService {
@@ -15,6 +18,7 @@ export class PostService {
     @InjectRepository(Member) private readonly memberRepository: Repository<Member>,
     @InjectRepository(HashTag) private readonly hashTagRepository: Repository<HashTag>,
     @InjectRepository(PostHashTag) private readonly postHashTagRepository: Repository<PostHashTag>,
+    private readonly postQueryRepository: PostQueryRepository,
   ) { }
 
   async createPost(memberId: number, dto: CreatePostInfoDto): Promise<void> {
@@ -30,6 +34,24 @@ export class PostService {
     })
     await this.saveHashTags(post.id, dto.hashTags);
   }
+
+  async getPostList(memberId: number, sortPostList: SortPostList) {
+    const sortBy = sortPostList.sortBy;
+
+    const member = await this.memberRepository.findOneBy({ id: memberId });
+    if (!member) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+    const memberGeneration = member.generation;
+    const postListTuples = await this.postQueryRepository.getPostList(memberId, sortPostList, sortBy, memberGeneration);
+    const totalCount = await this.postQueryRepository.getAllPostListTotalCount(memberId, sortPostList, sortBy, memberGeneration);
+    const postInfo = postListTuples.map((postList) =>
+      GetPostList.from(postList));
+
+    return { postInfo, totalCount };
+  }
+
+
 
   private async saveHashTags(postId: number, hashTags: HashTagDto[]): Promise<void> {
     await Promise.all(hashTags.map(async (hashTagDto) => {
