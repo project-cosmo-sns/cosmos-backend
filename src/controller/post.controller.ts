@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
+import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
 import { Roles } from 'src/common/roles/roles.decorator';
 import { CreatePostInfoDto } from 'src/dto/create-post-dto';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
@@ -22,6 +23,7 @@ export class PostController {
 
   @Roles('anyone')
   @ApiOperation({ summary: '포스트 목록' })
+  @ApiPaginatedResponse(PostListResponse)
   @Get('list')
   async getPostList(
     @Req() req,
