@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, InternalServerErrorException, NotFoundException, Param, ParseIntPipe, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
@@ -25,19 +25,30 @@ export class PostController {
   @Roles('anyone')
   @ApiOperation({ summary: '포스트 목록' })
   @ApiPaginatedResponse(PostListResponse)
+  @ApiResponse({ status: 401, description: '로그인 하지 않고 [기수순, 팔로우순]으로 정렬했을 경우' })
+  @ApiResponse({ status: 404, description: '사용자를 찾을 수 없는 경우' })
   @Get('list')
   async getPostList(
     @Req() req,
     @Query() sortPostList: SortPostList
   ): Promise<PaginationResponse<PostListResponse>> {
     const userId = req.user?.id;
-    const { postInfo, totalCount } = await this.postService.getPostList(userId, sortPostList);
-    return PaginationResponse.of({
-      data: PostListResponse.from(postInfo),
-      options: sortPostList,
-      totalCount,
-    })
+    try {
+      const { postInfo, totalCount } = await this.postService.getPostList(userId, sortPostList);
+      return PaginationResponse.of({
+        data: PostListResponse.from(postInfo),
+        options: sortPostList,
+        totalCount,
+      });
+    } catch (error) {
+      if (error instanceof UnauthorizedException || error instanceof NotFoundException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('서버 오류가 발생했습니다.');
+      }
+    }
   }
+
 
   @ApiOperation({ summary: '포스트 상세' })
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
