@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { json } from 'express';
 import { GithubAuthGuard } from 'src/guard/github-auth.guard';
 
 @ApiTags('OauthLogin')
@@ -16,5 +17,7 @@ export class OauthAuthenticationController {
   @ApiQuery({ name: 'code', required: true, description: '깃허브 oauth 후 받은 code' })
   @Post('/github/redirect')
   @UseGuards(GithubAuthGuard)
-  async handleRedirect() {}
+  async handleRedirect(@Res() res) {
+    return res.json();
+  }
 }

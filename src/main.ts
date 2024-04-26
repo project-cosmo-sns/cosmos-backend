@@ -8,11 +8,14 @@ import * as passport from 'passport';
 import { ConfigService } from '@nestjs/config';
 import { createClient } from 'redis';
 import RedisStore from 'connect-redis';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 declare const module: any;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
+  app.set('trust proxy', 1);
+
   const configService = app.get(ConfigService);
 
   const redisClient = createClient({
