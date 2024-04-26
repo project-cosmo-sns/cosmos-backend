@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
 import { GetPostList } from 'src/dto/get-post-list.dto';
-import { GetPostDetail, GetPostDetailDto } from 'src/dto/get-post-detail.dto';
+import { GetPostDetailDto } from 'src/dto/get-post-detail.dto';
 import { ListSortBy } from 'src/entity/common/Enums';
 
 @Injectable()
@@ -36,7 +36,6 @@ export class PostService {
     })
     await this.saveHashTags(post.id, dto.hashTags);
   }
-
   async getPostList(memberId: number, sortPostList: SortPostList) {
     const sortBy = sortPostList.sortBy;
     if (typeof memberId === 'undefined' && (sortBy === ListSortBy.BY_FOLLOW || sortBy === ListSortBy.BY_GENERATION)) {
