@@ -32,11 +32,11 @@ export class PostCommentService {
       throw new GoneException('해당 포스트는 삭제되었습니다.');
     }
     post.plusCount(post.commentCount);
+    await this.postRepository.save(post);
     await this.postCommentRepository.save({
       postId: postId,
       memberId: memberId,
       content: content
     })
-    await this.postRepository.save(post);
   }
 }
