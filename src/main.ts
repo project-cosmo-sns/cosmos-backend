@@ -47,7 +47,9 @@ async function bootstrap() {
         maxAge: 1000 * 60 * 60 * 24,
         domain: configService.get('SESSION_COOKIE_DOMAIN'),
         path: '/',
-        httpOnly: false,
+        httpOnly: true,
+        secure: true,
+        samesite: 'none',
       },
     }),
   );
