@@ -37,6 +37,7 @@ import { PostCommentService } from './service/post-comment.service';
 import { PostCommentController } from './controller/post-comment.controller';
 import { PostComment } from './entity/post_comment.entity';
 import { PostCommentHeart } from './entity/post_comment_heart.entity';
+import { PostView } from './entity/post_view.entity';
 
 @Module({
   imports: [
@@ -56,7 +57,8 @@ import { PostCommentHeart } from './entity/post_comment_heart.entity';
       PostCommentHeart,
       PostHashTag,
       HashTag,
-      Follow
+      Follow,
+      PostView
     ]),
     PassportModule.register({
       session: true,
