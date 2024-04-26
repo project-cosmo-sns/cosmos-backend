@@ -58,6 +58,7 @@ async function bootstrap() {
   app.enableCors({
     origin: ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://localhost', 'https://alpha.cosmo-sns.com'],
     credentials: true,
+    exposedHeaders: ['set-cookie'],
   });
 
   const config = new DocumentBuilder()
