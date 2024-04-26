@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
 import { Roles } from 'src/common/roles/roles.decorator';
 import { CreatePostInfoDto } from 'src/dto/create-post-dto';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
+import { PostDetailResponse } from 'src/dto/response/post-detail.response';
 import { PostListResponse } from 'src/dto/response/post-list.response';
 import { RolesGuard } from 'src/guard/roles.guard';
 import { PostService } from 'src/service/post.service';
@@ -35,5 +36,14 @@ export class PostController {
       options: sortPostList,
       totalCount,
     })
+  }
+  
+  @ApiOperation({ summary: '포스트 상세' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @ApiResponse({ type: PostDetailResponse })
+  @Get(':postId/detail')
+  async getPostDetail(@Param('postId', ParseIntPipe) postId: number): Promise<PostDetailResponse> {
+    const postDetail = await this.postService.getPostDetail(postId);
+    return PostDetailResponse.from(postDetail);
   }
 }

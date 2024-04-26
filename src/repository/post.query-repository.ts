@@ -4,8 +4,10 @@ import { plainToInstance } from 'class-transformer';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { ListSortBy } from 'src/entity/common/Enums';
 import { Follow } from 'src/entity/follow.entity';
+import { HashTag } from 'src/entity/hash_tag.entity';
 import { Member } from 'src/entity/member.entity';
 import { Post } from 'src/entity/post.entity';
+import { PostHashTag } from 'src/entity/post_hash_tag.entity';
 import { DataSource } from 'typeorm';
 
 @Injectable()
@@ -79,6 +81,42 @@ export class PostQueryRepository {
 
     return query;
   }
+
+  async getPostDetail(postId: number): Promise<GetPostDetailTuple> {
+    const postDetail = await this.dataSource
+      .createQueryBuilder()
+      .from(Post, 'post')
+      .innerJoin(Member, 'member', 'post.member_id = member.id')
+      .where('post.id = :postId', { postId })
+      .select([
+        'member.id as memberId',
+        'member.nickname as nickname',
+        'member.profile_image_url as profileImageUrl',
+        'post.id as postId',
+        'post.title as title',
+        'post.content as content',
+        'post.emoji_count as emojiCount',
+        'post.comment_count as commentCount',
+        'post.view_count as viewCount',
+        'member.deleted_at as memberDeletedAt'
+      ])
+      .getRawOne()
+    return plainToInstance(GetPostDetailTuple, postDetail);
+  }
+
+  async getPostDetailHashTag(postId: number): Promise<GetPostDetailHashTagTuple[]> {
+    const postDetailHashTag = await this.dataSource
+      .createQueryBuilder()
+      .from(HashTag, 'hash_tag')
+      .innerJoin(PostHashTag, 'post_hash_tag', 'post_hash_tag.hash_tag_id = hash_tag.id')
+      .where('post_hash_tag.post_id = :postId', { postId })
+      .select([
+        'hash_tag.tagName as tagName',
+        'hash_tag.color as color'
+      ])
+      .getRawMany()
+    return plainToInstance(GetPostDetailHashTagTuple, postDetailHashTag);
+  }
 }
 
 export class GetPostListTuple {
@@ -93,4 +131,23 @@ export class GetPostListTuple {
   emojiCount!: number;
   commentCount!: number;
   viewCount!: number;
+}
+
+export class GetPostDetailTuple {
+  memberId!: number;
+  nickname!: string;
+  profileImageUrl!: string;
+  createdAt!: Date;
+  postId!: number;
+  title!: string;
+  content!: string;
+  emojiCount!: number;
+  commentCount!: number;
+  viewCount!: number;
+  memberDeletedAt!: Date;
+}
+
+export class GetPostDetailHashTagTuple {
+  tagName: string;
+  color: string;
 }
