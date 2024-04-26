@@ -4,8 +4,10 @@ import { plainToInstance } from 'class-transformer';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { ListSortBy } from 'src/entity/common/Enums';
 import { Follow } from 'src/entity/follow.entity';
+import { HashTag } from 'src/entity/hash_tag.entity';
 import { Member } from 'src/entity/member.entity';
 import { Post } from 'src/entity/post.entity';
+import { PostHashTag } from 'src/entity/post_hash_tag.entity';
 import { DataSource } from 'typeorm';
 
 @Injectable()
@@ -101,6 +103,20 @@ export class PostQueryRepository {
       .getRawOne()
     return plainToInstance(GetPostDetailTuple, postDetail);
   }
+
+  async getPostDetailHashTag(postId: number): Promise<GetPostDetailHashTagTuple[]> {
+    const postDetailHashTag = await this.dataSource
+      .createQueryBuilder()
+      .from(HashTag, 'hash_tag')
+      .innerJoin(PostHashTag, 'post_hash_tag', 'post_hash_tag.hash_tag_id = hash_tag.id')
+      .where('post_hash_tag.post_id = :postId', { postId })
+      .select([
+        'hash_tag.tagName as tagName',
+        'hash_tag.color as color'
+      ])
+      .getRawMany()
+    return plainToInstance(GetPostDetailHashTagTuple, postDetailHashTag);
+  }
 }
 
 export class GetPostListTuple {
@@ -129,4 +145,9 @@ export class GetPostDetailTuple {
   commentCount!: number;
   viewCount!: number;
   memberDeletedAt!: Date;
+}
+
+export class GetPostDetailHashTagTuple {
+  tagName: string;
+  color: string;
 }

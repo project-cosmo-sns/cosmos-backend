@@ -66,17 +66,9 @@ export class PostService {
       throw new GoneException('해당 글 작성자가 존재하지 않습니다.');
     }
 
-    const postHashTagInfo = await this.postHashTagRepository.findBy({ postId });
-    const hashTagInfo = await Promise.all(
-      postHashTagInfo.map(async (postHashTag) => {
-        const hashTag = await this.hashTagRepository.findOneBy({ id: postHashTag.hashTagId });
-        if (hashTag) {
-          return { tagName: hashTag.tagName, color: hashTag.color };
-        }
-        return {};
-      })
-    );
-    return new GetPostDetailDto(postDetailInfo, hashTagInfo);
+    const postDetailHashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postId);
+
+    return new GetPostDetailDto(postDetailInfo, postDetailHashTagInfo);
   }
 
 
