@@ -64,4 +64,13 @@ export class PostController {
   async deletePostInfo(@Req() req, @Param('postId', ParseIntPipe) postId: number): Promise<void> {
     return this.postService.deletePost(postId, req.user.id);
   }
+
+  @Roles('anyone')
+  @ApiOperation({ summary: '포스트 조회수 증가' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @Post(':postId/view-count/increase')
+  async increasePostViewCount(@Req() req, @Param('postId', ParseIntPipe) postId: number): Promise<void> {
+    const userId = req.user?.id;
+    return this.postService.increasePostViewCount(postId, userId);
+  }
 }

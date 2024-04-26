@@ -39,6 +39,10 @@ export class Post {
     this.deletedAt = deletedAt;
   }
 
+  plusPostViewCount(viewCount: number) {
+    this.viewCount = viewCount + 1;
+  }
+
   plusCommentCount(commentCount: number) {
     this.commentCount = commentCount + 1;
   }
