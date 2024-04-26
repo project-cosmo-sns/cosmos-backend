@@ -38,4 +38,8 @@ export class Post {
   deletePostInfo(deletedAt?: Date) {
     this.deletedAt = deletedAt;
   }
+
+  plusCount(commentCount: number) {
+    this.commentCount = commentCount + 1;
+  }
 }

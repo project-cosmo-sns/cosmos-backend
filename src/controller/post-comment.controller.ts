@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
@@ -30,5 +30,16 @@ export class PostCommentController {
       options: paginationRequest,
       totalCount,
     })
+  }
+
+  @ApiOperation({ summary: '포스트 댓글 쓰기' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @Post(':postId/write')
+  async writePostComment(
+    @Param('postId', ParseIntPipe) postId: number,
+    @Req() req,
+    @Body('content') content: string,
+  ): Promise<void> {
+    return this.postCommentService.writePostComment(postId, req.user.id, content);
   }
 }
