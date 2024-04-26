@@ -6,6 +6,8 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import { ConfigService } from '@nestjs/config';
+import { createClient } from 'redis';
+import RedisStore from 'connect-redis';
 
 declare const module: any;
 
@@ -15,13 +17,30 @@ async function bootstrap() {
   });
   const configService = app.get(ConfigService);
 
+  const redisClient = createClient({
+    socket: {
+      host: configService.get('REDIS_HOST'),
+      port: configService.get('REDIS_PORT'),
+    },
+    password: configService.get('REDIS_PASSWORD'),
+  });
+  redisClient
+    .connect()
+    .then(() => console.log('redis connect'))
+    .catch(console.error);
+
+  const redisStore = new RedisStore({
+    client: redisClient,
+    prefix: 'cosmo-sns:',
+  });
+
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
   app.use(
     session({
       name: configService.get('COOKIE_NAME'),
       secret: configService.get('COOKIE_SECRET'),
-      // store: redisStore,
+      store: redisStore,
       resave: false,
       saveUninitialized: false,
       cookie: {
