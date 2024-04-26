@@ -56,7 +56,7 @@ async function bootstrap() {
   app.use(passport.session());
 
   app.enableCors({
-    origin: ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://alpha.cosmo-sns.com'],
+    origin: ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://localhost', 'https://alpha.cosmo-sns.com'],
     credentials: true,
   });
 
