@@ -1,4 +1,4 @@
-import { Body, Controller, Get, InternalServerErrorException, NotFoundException, Param, ParseIntPipe, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, InternalServerErrorException, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
@@ -49,7 +49,6 @@ export class PostController {
     }
   }
 
-
   @ApiOperation({ summary: '포스트 상세' })
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
   @ApiResponse({ type: PostDetailResponse })
@@ -57,5 +56,12 @@ export class PostController {
   async getPostDetail(@Param('postId', ParseIntPipe) postId: number): Promise<PostDetailResponse> {
     const postDetail = await this.postService.getPostDetail(postId);
     return PostDetailResponse.from(postDetail);
+  }
+
+  @ApiOperation({ summary: '포스트 삭제' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @Delete(':postId')
+  async deletePostInfo(@Req() req, @Param('postId', ParseIntPipe) postId: number): Promise<void> {
+    return this.postService.deletePost(postId, req.user.id);
   }
 }
