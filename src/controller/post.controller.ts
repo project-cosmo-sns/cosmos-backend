@@ -26,22 +26,22 @@ export class PostController {
   @ApiOperation({ summary: '포스트 목록' })
   @ApiPaginatedResponse(PostListResponse)
   @ApiResponse({ status: 401, description: '로그인 하지 않고 [기수순, 팔로우순]으로 정렬했을 경우' })
-  @ApiResponse({ status: 404, description: '사용자를 찾을 수 없는 경우' })
   @Get('list')
   async getPostList(
     @Req() req,
     @Query() sortPostList: SortPostList
   ): Promise<PaginationResponse<PostListResponse>> {
     const userId = req.user?.id;
+    const userGeneration = req.user?.generation;
     try {
-      const { postInfo, totalCount } = await this.postService.getPostList(userId, sortPostList);
+      const { postInfo, totalCount } = await this.postService.getPostList(userId, userGeneration, sortPostList);
       return PaginationResponse.of({
         data: PostListResponse.from(postInfo),
         options: sortPostList,
         totalCount,
       });
     } catch (error) {
-      if (error instanceof UnauthorizedException || error instanceof NotFoundException) {
+      if (error instanceof UnauthorizedException) {
         throw error;
       } else {
         throw new InternalServerErrorException('서버 오류가 발생했습니다.');

@@ -36,22 +36,13 @@ export class PostService {
     })
     await this.saveHashTags(post.id, dto.hashTags);
   }
-  async getPostList(memberId: number, sortPostList: SortPostList) {
+  async getPostList(memberId: number, userGeneration: number, sortPostList: SortPostList) {
     const sortBy = sortPostList.sortBy;
     if (typeof memberId === 'undefined' && (sortBy === ListSortBy.BY_FOLLOW || sortBy === ListSortBy.BY_GENERATION)) {
       throw new UnauthorizedException('로그인이 필요합니다.');
     }
-
-    let memberGeneration = -999;
-    if (memberId) {
-      const member = await this.memberRepository.findOneBy({ id: memberId });
-      if (!member) {
-        throw new NotFoundException('사용자를 찾을 수 없습니다.');
-      }
-      memberGeneration = member.generation;
-    }
-    const postListTuples = await this.postQueryRepository.getPostList(memberId, sortPostList, sortBy, memberGeneration);
-    const totalCount = await this.postQueryRepository.getAllPostListTotalCount(memberId, sortPostList, sortBy, memberGeneration);
+    const postListTuples = await this.postQueryRepository.getPostList(memberId, sortPostList, sortBy, userGeneration);
+    const totalCount = await this.postQueryRepository.getAllPostListTotalCount(memberId, sortPostList, sortBy, userGeneration);
 
     const postInfo = postListTuples.map((postList) =>
       GetPostList.from(postList));
