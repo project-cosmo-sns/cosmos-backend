@@ -30,14 +30,15 @@ export class PostController {
     @Req() req,
     @Query() sortPostList: SortPostList
   ): Promise<PaginationResponse<PostListResponse>> {
-    const { postInfo, totalCount } = await this.postService.getPostList(req.user.id, sortPostList);
+    const userId = req.user?.id;
+    const { postInfo, totalCount } = await this.postService.getPostList(userId, sortPostList);
     return PaginationResponse.of({
       data: PostListResponse.from(postInfo),
       options: sortPostList,
       totalCount,
     })
   }
-  
+
   @ApiOperation({ summary: '포스트 상세' })
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
   @ApiResponse({ type: PostDetailResponse })

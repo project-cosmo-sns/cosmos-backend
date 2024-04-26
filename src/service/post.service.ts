@@ -1,4 +1,4 @@
-import { GoneException, Injectable, NotFoundException } from '@nestjs/common';
+import { GoneException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashTagDto } from 'src/dto/hash-tag-dto';
 import { CreatePostInfoDto } from 'src/dto/create-post-dto';
@@ -11,6 +11,7 @@ import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
 import { GetPostList } from 'src/dto/get-post-list.dto';
 import { GetPostDetail, GetPostDetailDto } from 'src/dto/get-post-detail.dto';
+import { ListSortBy } from 'src/entity/common/Enums';
 
 @Injectable()
 export class PostService {
@@ -38,14 +39,21 @@ export class PostService {
 
   async getPostList(memberId: number, sortPostList: SortPostList) {
     const sortBy = sortPostList.sortBy;
-
-    const member = await this.memberRepository.findOneBy({ id: memberId });
-    if (!member) {
-      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    if (typeof memberId === 'undefined' && (sortBy === ListSortBy.BY_FOLLOW || sortBy === ListSortBy.BY_GENERATION)) {
+      throw new UnauthorizedException('로그인이 필요합니다.');
     }
-    const memberGeneration = member.generation;
+
+    let memberGeneration = -999;
+    if (memberId) {
+      const member = await this.memberRepository.findOneBy({ id: memberId });
+      if (!member) {
+        throw new NotFoundException('사용자를 찾을 수 없습니다.');
+      }
+      memberGeneration = member.generation;
+    }
     const postListTuples = await this.postQueryRepository.getPostList(memberId, sortPostList, sortBy, memberGeneration);
     const totalCount = await this.postQueryRepository.getAllPostListTotalCount(memberId, sortPostList, sortBy, memberGeneration);
+
     const postInfo = postListTuples.map((postList) =>
       GetPostList.from(postList));
 
