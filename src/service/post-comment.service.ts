@@ -31,7 +31,7 @@ export class PostCommentService {
     if (post.deletedAt !== null) {
       throw new GoneException('해당 포스트는 삭제되었습니다.');
     }
-    post.plusCount(post.commentCount);
+    post.plusCommentCount(post.commentCount);
     await this.postRepository.save(post);
     await this.postCommentRepository.save({
       postId: postId,
