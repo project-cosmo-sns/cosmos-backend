@@ -15,7 +15,7 @@ export class Member {
   profileImageUrl: string;
 
   @Column({ name: 'generation', type: 'int', nullable: true })
-  generation?: number;
+  generation: number;
 
   @Column({ name: 'introduce', length: 200, nullable: true })
   introduce?: string;
