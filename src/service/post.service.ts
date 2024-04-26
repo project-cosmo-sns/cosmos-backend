@@ -69,6 +69,19 @@ export class PostService {
     return new GetPostDetailDto(postDetailInfo, postDetailHashTagInfo);
   }
 
+  async deletePost(postId: number, memberId: number): Promise<void> {
+    const postInfo = await this.postRepository.findOneBy({ id: postId });
+    if (!postInfo) {
+      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+    }
+    if (postInfo.memberId !== memberId) {
+      throw new UnauthorizedException('해당 포스트를 작성한 사용자가 아닙니다.');
+    }
+
+    postInfo.deletePostInfo(new Date())
+    await this.postRepository.save(postInfo);
+  }
+
 
   private async saveHashTags(postId: number, hashTags: HashTagDto[]): Promise<void> {
     await Promise.all(hashTags.map(async (hashTagDto) => {

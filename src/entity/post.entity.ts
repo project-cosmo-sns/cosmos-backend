@@ -20,10 +20,10 @@ export class Post {
   @Column({ name: 'view_count', nullable: false })
   viewCount!: number;
 
-  @Column({name:'emoji_count', nullable: false})
+  @Column({ name: 'emoji_count', nullable: false })
   emojiCount!: number;
 
-  @Column({name:'comment_count', nullable: false})
+  @Column({ name: 'comment_count', nullable: false })
   commentCount!: number;
 
   @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
@@ -34,4 +34,8 @@ export class Post {
 
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', nullable: false })
   updatedAt!: Date;
+
+  deletePostInfo(deletedAt?: Date) {
+    this.deletedAt = deletedAt;
+  }
 }
