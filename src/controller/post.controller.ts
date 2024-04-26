@@ -10,7 +10,7 @@ import { PostListResponse } from 'src/dto/response/post-list.response';
 import { RolesGuard } from 'src/guard/roles.guard';
 import { PostService } from 'src/service/post.service';
 
-@ApiTags('Post')
+@ApiTags('포스트')
 @Controller('post')
 @UseGuards(RolesGuard)
 export class PostController {
