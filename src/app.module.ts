@@ -32,6 +32,11 @@ import { FeedCommentController } from './controller/feed-comment.controller';
 import { FeedCommentService } from './service/feed-comment.service';
 import { FeedCommentQueryRepository } from './repository/feed-comment.query-repository';
 import { FeedCommentHeart } from './entity/feed_comment_heart';
+import { PostCommentQueryRepository } from './repository/post-comment.query-repository';
+import { PostCommentService } from './service/post-comment.service';
+import { PostCommentController } from './controller/post-comment.controller';
+import { PostComment } from './entity/post_comment.entity';
+import { PostCommentHeart } from './entity/post_comment_heart.entity';
 
 @Module({
   imports: [
@@ -47,6 +52,8 @@ import { FeedCommentHeart } from './entity/feed_comment_heart';
       FeedComment,
       FeedCommentHeart,
       Post,
+      PostComment,
+      PostCommentHeart,
       PostHashTag,
       HashTag,
       Follow
@@ -61,6 +68,7 @@ import { FeedCommentHeart } from './entity/feed_comment_heart';
     FeedController,
     FeedCommentController,
     PostController,
+    PostCommentController,
   ],
   providers: [
     // Service
@@ -70,12 +78,14 @@ import { FeedCommentHeart } from './entity/feed_comment_heart';
     FeedService,
     FeedCommentService,
     PostService,
+    PostCommentService,
 
     // QueryRepository
     MemberQueryRepository,
     FeedQueryRepository,
     FeedCommentQueryRepository,
     PostQueryRepository,
+    PostCommentQueryRepository,
 
     // Strategy
     GithubStrategy,
