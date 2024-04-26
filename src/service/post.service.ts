@@ -75,7 +75,7 @@ export class PostService {
       throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
     }
     if (postInfo.memberId !== memberId) {
-      throw new UnauthorizedException('해당 포스트를 작성한 사용자가 아닙니다.');
+      throw new UnauthorizedException('권한이 없습니다.');
     }
 
     postInfo.deletePostInfo(new Date())
