@@ -12,9 +12,7 @@ import RedisStore from 'connect-redis';
 declare const module: any;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    bufferLogs: true,
-  });
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
   const configService = app.get(ConfigService);
 
   const redisClient = createClient({
@@ -49,7 +47,7 @@ async function bootstrap() {
         path: '/',
         httpOnly: true,
         secure: true,
-        samesite: 'none',
+        sameSite: 'None',
       },
     }),
   );
