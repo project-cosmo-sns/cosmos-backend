@@ -63,4 +63,32 @@ export class PostCommentService {
     commentInfo.setCommentInfo(content);
     await this.postCommentRepository.save(commentInfo);
   }
+
+  async deletePostComment(postId: number, commentId: number, memberId: number) {
+    const post = await this.postRepository.findOneBy({ id: postId });
+    if (!post) {
+      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+    }
+    if (post.deletedAt !== null) {
+      throw new GoneException('해당 포스트는 삭제되었습니다.');
+    }
+    const commentInfo = await this.postCommentRepository.findOneBy({ id: commentId, postId });
+    if (!commentInfo) {
+      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+    }
+    if (commentInfo.memberId !== memberId) {
+      throw new UnauthorizedException('접근 권한이 없습니다.');
+    }
+    if (commentInfo.deletedAt !== null) {
+      throw new GoneException('해당 댓글은 삭제되었습니다.');
+    }
+
+    post.minusCommentCount(post.commentCount);
+    await this.postRepository.save(post);
+
+    commentInfo.deleteCommentInfo(new Date());
+    await this.postCommentRepository.save(commentInfo);
+
+
+  }
 }

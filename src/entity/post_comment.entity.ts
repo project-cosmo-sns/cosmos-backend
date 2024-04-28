@@ -29,4 +29,8 @@ export class PostComment {
   setCommentInfo(content: string) {
     this.content = content;
   }
+
+  deleteCommentInfo(deletedAt: Date) {
+    this.deletedAt = deletedAt;
+  }
 }

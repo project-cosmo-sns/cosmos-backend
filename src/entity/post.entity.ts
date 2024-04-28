@@ -47,5 +47,8 @@ export class Post {
     this.commentCount = commentCount + 1;
   }
 
+  minusCommentCount(commentCount: number) {
+    this.commentCount = commentCount - 1;
+  }
 
 }
