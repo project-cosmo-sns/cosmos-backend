@@ -65,7 +65,6 @@ export class PostCommentController {
     }
   }
 
-  @Roles('anyone')
   @ApiOperation({ summary: '포스트 댓글 삭제' })
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
   @ApiParam({ name: 'commentId', required: true, description: '포스트 댓글 id' })
@@ -77,7 +76,7 @@ export class PostCommentController {
     @Param('commentId', ParseIntPipe) commentId: number,
     @Req() req
   ): Promise<void> {
-    try { return this.postCommentService.deletePostComment(postId, commentId, 2); }
+    try { return this.postCommentService.deletePostComment(postId, commentId, req.user.id); }
 
     catch (error) {
       if (error instanceof UnauthorizedException || error instanceof GoneException) {
