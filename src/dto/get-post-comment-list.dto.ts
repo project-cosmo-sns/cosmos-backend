@@ -1,4 +1,5 @@
-import { GetPostCommentTuple } from 'src/repository/post-comment.query-repository';
+import { GetPostCommentTuple } from "src/repository/post.query-repository";
+
 
 export class GetPostCommentList {
   memberId!: number;

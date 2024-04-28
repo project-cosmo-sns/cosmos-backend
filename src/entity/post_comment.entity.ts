@@ -33,4 +33,12 @@ export class PostComment {
   deleteCommentInfo(deletedAt: Date) {
     this.deletedAt = deletedAt;
   }
+
+  plusCommentHeartCount(heartCount: number) {
+    this.heartCount = heartCount + 1;
+  }
+
+  minusCommentHeartCount(heartCount: number) {
+    this.heartCount = heartCount - 1;
+  }
 }

@@ -13,6 +13,10 @@ import { GetPostList } from 'src/dto/get-post-list.dto';
 import { GetPostDetailDto } from 'src/dto/get-post-detail.dto';
 import { ListSortBy } from 'src/entity/common/Enums';
 import { PostView } from 'src/entity/post_view.entity';
+import { PostComment } from 'src/entity/post_comment.entity';
+import { PostCommentHeart } from 'src/entity/post_comment_heart.entity';
+import { PaginationRequest } from 'src/common/pagination/pagination-request';
+import { GetPostCommentList } from 'src/dto/get-post-comment-list.dto';
 
 @Injectable()
 export class PostService {
@@ -22,6 +26,8 @@ export class PostService {
     @InjectRepository(HashTag) private readonly hashTagRepository: Repository<HashTag>,
     @InjectRepository(PostHashTag) private readonly postHashTagRepository: Repository<PostHashTag>,
     @InjectRepository(PostView) private readonly postViewRepository: Repository<PostView>,
+    @InjectRepository(PostComment) private readonly postCommentRepository: Repository<PostComment>,
+    @InjectRepository(PostCommentHeart) private readonly postCommentHeartRepository: Repository<PostCommentHeart>,
     private readonly postQueryRepository: PostQueryRepository,
   ) { }
 
@@ -115,5 +121,126 @@ export class PostService {
         hashTagId: hashTagInfo.id,
       });
     }));
+  }
+
+  async getPostCommentList(postId: number, memberId: number, paginationRequest: PaginationRequest) {
+    const postCommentList = await this.postQueryRepository.getPostCommentList(postId, memberId, paginationRequest);
+    const totalCount = await this.postQueryRepository.getPostCommentListCount(postId);
+
+    const postCommentInfo = postCommentList.map((commentList) =>
+      GetPostCommentList.from(commentList));
+    return { postCommentInfo, totalCount };
+  }
+
+  async writePostComment(postId: number, memberId: number, content: string): Promise<void> {
+    const post = await this.postRepository.findOneBy({ id: postId });
+    if (!post) {
+      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+    }
+    if (post.deletedAt !== null) {
+      throw new GoneException('해당 포스트는 삭제되었습니다.');
+    }
+    post.plusCommentCount(post.commentCount);
+    await this.postRepository.save(post);
+    await this.postCommentRepository.save({
+      postId: postId,
+      memberId: memberId,
+      content: content
+    })
+  }
+
+  async patchPostComment(postId: number, commentId: number, memberId: number, content: string): Promise<void> {
+    const post = await this.postRepository.findOneBy({ id: postId });
+    if (!post) {
+      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+    }
+    if (post.deletedAt !== null) {
+      throw new GoneException('해당 포스트는 삭제되었습니다.');
+    }
+
+    const commentInfo = await this.postCommentRepository.findOneBy({ id: commentId, postId });
+    if (!commentInfo) {
+      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+    }
+    if (commentInfo.memberId !== memberId) {
+      throw new UnauthorizedException('접근 권한이 없습니다.');
+    }
+    if (commentInfo.deletedAt !== null) {
+      throw new GoneException('해당 댓글은 삭제되었습니다.');
+    }
+
+    commentInfo.setCommentInfo(content);
+    await this.postCommentRepository.save(commentInfo);
+  }
+
+  async deletePostComment(postId: number, commentId: number, memberId: number): Promise<void> {
+    const post = await this.postRepository.findOneBy({ id: postId });
+    if (!post) {
+      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+    }
+    if (post.deletedAt !== null) {
+      throw new GoneException('해당 포스트는 삭제되었습니다.');
+    }
+    const commentInfo = await this.postCommentRepository.findOneBy({ id: commentId, postId });
+    if (!commentInfo) {
+      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+    }
+    if (commentInfo.memberId !== memberId) {
+      throw new UnauthorizedException('접근 권한이 없습니다.');
+    }
+    if (commentInfo.deletedAt !== null) {
+      throw new GoneException('해당 댓글은 삭제되었습니다.');
+    }
+
+    post.minusCommentCount(post.commentCount);
+    await this.postRepository.save(post);
+
+    commentInfo.deleteCommentInfo(new Date());
+    await this.postCommentRepository.save(commentInfo);
+  }
+
+  async heartPostComment(postId: number, commentId: number, memberId: number): Promise<void> {
+    const post = await this.postRepository.findOneBy({ id: postId });
+    if (!post) {
+      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+    }
+    if (post.deletedAt !== null) {
+      throw new GoneException('해당 포스트는 삭제되었습니다.');
+    }
+    const commentInfo = await this.postCommentRepository.findOneBy({ id: commentId, postId });
+    if (!commentInfo) {
+      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+    }
+    if (commentInfo.deletedAt !== null) {
+      throw new GoneException('해당 댓글은 삭제되었습니다.');
+    }
+    commentInfo.plusCommentHeartCount(commentInfo.heartCount);
+    await this.postCommentRepository.save(commentInfo);
+
+    await this.postCommentHeartRepository.save({ commentId, memberId });
+  }
+
+  async deletePostCommentHeart(postId: number, commentId: number, memberId: number) {
+    const post = await this.postRepository.findOneBy({ id: postId });
+    if (!post) {
+      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+    }
+    if (post.deletedAt !== null) {
+      throw new GoneException('해당 포스트는 삭제되었습니다.');
+    }
+    const commentInfo = await this.postCommentRepository.findOneBy({ id: commentId, postId });
+    if (!commentInfo) {
+      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+    }
+    if (commentInfo.deletedAt !== null) {
+      throw new GoneException('해당 댓글은 삭제되었습니다.');
+    }
+    const commentHeartInfo = await this.postCommentHeartRepository.findOneBy({ commentId, memberId });
+    if (!commentHeartInfo) {
+      throw new NotFoundException('해당 댓글 좋아요를 찾을 수 없습니다.');
+    }
+    commentInfo.minusCommentHeartCount(commentInfo.heartCount);
+    await this.postCommentRepository.save(commentInfo);
+    await this.postCommentHeartRepository.remove(commentHeartInfo);
   }
 }
