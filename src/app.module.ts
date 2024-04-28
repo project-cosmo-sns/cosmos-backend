@@ -38,6 +38,8 @@ import { PostCommentController } from './controller/post-comment.controller';
 import { PostComment } from './entity/post_comment.entity';
 import { PostCommentHeart } from './entity/post_comment_heart.entity';
 import { PostView } from './entity/post_view.entity';
+import { ImageController } from './controller/image.controller';
+import { ImageService } from './service/image.service';
 
 @Module({
   imports: [
@@ -58,7 +60,7 @@ import { PostView } from './entity/post_view.entity';
       PostHashTag,
       HashTag,
       Follow,
-      PostView
+      PostView,
     ]),
     PassportModule.register({
       session: true,
@@ -71,6 +73,7 @@ import { PostView } from './entity/post_view.entity';
     FeedCommentController,
     PostController,
     PostCommentController,
+    ImageController,
   ],
   providers: [
     // Service
@@ -81,6 +84,7 @@ import { PostView } from './entity/post_view.entity';
     FeedCommentService,
     PostService,
     PostCommentService,
+    ImageService,
 
     // QueryRepository
     MemberQueryRepository,
@@ -100,4 +104,4 @@ import { PostView } from './entity/post_view.entity';
     Logger,
   ],
 })
-export class AppModule { }
+export class AppModule {}
