@@ -8,13 +8,11 @@ import * as passport from 'passport';
 import { ConfigService } from '@nestjs/config';
 import { createClient } from 'redis';
 import RedisStore from 'connect-redis';
-import { NestExpressApplication } from '@nestjs/platform-express';
 
 declare const module: any;
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
-  app.set('trust proxy', 1);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
   const configService = app.get(ConfigService);
 
@@ -48,9 +46,8 @@ async function bootstrap() {
         maxAge: 1000 * 60 * 60 * 24,
         domain: configService.get('SESSION_COOKIE_DOMAIN'),
         path: '/',
-        httpOnly: false,
-        secure: true,
-        sameSite: 'None',
+        httpOnly: true,
+        secure: false,
       },
     }),
   );
@@ -59,9 +56,14 @@ async function bootstrap() {
   app.use(passport.session());
 
   app.enableCors({
-    origin: ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://localhost', 'https://alpha.cosmo-sns.com'],
+    origin: [
+      'https://localhost:3000',
+      'https://127.0.0.1:3000',
+      'https://localhost',
+      'https://local.cosmo-sns.com',
+      'https://alpha.cosmo-sns.com',
+    ],
     credentials: true,
-    exposedHeaders: ['set-cookie'],
   });
 
   const config = new DocumentBuilder()
