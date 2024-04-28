@@ -1,10 +1,12 @@
-import { Body, Controller, Delete, Get, InternalServerErrorException, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, GoneException, InternalServerErrorException, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { ApiGoneResponse, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
 import { Roles } from 'src/common/roles/roles.decorator';
 import { CreatePostInfoDto } from 'src/dto/create-post-dto';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
+import { PostCommentListResponse } from 'src/dto/response/post-comment-list.response';
 import { PostDetailResponse } from 'src/dto/response/post-detail.response';
 import { PostListResponse } from 'src/dto/response/post-list.response';
 import { RolesGuard } from 'src/guard/roles.guard';
@@ -72,5 +74,120 @@ export class PostController {
   async increasePostViewCount(@Req() req, @Param('postId', ParseIntPipe) postId: number): Promise<void> {
     const userId = req.user?.id;
     return this.postService.increasePostViewCount(postId, userId);
+  }
+
+  @ApiOperation({ summary: '포스트 댓글 목록' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @ApiPaginatedResponse(PostCommentListResponse)
+  @Get(':postId/comment/list')
+  async getPostCommentList(
+    @Req() req,
+    @Query() paginationRequest: PaginationRequest,
+    @Param('postId', ParseIntPipe) postId: number
+  ): Promise<PaginationResponse<PostCommentListResponse>> {
+    const { postCommentInfo, totalCount } = await this.postService.getPostCommentList(postId, req.user.id, paginationRequest);
+    return PaginationResponse.of({
+      data: PostCommentListResponse.from(postCommentInfo),
+      options: paginationRequest,
+      totalCount,
+    })
+  }
+
+  @ApiOperation({ summary: '포스트 댓글 쓰기' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @Post(':postId/comment/write')
+  async writePostComment(
+    @Param('postId', ParseIntPipe) postId: number,
+    @Req() req,
+    @Body('content') content: string,
+  ): Promise<void> {
+    return this.postService.writePostComment(postId, req.user.id, content);
+  }
+
+  @ApiOperation({ summary: '포스트 댓글 수정' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @ApiParam({ name: 'commentId', required: true, description: '포스트 댓글 id' })
+  @ApiUnauthorizedResponse({ status: 401, description: '해당 댓글을 작성한 사람이 아닐 경우' })
+  @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었거나, 댓글이 삭제된 경우' })
+  @Patch(':postId/comment/:commentId/modify')
+  async modifyPostComment(
+    @Param('postId', ParseIntPipe) postId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Req() req,
+    @Body('content') content: string,
+  ): Promise<void> {
+    try { return this.postService.patchPostComment(postId, commentId, req.user.id, content); }
+    catch (error) {
+      if (error instanceof UnauthorizedException || error instanceof GoneException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('서버 오류가 발생했습니다.');
+      }
+    }
+  }
+
+  @ApiOperation({ summary: '포스트 댓글 삭제' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @ApiParam({ name: 'commentId', required: true, description: '포스트 댓글 id' })
+  @ApiUnauthorizedResponse({ status: 401, description: '해당 댓글을 작성한 사람이 아닐 경우' })
+  @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었거나, 댓글이 삭제된 경우' })
+  @Delete(':postId/comment/:commentId')
+  async removePostComment(
+    @Param('postId', ParseIntPipe) postId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Req() req
+  ): Promise<void> {
+    try { return this.postService.deletePostComment(postId, commentId, req.user.id); }
+
+    catch (error) {
+      if (error instanceof UnauthorizedException || error instanceof GoneException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('서버 오류가 발생했습니다.');
+      }
+    }
+  }
+
+  @ApiOperation({ summary: '포스트 댓글 좋아요' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @ApiParam({ name: 'commentId', required: true, description: '포스트 댓글 id' })
+  @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었거나, 댓글이 삭제된 경우' })
+  @Post(':postId/comment/:commentId/like')
+  async likePostComment(
+    @Param('postId', ParseIntPipe) postId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Req() req,
+  ): Promise<void> {
+    try {
+      return this.postService.heartPostComment(postId, commentId, req.user.id);
+    }
+    catch (error) {
+      if (error instanceof GoneException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('서버 오류가 발생했습니다.');
+      }
+    }
+  }
+
+  @ApiOperation({ summary: '포스트 댓글 좋아요 취소' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @ApiParam({ name: 'commentId', required: true, description: '포스트 댓글 id' })
+  @ApiUnauthorizedResponse({ status: 401, description: '해당 댓글 좋아요를 누른 사람이 아닐 경우' })
+  @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었거나, 댓글이 삭제된 경우' })
+  @Delete(':postId/comment/:commentId/like')
+  async removePostCommentHeart(
+    @Param('postId', ParseIntPipe) postId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Req() req,
+  ): Promise<void> {
+    try { return this.postService.deletePostCommentHeart(postId, commentId, req.user.id); }
+    catch (error) {
+      if (error instanceof UnauthorizedException || error instanceof GoneException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('서버 오류가 발생했습니다.');
+      }
+    }
   }
 }
