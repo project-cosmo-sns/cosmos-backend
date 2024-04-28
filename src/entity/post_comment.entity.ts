@@ -37,4 +37,8 @@ export class PostComment {
   plusCommentHeartCount(heartCount: number) {
     this.heartCount = heartCount + 1;
   }
+
+  minusCommentHeartCount(heartCount: number) {
+    this.heartCount = heartCount - 1;
+  }
 }

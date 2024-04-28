@@ -112,4 +112,28 @@ export class PostCommentService {
 
     await this.postCommentHeartRepository.save({ commentId, memberId });
   }
+
+  async deletePostCommentHeart(postId: number, commentId: number, memberId: number) {
+    const post = await this.postRepository.findOneBy({ id: postId });
+    if (!post) {
+      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+    }
+    if (post.deletedAt !== null) {
+      throw new GoneException('해당 포스트는 삭제되었습니다.');
+    }
+    const commentInfo = await this.postCommentRepository.findOneBy({ id: commentId, postId });
+    if (!commentInfo) {
+      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+    }
+    if (commentInfo.deletedAt !== null) {
+      throw new GoneException('해당 댓글은 삭제되었습니다.');
+    }
+    const commentHeartInfo = await this.postCommentHeartRepository.findOneBy({ commentId, memberId });
+    if (!commentHeartInfo) {
+      throw new NotFoundException('해당 댓글 좋아요를 찾을 수 없습니다.');
+    }
+    commentInfo.minusCommentHeartCount(commentInfo.heartCount);
+    await this.postCommentRepository.save(commentInfo);
+    await this.postCommentHeartRepository.remove(commentHeartInfo);
+  }
 }

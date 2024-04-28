@@ -108,4 +108,25 @@ export class PostCommentController {
       }
     }
   }
+
+  @ApiOperation({ summary: '포스트 댓글 좋아요 취소' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @ApiParam({ name: 'commentId', required: true, description: '포스트 댓글 id' })
+  @ApiUnauthorizedResponse({ status: 401, description: '해당 댓글 좋아요를 누른 사람이 아닐 경우' })
+  @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었거나, 댓글이 삭제된 경우' })
+  @Delete(':postId/:commentId/like')
+  async removePostCommentHeart(
+    @Param('postId', ParseIntPipe) postId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Req() req,
+  ): Promise<void> {
+    try { return this.postCommentService.deletePostCommentHeart(postId, commentId, req.user.id); }
+    catch (error) {
+      if (error instanceof UnauthorizedException || error instanceof GoneException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('서버 오류가 발생했습니다.');
+      }
+    }
+  }
 }
