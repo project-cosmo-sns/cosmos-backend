@@ -60,7 +60,7 @@ async function bootstrap() {
       'https://localhost:3000',
       'https://127.0.0.1:3000',
       'https://localhost',
-      'https://local.cosmo-sns.com',
+      'https://local.cosmo-sns.com:3000',
       'https://alpha.cosmo-sns.com',
     ],
     credentials: true,
