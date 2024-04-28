@@ -25,4 +25,8 @@ export class PostComment {
 
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', nullable: false })
   updatedAt!: Date;
+
+  setCommentInfo(content: string) {
+    this.content = content;
+  }
 }
