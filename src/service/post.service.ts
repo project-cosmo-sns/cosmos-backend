@@ -44,6 +44,7 @@ export class PostService {
     })
     await this.saveHashTags(post.id, dto.hashTags);
   }
+
   async getPostList(memberId: number, userGeneration: number, sortPostList: SortPostList) {
     const sortBy = sortPostList.sortBy;
     if (typeof memberId === 'undefined' && (sortBy === ListSortBy.BY_FOLLOW || sortBy === ListSortBy.BY_GENERATION)) {
@@ -108,17 +109,18 @@ export class PostService {
 
   private async saveHashTags(postId: number, hashTags: HashTagDto[]): Promise<void> {
     await Promise.all(hashTags.map(async (hashTagDto) => {
-      let hashTagInfo = await this.hashTagRepository.findOneBy({ tagName: hashTagDto.tagName, color: hashTagDto.color });
-
-      if (!hashTagInfo) {
-        hashTagInfo = await this.hashTagRepository.save({
+      let tagId = hashTagDto.hashTagId;
+      if (!hashTagDto.hashTagId) {
+        const newHashTag = await this.hashTagRepository.save({
           tagName: hashTagDto.tagName,
           color: hashTagDto.color,
         });
+        tagId = newHashTag.id;
       }
+
       await this.postHashTagRepository.save({
-        postId: postId,
-        hashTagId: hashTagInfo.id,
+        postId,
+        hashTagId: tagId,
       });
     }));
   }
