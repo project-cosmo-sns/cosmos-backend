@@ -17,6 +17,8 @@ import { PostComment } from 'src/entity/post_comment.entity';
 import { PostCommentHeart } from 'src/entity/post_comment_heart.entity';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { GetPostCommentList } from 'src/dto/get-post-comment-list.dto';
+import { HashTagSearchRequest } from 'src/dto/request/hash-tag-search.request';
+import { GetHashTagSearch } from 'src/dto/get-hash-tag-search.dto';
 
 @Injectable()
 export class PostService {
@@ -244,5 +246,11 @@ export class PostService {
     commentInfo.minusCommentHeartCount(commentInfo.heartCount);
     await this.postCommentRepository.save(commentInfo);
     await this.postCommentHeartRepository.remove(commentHeartInfo);
+  }
+
+  async getHashTagSearchInfo(hashTagResult: HashTagSearchRequest) {
+    const hashTagSearchTuples = await this.postQueryRepository.getHashTagSearchList(hashTagResult);
+    const hashTagSearchInfo = hashTagSearchTuples.map((hashTagSearch) => GetHashTagSearch.from(hashTagSearch));
+    return hashTagSearchInfo;
   }
 }

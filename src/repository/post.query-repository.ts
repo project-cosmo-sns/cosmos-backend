@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Transform, plainToInstance } from 'class-transformer';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
+import { HashTagSearchRequest } from 'src/dto/request/hash-tag-search.request';
 import { ListSortBy } from 'src/entity/common/Enums';
 import { Follow } from 'src/entity/follow.entity';
 import { HashTag } from 'src/entity/hash_tag.entity';
@@ -165,6 +166,18 @@ export class PostQueryRepository {
       .andWhere('member.deletedAt IS NULL')
       .andWhere('post_comment.post_id = :postId', { postId });
   }
+
+  async getHashTagSearchList(search: HashTagSearchRequest): Promise<GetHashTagSearchTuple[]> {
+    const searchResult = await this.dataSource
+      .createQueryBuilder()
+      .from(HashTag, 'hash_Tag')
+      .select(['tag_name as tagName'])
+      .where(`tag_name LIKE '%${search.searchWord}%'`)
+      .limit(10)
+      .getRawMany()
+
+    return plainToInstance(GetHashTagSearchTuple, searchResult);
+  }
 }
 
 export class GetPostListTuple {
@@ -211,4 +224,8 @@ export class GetPostCommentTuple {
   createdAt: Date;
   @Transform(({ value }) => Boolean(value))
   isHearted: boolean;
+}
+
+export class GetHashTagSearchTuple {
+  tagName!: string;
 }
