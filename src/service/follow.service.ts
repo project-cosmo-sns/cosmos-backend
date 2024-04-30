@@ -1,4 +1,4 @@
-import { ConflictException, GoneException, Injectable } from "@nestjs/common";
+import { ConflictException, GoneException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from '@nestjs/typeorm';
 import { GetFollowerList } from "src/dto/get-follower-list";
 import { GetFollowingList } from "src/dto/get-following-list";
@@ -24,8 +24,19 @@ export class FollowService {
     if (memberInfo?.deletedAt !== null) {
       throw new GoneException('탈퇴한 유저입니다.');
     }
-    if (followingMemberId)
-      await this.followRepository.save({ followerMemberId, followingMemberId });
+    await this.followRepository.save({ followerMemberId, followingMemberId });
+  }
+
+  async unFollowMember(followingMemberId: number, followerMemberId: number): Promise<void> {
+    const followInfo = await this.followRepository.findOneBy({ followerMemberId, followingMemberId });
+    if (!followInfo) {
+      throw new NotFoundException('팔로우 되어 있지 않습니다.');
+    }
+    const memberInfo = await this.memberRepository.findOneBy({ id: followingMemberId });
+    if (memberInfo?.deletedAt !== null) {
+      throw new GoneException('탈퇴한 유저입니다.');
+    }
+    await this.followRepository.remove(followInfo);
   }
 
   async getFollowerLists(memberId: number) {
