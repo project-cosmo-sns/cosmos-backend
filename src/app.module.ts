@@ -38,6 +38,9 @@ import { PostView } from './entity/post_view.entity';
 import { ImageController } from './controller/image.controller';
 import { ImageService } from './service/image.service';
 import { PostEmoji } from './entity/post_emoji.entity';
+import { FollowController } from './controller/follow.controller';
+import { FollowService } from './service/follow.service';
+import { FollowQueryRepository } from './repository/follow.query-repository';
 
 @Module({
   imports: [
@@ -72,6 +75,7 @@ import { PostEmoji } from './entity/post_emoji.entity';
     FeedCommentController,
     PostController,
     ImageController,
+    FollowController,
   ],
   providers: [
     // Service
@@ -82,12 +86,14 @@ import { PostEmoji } from './entity/post_emoji.entity';
     FeedCommentService,
     PostService,
     ImageService,
+    FollowService,
 
     // QueryRepository
     MemberQueryRepository,
     FeedQueryRepository,
     FeedCommentQueryRepository,
     PostQueryRepository,
+    FollowQueryRepository,
 
     // Strategy
     GithubStrategy,
