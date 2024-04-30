@@ -19,6 +19,7 @@ import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { GetPostCommentList } from 'src/dto/get-post-comment-list.dto';
 import { HashTagSearchRequest } from 'src/dto/request/hash-tag-search.request';
 import { GetHashTagSearch } from 'src/dto/get-hash-tag-search.dto';
+import { PostEmoji } from 'src/entity/post_emoji.entity';
 
 @Injectable()
 export class PostService {
@@ -30,6 +31,7 @@ export class PostService {
     @InjectRepository(PostView) private readonly postViewRepository: Repository<PostView>,
     @InjectRepository(PostComment) private readonly postCommentRepository: Repository<PostComment>,
     @InjectRepository(PostCommentHeart) private readonly postCommentHeartRepository: Repository<PostCommentHeart>,
+    @InjectRepository(PostEmoji) private readonly postEmojiRepository: Repository<PostEmoji>,
     private readonly postQueryRepository: PostQueryRepository,
   ) { }
 
@@ -93,6 +95,24 @@ export class PostService {
     await this.postRepository.save(postInfo);
   }
 
+  async createPostEmoji(postId: number, memberId: number, emoji: string) {
+    const postInfo = await this.postRepository.findOneBy({ id: postId });
+    if (!postInfo) {
+      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+    }
+    if (postInfo.deletedAt !== null) {
+      throw new GoneException('해당 포스트는 삭제되었습니다.');
+    }
+
+    postInfo.plusEmojiCount(postInfo.emojiCount);
+    await this.postRepository.save(postInfo);
+
+    await this.postEmojiRepository.save({
+      postId,
+      memberId,
+      emoji
+    });
+  }
 
   async increasePostViewCount(postId: number, memberId: number): Promise<void> {
     const postInfo = await this.postRepository.findOneBy({ id: postId });

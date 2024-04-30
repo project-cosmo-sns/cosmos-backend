@@ -51,4 +51,11 @@ export class Post {
     this.commentCount = commentCount - 1;
   }
 
+  plusEmojiCount(emojiCount: number) {
+    this.emojiCount = emojiCount + 1;
+  }
+
+  minusEmojiCount(emojiCount: number) {
+    this.emojiCount = emojiCount - 1;
+  }
 }

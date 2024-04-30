@@ -69,6 +69,19 @@ export class PostController {
     return this.postService.deletePost(postId, req.user.id);
   }
 
+
+  @ApiOperation({ summary: '포스트 이모지 추가' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었을 경우' })
+  @Post(':postId/emoji')
+  async createPostEmoji(
+    @Req() req,
+    @Param('postId', ParseIntPipe) postId: number,
+    @Body('emoji') emoji: string,
+  ): Promise<void> {
+    return this.postService.createPostEmoji(postId, req.user.id, emoji);
+  }
+
   @Roles('anyone')
   @ApiOperation({ summary: '포스트 조회수 증가' })
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
