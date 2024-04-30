@@ -5,8 +5,10 @@ import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
 import { Roles } from 'src/common/roles/roles.decorator';
 import { PostFeedRequestDto } from 'src/dto/request/post-feed.request.dto';
+import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
 import { RolesGuard } from 'src/guard/roles.guard';
+import { FeedCommentService } from 'src/service/feed-comment.service';
 import { FeedService } from 'src/service/feed.service';
 
 @ApiTags('피드')
@@ -15,6 +17,7 @@ import { FeedService } from 'src/service/feed.service';
 export class FeedController {
   constructor(
     private readonly feedService: FeedService,
+    private readonly feedCommentService: FeedCommentService,
   ) {}
 
   @ApiOperation({ summary: '피드 작성' })
@@ -45,5 +48,27 @@ export class FeedController {
     const feed = await this.feedService.getFeedDetail(feedId);
 
     return feed;
+  }
+
+  @ApiOperation({ summary: '피드 댓글 목록' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
+  @ApiPaginatedResponse(GetFeedCommentResponseDto)
+  @Get('/:feedId/comment/list')
+  async getFeedComment(
+    @Req() req,
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @Query() paginationRequest: PaginationRequest,
+  ): Promise<PaginationResponse<GetFeedCommentResponseDto>> {
+    const { commentList, totalCount } = await this.feedCommentService.getFeedCommentList(
+      feedId,
+      req.user.id,
+      paginationRequest,
+    );
+
+    return PaginationResponse.of({
+      data: commentList,
+      options: paginationRequest,
+      totalCount,
+    });
   }
 }
