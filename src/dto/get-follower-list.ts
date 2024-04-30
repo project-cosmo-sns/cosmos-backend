@@ -1,4 +1,4 @@
-import { GetFollowerTuple } from "src/repository/follow.query-repository";
+import { GetFollowTuple } from "src/repository/follow.query-repository";
 
 export class GetFollowerList {
   memberId!: number;
@@ -17,7 +17,7 @@ export class GetFollowerList {
     this.generation = generation;
     this.profileImageUrl = profileImageUrl;
   }
-  static from(tuple: GetFollowerTuple) {
+  static from(tuple: GetFollowTuple) {
     return new GetFollowerList(
       tuple.memberId,
       tuple.nickname,

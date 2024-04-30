@@ -8,7 +8,7 @@ import { plainToInstance } from 'class-transformer';
 export class FollowQueryRepository {
   constructor(private readonly dataSource: DataSource) { }
 
-  async getFollowerQuery(memberId: number): Promise<GetFollowerTuple[]> {
+  async getFollowerQuery(memberId: number): Promise<GetFollowTuple[]> {
     const followerListInfo = await this.dataSource
       .createQueryBuilder()
       .from(Follow, 'follow')
@@ -21,12 +21,12 @@ export class FollowQueryRepository {
       ])
       .where('follow.follower_member_id = :memberId', { memberId })
       .getRawMany()
-    return plainToInstance(GetFollowerTuple, followerListInfo);
+    return plainToInstance(GetFollowTuple, followerListInfo);
   }
 
 }
 
-export class GetFollowerTuple {
+export class GetFollowTuple {
   memberId!: number;
   nickname!: string;
   generation!: number;
