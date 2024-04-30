@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
@@ -48,6 +48,13 @@ export class FeedController {
     const feed = await this.feedService.getFeedDetail(feedId);
 
     return feed;
+  }
+
+  @ApiOperation({ summary: '피드 삭제' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
+  @Delete(':feedId')
+  async deleteFeed(@Req() req, @Param('feedId', ParseIntPipe) feedId: number): Promise<void> {
+    return this.feedService.deleteFeed(feedId, req.user.id);
   }
 
   @ApiOperation({ summary: '피드 댓글 목록' })
