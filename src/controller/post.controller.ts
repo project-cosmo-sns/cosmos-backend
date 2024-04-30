@@ -5,7 +5,9 @@ import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
 import { Roles } from 'src/common/roles/roles.decorator';
 import { CreatePostInfoDto } from 'src/dto/create-post-dto';
+import { HashTagSearchRequest } from 'src/dto/request/hash-tag-search.request';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
+import { HashTagSearchResponse } from 'src/dto/response/hash-tag-search.response';
 import { PostCommentListResponse } from 'src/dto/response/post-comment-list.response';
 import { PostDetailResponse } from 'src/dto/response/post-detail.response';
 import { PostListResponse } from 'src/dto/response/post-list.response';
@@ -189,5 +191,15 @@ export class PostController {
         throw new InternalServerErrorException('서버 오류가 발생했습니다.');
       }
     }
+  }
+
+  @ApiOperation({ summary: '해시태그 검색' })
+  @ApiResponse({ type: HashTagSearchResponse })
+  @Get('search/hashTag')
+  async searchHashTag(
+    @Query() hashTagSearchRequest: HashTagSearchRequest
+  ): Promise<HashTagSearchResponse[]> {
+    const hashTagSearchResult = await this.postService.getHashTagSearchInfo(hashTagSearchRequest);
+    return HashTagSearchResponse.from(hashTagSearchResult);
   }
 }
