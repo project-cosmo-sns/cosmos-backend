@@ -64,6 +64,18 @@ export class FeedQueryRepository {
       .where('feed.deletedAt IS NULL')
       .andWhere('member.deletedAt IS NULL');
   }
+
+  async getIsNotDeletedFeed(feedId: number): Promise<Feed | undefined> {
+    const feed = this.dataSource
+      .createQueryBuilder()
+      .from(Feed, 'feed')
+      .where('feed.id = :feedId', { feedId })
+      .andWhere('feed.deletedAt IS NULL')
+      .select('feed')
+      .getOne();
+
+    return plainToInstance(Feed, feed);
+  }
 }
 
 export class GetFeedTuple {

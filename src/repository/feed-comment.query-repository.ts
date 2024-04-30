@@ -55,6 +55,18 @@ export class FeedCommentQueryRepository {
       .andWhere('member.deletedAt IS NULL')
       .andWhere('feedComment.feed_id = :feedId', { feedId });
   }
+
+  async getIsNotDeletedFeedComment(feedCommentId: number): Promise<FeedComment | undefined> {
+    const feedComment = this.dataSource
+      .createQueryBuilder()
+      .from(FeedComment, 'feedComment')
+      .where('feedComment.id = :feedCommentId', { feedCommentId })
+      .andWhere('feedComment.deletedAt IS NULL')
+      .select('feedComment')
+      .getOne();
+
+    return plainToInstance(FeedComment, feedComment);
+  }
 }
 
 export class GetFeedCommentTuple {

@@ -28,7 +28,6 @@ import { PostController } from './controller/post.controller';
 import { Follow } from './entity/follow.entity';
 import { PostQueryRepository } from './repository/post.query-repository';
 import { FeedComment } from './entity/feed_comment.entity';
-import { FeedCommentController } from './controller/feed-comment.controller';
 import { FeedCommentService } from './service/feed-comment.service';
 import { FeedCommentQueryRepository } from './repository/feed-comment.query-repository';
 import { FeedCommentHeart } from './entity/feed_comment_heart';
@@ -65,14 +64,7 @@ import { PostEmoji } from './entity/post_emoji.entity';
       session: true,
     }),
   ],
-  controllers: [
-    AppController,
-    OauthAuthenticationController,
-    FeedController,
-    FeedCommentController,
-    PostController,
-    ImageController,
-  ],
+  controllers: [AppController, OauthAuthenticationController, FeedController, PostController, ImageController],
   providers: [
     // Service
     AppService,

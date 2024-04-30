@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
@@ -74,6 +74,22 @@ export class FeedService {
         createdAt: feed.feedCreatedAt,
       },
     );
+  }
+
+  async deleteFeed(feedId: number, memberId: number): Promise<void> {
+    const feedInfo = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
+
+    if (!feedInfo) {
+      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+    }
+
+    if (feedInfo.memberId !== memberId) {
+      throw new UnauthorizedException('권한이 없습니다.');
+    }
+
+    feedInfo.deleteFeed(new Date());
+
+    await this.feedRepository.save(feedInfo);
   }
 }
 
