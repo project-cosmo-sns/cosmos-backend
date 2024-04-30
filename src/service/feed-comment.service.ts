@@ -1,5 +1,5 @@
 import { FeedCommentQueryRepository } from './../repository/feed-comment.query-repository';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { GoneException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
@@ -67,6 +67,27 @@ export class FeedCommentService {
       memberId,
       content,
     });
+  }
+
+  async patchFeedComment(feedId: number, commentId: number, memberId: number, content: string): Promise<void> {
+    const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
+
+    if (!feed) {
+      throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
+    }
+
+    const feedComment = await this.feedCommentQueryRepository.getIsNotDeletedFeedComment(commentId);
+
+    if (!feedComment) {
+      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+    }
+
+    if (feedComment.memberId !== memberId) {
+      throw new UnauthorizedException('접근 권한이 없습니다.');
+    }
+
+    feedComment.setCommentContent(content);
+    await this.feedCommentRepository.save(feedComment);
   }
 }
 

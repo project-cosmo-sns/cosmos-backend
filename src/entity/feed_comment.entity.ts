@@ -25,4 +25,8 @@ export class FeedComment {
 
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', nullable: false })
   updatedAt!: Date;
+
+  setCommentContent(content: string) {
+    this.content = content;
+  }
 }
