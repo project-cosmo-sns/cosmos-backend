@@ -66,12 +66,15 @@ export class FeedQueryRepository {
   }
 
   async getIsNotDeletedFeed(feedId: number): Promise<Feed | undefined> {
-    return this.dataSource
+    const feed = this.dataSource
       .createQueryBuilder()
       .from(Feed, 'feed')
       .where('feed.id = :feedId', { feedId })
       .andWhere('feed.deletedAt IS NULL')
-      .getRawOne();
+      .select('feed')
+      .getOne();
+
+    return plainToInstance(Feed, feed);
   }
 }
 

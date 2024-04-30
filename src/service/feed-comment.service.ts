@@ -1,11 +1,21 @@
 import { FeedCommentQueryRepository } from './../repository/feed-comment.query-repository';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
+import { Feed } from 'src/entity/feed.entity';
+import { FeedComment } from 'src/entity/feed_comment.entity';
+import { FeedQueryRepository } from 'src/repository/feed.query-repository';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class FeedCommentService {
-  constructor(private readonly feedCommentQueryRepository: FeedCommentQueryRepository) {}
+  constructor(
+    @InjectRepository(Feed) private readonly feedRepository: Repository<Feed>,
+    @InjectRepository(FeedComment) private readonly feedCommentRepository: Repository<FeedComment>,
+    private readonly feedQueryRepository: FeedQueryRepository,
+    private readonly feedCommentQueryRepository: FeedCommentQueryRepository,
+  ) {}
 
   async getFeedCommentList(
     feedId: number,
@@ -40,6 +50,23 @@ export class FeedCommentService {
     });
 
     return { commentList, totalCount };
+  }
+
+  async postFeedComment(feedId: number, memberId: number, content: string): Promise<void> {
+    const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
+
+    if (!feed) {
+      throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
+    }
+
+    feed.plusCommentCount(feed.commentCount);
+
+    await this.feedRepository.save(feed);
+    await this.feedCommentRepository.save({
+      feedId,
+      memberId,
+      content,
+    });
   }
 }
 

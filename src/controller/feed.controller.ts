@@ -78,4 +78,15 @@ export class FeedController {
       totalCount,
     });
   }
+
+  @ApiOperation({ summary: '피드 댓글 작성' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
+  @Post(':feedId/comment')
+  async postFeedComment(
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @Req() req,
+    @Body('content') content: string,
+  ): Promise<void> {
+    return this.feedCommentService.postFeedComment(feedId, req.user.id, content);
+  }
 }

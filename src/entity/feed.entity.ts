@@ -32,4 +32,12 @@ export class Feed {
   deleteFeed(deletedAt?: Date) {
     this.deletedAt = deletedAt;
   }
+
+  plusCommentCount(commentCount: number) {
+    this.commentCount = commentCount + 1;
+  }
+
+  minusCommentCount(commentCount: number) {
+    this.commentCount = commentCount - 1;
+  }
 }

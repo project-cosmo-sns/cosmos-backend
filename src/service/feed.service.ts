@@ -79,7 +79,7 @@ export class FeedService {
   async deleteFeed(feedId: number, memberId: number): Promise<void> {
     const feedInfo = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
 
-    if (!feedInfo || feedInfo.deletedAt !== null) {
+    if (!feedInfo) {
       throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
     }
 
@@ -88,6 +88,7 @@ export class FeedService {
     }
 
     feedInfo.deleteFeed(new Date());
+
     await this.feedRepository.save(feedInfo);
   }
 }
