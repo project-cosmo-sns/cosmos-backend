@@ -37,6 +37,7 @@ import { PostCommentHeart } from './entity/post_comment_heart.entity';
 import { PostView } from './entity/post_view.entity';
 import { ImageController } from './controller/image.controller';
 import { ImageService } from './service/image.service';
+import { PostEmoji } from './entity/post_emoji.entity';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { ImageService } from './service/image.service';
       HashTag,
       Follow,
       PostView,
+      PostEmoji,
     ]),
     PassportModule.register({
       session: true,
@@ -98,4 +100,4 @@ import { ImageService } from './service/image.service';
     Logger,
   ],
 })
-export class AppModule {}
+export class AppModule { }
