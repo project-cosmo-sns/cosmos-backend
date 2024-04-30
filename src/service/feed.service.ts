@@ -77,10 +77,12 @@ export class FeedService {
   }
 
   async deleteFeed(feedId: number, memberId: number): Promise<void> {
-    const feedInfo = await this.feedRepository.findOneBy({ id: feedId });
-    if (!feedInfo) {
+    const feedInfo = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
+
+    if (!feedInfo || feedInfo.deletedAt !== null) {
       throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
     }
+
     if (feedInfo.memberId !== memberId) {
       throw new UnauthorizedException('권한이 없습니다.');
     }
