@@ -114,6 +114,29 @@ export class PostService {
     });
   }
 
+  async removePostEmoji(postId: number, memberId: number, emojiId: number) {
+    const postInfo = await this.postRepository.findOneBy({ id: postId });
+    if (!postInfo) {
+      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+    }
+    if (postInfo.deletedAt !== null) {
+      throw new GoneException('해당 포스트는 삭제되었습니다.');
+    }
+
+    const emojiInfo = await this.postEmojiRepository.findOneBy({ id: emojiId });
+    if (!emojiInfo) {
+      throw new NotFoundException('해당 이모지를 찾을 수 없습니다.');
+    }
+    if (emojiInfo.memberId !== memberId) {
+      throw new UnauthorizedException('삭제 권한이 없습니다.');
+    }
+
+    postInfo.minusEmojiCount(postInfo.emojiCount);
+    await this.postRepository.save(postInfo);
+
+    await this.postEmojiRepository.remove(emojiInfo);
+  }
+
   async increasePostViewCount(postId: number, memberId: number): Promise<void> {
     const postInfo = await this.postRepository.findOneBy({ id: postId });
     if (!postInfo) {
