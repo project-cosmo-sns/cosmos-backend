@@ -1,5 +1,5 @@
-import { Controller, Get, Param, ParseIntPipe, Req, UseGuards } from "@nestjs/common";
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Controller, Get, Param, ParseIntPipe, Post, Req, UseGuards } from "@nestjs/common";
+import { ApiConflictResponse, ApiGoneResponse, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { FollowerResponse } from "src/dto/response/follower.response";
 import { FollowingResponse } from "src/dto/response/following.response";
 import { RolesGuard } from "src/guard/roles.guard";
@@ -10,6 +10,17 @@ import { FollowService } from "src/service/follow.service";
 @UseGuards(RolesGuard)
 export class FollowController {
   constructor(private readonly followService: FollowService) { }
+
+  @ApiOperation({ summary: '팔로우' })
+  @ApiConflictResponse({ status: 409, description: '이미 팔로우 되어 있을 경우' })
+  @ApiGoneResponse({ status: 410, description: '팔로우할 유저가 탈퇴한 경우' })
+  @ApiParam({ name: 'memberId', required: true, description: '팔로우할 멤버 id' })
+  @Post(':memberId')
+  async postFollow(
+    @Param('memberId', ParseIntPipe) memberId: number,
+    @Req() req,): Promise<void> {
+    return this.followService.followMember(memberId, req.user.id);
+  }
 
   @ApiOperation({ summary: '팔로우 목록 (해당 member가 팔로우 하는 유저) ' })
   @ApiParam({ name: 'memberId', required: true, description: '멤버 id' })
@@ -32,5 +43,6 @@ export class FollowController {
     const followingList = await this.followService.getFollowingLists(memberId);
     return FollowingResponse.from(followingList);
   }
+
 
 }
