@@ -28,4 +28,16 @@ export class Feed {
 
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', nullable: false })
   updatedAt!: Date;
+
+  deleteFeed(deletedAt?: Date) {
+    this.deletedAt = deletedAt;
+  }
+
+  plusCommentCount(commentCount: number) {
+    this.commentCount = commentCount + 1;
+  }
+
+  minusCommentCount(commentCount: number) {
+    this.commentCount = commentCount - 1;
+  }
 }

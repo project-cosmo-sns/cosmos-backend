@@ -25,4 +25,20 @@ export class FeedComment {
 
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', nullable: false })
   updatedAt!: Date;
+
+  setCommentContent(content: string) {
+    this.content = content;
+  }
+
+  deleteComment(deletedAt: Date) {
+    this.deletedAt = deletedAt;
+  }
+
+  plusCommentHeartCount(heartCount: number) {
+    this.heartCount = heartCount + 1;
+  }
+
+  minusCommentHeartCount(heartCount: number) {
+    this.heartCount = heartCount - 1;
+  }
 }
