@@ -134,4 +134,26 @@ export class FeedController {
       }
     }
   }
+
+  @ApiOperation({ summary: '피드 댓글 삭제' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
+  @ApiParam({ name: 'commentId', required: true, description: '피드 댓글 id' })
+  @ApiUnauthorizedResponse({ status: 401, description: '해당 댓글을 작성한 사람이 아닐 경우' })
+  @ApiGoneResponse({ status: 410, description: '피드가 삭제되었거나, 댓글이 삭제된 경우' })
+  @Delete(':feedId/comment/:commentId')
+  async deleteFeedComment(
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Req() req,
+  ): Promise<void> {
+    try {
+      return this.feedCommentService.deleteFeedComment(feedId, commentId, req.user.id);
+    } catch (error) {
+      if (error instanceof UnauthorizedException || error instanceof GoneException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('서버 오류가 발생했습니다.');
+      }
+    }
+  }
 }

@@ -76,18 +76,42 @@ export class FeedCommentService {
       throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
     }
 
-    const feedComment = await this.feedCommentQueryRepository.getIsNotDeletedFeedComment(commentId);
+    const comment = await this.feedCommentQueryRepository.getIsNotDeletedFeedComment(commentId);
 
-    if (!feedComment) {
+    if (!comment) {
       throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
     }
 
-    if (feedComment.memberId !== memberId) {
+    if (comment.memberId !== memberId) {
       throw new UnauthorizedException('접근 권한이 없습니다.');
     }
 
-    feedComment.setCommentContent(content);
-    await this.feedCommentRepository.save(feedComment);
+    comment.setCommentContent(content);
+    await this.feedCommentRepository.save(comment);
+  }
+
+  async deleteFeedComment(feedId: number, commentId: number, memberId: number): Promise<void> {
+    const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
+
+    if (!feed) {
+      throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
+    }
+
+    const comment = await this.feedCommentQueryRepository.getIsNotDeletedFeedComment(commentId);
+
+    if (!comment) {
+      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+    }
+
+    if (comment.memberId !== memberId) {
+      throw new UnauthorizedException('접근 권한이 없습니다.');
+    }
+
+    feed.minusCommentCount(feed.commentCount);
+    await this.feedRepository.save(feed);
+
+    comment.deleteComment(new Date());
+    await this.feedCommentRepository.save(comment);
   }
 }
 

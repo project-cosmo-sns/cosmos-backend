@@ -29,4 +29,16 @@ export class FeedComment {
   setCommentContent(content: string) {
     this.content = content;
   }
+
+  deleteComment(deletedAt: Date) {
+    this.deletedAt = deletedAt;
+  }
+
+  plusCommentHeartCount(heartCount: number) {
+    this.heartCount = heartCount + 1;
+  }
+
+  minusCommentHeartCount(heartCount: number) {
+    this.heartCount = heartCount - 1;
+  }
 }
