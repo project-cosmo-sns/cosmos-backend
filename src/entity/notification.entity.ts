@@ -8,13 +8,10 @@ export class Notification {
   @Column({ name: 'member_id', nullable: false })
   memberId!: number;
 
-  @Column({ name: 'feed_id', nullable: true })
-  feedId?: number;
+  @Column({ name: 'send_member_id', nullable: false })
+  sendMemberId!: number;
 
-  @Column({ name: 'post_id', nullable: true })
-  postId?: number;
-
-  @Column({ name: 'notification_type', nullable: false, length: 45 })
+  @Column({ name: 'notification_type', nullable: false, length: 100 })
   notificationType!: string;
 
   @Column({ nullable: false, length: 200 })

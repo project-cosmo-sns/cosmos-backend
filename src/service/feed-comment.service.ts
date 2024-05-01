@@ -6,7 +6,9 @@ import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.res
 import { Feed } from 'src/entity/feed.entity';
 import { FeedComment } from 'src/entity/feed_comment.entity';
 import { FeedCommentHeart } from 'src/entity/feed_comment_heart';
+import { Notification } from 'src/entity/notification.entity';
 import { FeedQueryRepository } from 'src/repository/feed.query-repository';
+import { MemberQueryRepository } from 'src/repository/member.query-repository';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -15,8 +17,10 @@ export class FeedCommentService {
     @InjectRepository(Feed) private readonly feedRepository: Repository<Feed>,
     @InjectRepository(FeedComment) private readonly feedCommentRepository: Repository<FeedComment>,
     @InjectRepository(FeedCommentHeart) private readonly feedCommentHeartRepository: Repository<FeedCommentHeart>,
+    @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
     private readonly feedQueryRepository: FeedQueryRepository,
     private readonly feedCommentQueryRepository: FeedCommentQueryRepository,
+    private readonly memberQueryRepository: MemberQueryRepository,
   ) {}
 
   async getFeedCommentList(
@@ -64,11 +68,35 @@ export class FeedCommentService {
     feed.plusCommentCount(feed.commentCount);
 
     await this.feedRepository.save(feed);
-    await this.feedCommentRepository.save({
+    const comment = await this.feedCommentRepository.save({
       feedId,
       memberId,
       content,
     });
+
+    // 피드 댓글 알림 보내기
+    if (memberId === feed.memberId) {
+      return;
+    }
+
+    const sendMember = await this.memberQueryRepository.getMemberIsNotDeletedById(memberId);
+
+    if (!sendMember) {
+      throw new NotFoundException('해당 회원을 찾을 수 없습니다.');
+    }
+
+    const notification = new Notification();
+
+    notification.memberId = feed.memberId;
+    notification.sendMemberId = memberId;
+    notification.notificationType = JSON.stringify({
+      type: 'CREATE_FEED_COMMENT',
+      feedId: feed.id,
+      commentId: comment.id,
+    });
+    notification.content = `${sendMember.nickname}님이 회원님의 피드에 댓글을 남겼습니다.`;
+
+    await this.notificationRepository.save(notification);
   }
 
   async patchFeedComment(feedId: number, commentId: number, memberId: number, content: string): Promise<void> {
