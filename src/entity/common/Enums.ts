@@ -10,4 +10,5 @@ export enum ListSortBy {
 export enum NotificationType {
   CREATE_FEED_COMMENT = 'CREATE_FEED_COMMENT',
   CREATE_POST_COMMENT = 'CREATE_POST_COMMENT',
+  FOLLOW = 'FOLLOW',
 }
