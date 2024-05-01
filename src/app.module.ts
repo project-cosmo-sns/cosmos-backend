@@ -42,7 +42,7 @@ import { FollowService } from './service/follow.service';
 import { FollowQueryRepository } from './repository/follow.query-repository';
 import { FeedEmoji } from './entity/feed_emoji.entity';
 import { Notification } from './entity/notification.entity';
-import { NotificationDomainService } from './\bdomain-service/notification.domain-service';
+import { NotificationController } from './controller/notification.controller';
 
 @Module({
   imports: [
@@ -79,6 +79,7 @@ import { NotificationDomainService } from './\bdomain-service/notification.domai
     PostController,
     ImageController,
     FollowController,
+    NotificationController,
   ],
   providers: [
     // Service
@@ -90,9 +91,6 @@ import { NotificationDomainService } from './\bdomain-service/notification.domai
     PostService,
     ImageService,
     FollowService,
-
-    // DomainService
-    NotificationDomainService,
 
     // QueryRepository
     MemberQueryRepository,

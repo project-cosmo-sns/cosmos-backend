@@ -1,7 +1,6 @@
 import { FeedCommentQueryRepository } from './../repository/feed-comment.query-repository';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NotificationDomainService } from 'src/\bdomain-service/notification.domain-service';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
 import { NotificationType } from 'src/entity/common/Enums';
@@ -10,6 +9,7 @@ import { FeedComment } from 'src/entity/feed_comment.entity';
 import { FeedCommentHeart } from 'src/entity/feed_comment_heart';
 import { Notification } from 'src/entity/notification.entity';
 import { FeedQueryRepository } from 'src/repository/feed.query-repository';
+import { MemberQueryRepository } from 'src/repository/member.query-repository';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class FeedCommentService {
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
     private readonly feedQueryRepository: FeedQueryRepository,
     private readonly feedCommentQueryRepository: FeedCommentQueryRepository,
-    private readonly notificationDomainService: NotificationDomainService,
+    private readonly memberQueryRepository: MemberQueryRepository,
   ) {}
 
   async getFeedCommentList(
@@ -75,11 +75,7 @@ export class FeedCommentService {
       content,
     });
 
-    this.notificationDomainService.postNotification(feed.memberId, memberId, {
-      type: NotificationType.CREATE_FEED_COMMENT,
-      feedId: feed.id,
-      commentId: comment.id,
-    });
+    this.newFeedCommentNotification(feed.memberId, memberId, feedId, comment.id);
   }
 
   async patchFeedComment(feedId: number, commentId: number, memberId: number, content: string): Promise<void> {
@@ -167,6 +163,35 @@ export class FeedCommentService {
     comment.minusCommentHeartCount(comment.heartCount);
     await this.feedCommentRepository.save(comment);
     await this.feedCommentHeartRepository.remove(commentHeart);
+  }
+
+  private async newFeedCommentNotification(receivedMemberId, sendMemberId, feedId, commentId) {
+    if (receivedMemberId === sendMemberId) {
+      return;
+    }
+
+    try {
+      const sendMember = await this.memberQueryRepository.getMemberIsNotDeletedById(sendMemberId);
+
+      if (!sendMember) {
+        throw new NotFoundException('해당 회원을 찾을 수 없습니다.');
+      }
+
+      const notification = new Notification();
+
+      notification.memberId = receivedMemberId;
+      notification.sendMemberId = sendMemberId;
+      notification.notificationType = JSON.stringify({
+        type: NotificationType.CREATE_FEED_COMMENT,
+        feedId,
+        commentId,
+      });
+      notification.content = `${sendMember.nickname}님이 회원님의 피드에 댓글을 남겼습니다.`;
+
+      await this.notificationRepository.save(notification);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 

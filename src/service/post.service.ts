@@ -20,7 +20,8 @@ import { GetPostCommentList } from 'src/dto/get-post-comment-list.dto';
 import { HashTagSearchRequest } from 'src/dto/request/hash-tag-search.request';
 import { GetHashTagSearch } from 'src/dto/get-hash-tag-search.dto';
 import { PostEmoji } from 'src/entity/post_emoji.entity';
-import { NotificationDomainService } from 'src/\bdomain-service/notification.domain-service';
+import { MemberQueryRepository } from 'src/repository/member.query-repository';
+import { Notification } from 'src/entity/notification.entity';
 
 @Injectable()
 export class PostService {
@@ -33,8 +34,9 @@ export class PostService {
     @InjectRepository(PostComment) private readonly postCommentRepository: Repository<PostComment>,
     @InjectRepository(PostCommentHeart) private readonly postCommentHeartRepository: Repository<PostCommentHeart>,
     @InjectRepository(PostEmoji) private readonly postEmojiRepository: Repository<PostEmoji>,
+    @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
     private readonly postQueryRepository: PostQueryRepository,
-    private readonly notificationDomainService: NotificationDomainService,
+    private readonly memberQueryRepository: MemberQueryRepository,
   ) {}
 
   async createPost(memberId: number, dto: CreatePostInfoDto): Promise<void> {
@@ -202,11 +204,7 @@ export class PostService {
       content: content,
     });
 
-    this.notificationDomainService.postNotification(post.memberId, memberId, {
-      type: NotificationType.CREATE_POST_COMMENT,
-      postId: post.id,
-      commentId: comment.id,
-    });
+    this.newPostCommentNotification(post.memberId, memberId, postId, comment.id);
   }
 
   async patchPostComment(postId: number, commentId: number, memberId: number, content: string): Promise<void> {
@@ -308,5 +306,34 @@ export class PostService {
     const hashTagSearchTuples = await this.postQueryRepository.getHashTagSearchList(hashTagResult);
     const hashTagSearchInfo = hashTagSearchTuples.map((hashTagSearch) => GetHashTagSearch.from(hashTagSearch));
     return hashTagSearchInfo;
+  }
+
+  private async newPostCommentNotification(receivedMemberId, sendMemberId, postId, commentId) {
+    if (receivedMemberId === sendMemberId) {
+      return;
+    }
+
+    try {
+      const sendMember = await this.memberQueryRepository.getMemberIsNotDeletedById(sendMemberId);
+
+      if (!sendMember) {
+        throw new NotFoundException('해당 회원을 찾을 수 없습니다.');
+      }
+
+      const notification = new Notification();
+
+      notification.memberId = receivedMemberId;
+      notification.sendMemberId = sendMemberId;
+      notification.notificationType = JSON.stringify({
+        type: NotificationType.CREATE_POST_COMMENT,
+        postId,
+        commentId,
+      });
+      notification.content = `${sendMember.nickname}님이 회원님의 포스트에 댓글을 남겼습니다.`;
+
+      await this.notificationRepository.save(notification);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
