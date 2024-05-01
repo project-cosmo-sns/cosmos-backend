@@ -19,4 +19,16 @@ export class MemberQueryRepository {
 
     return plainToInstance(Member, member);
   }
+
+  async getMemberIsNotDeletedById(memberId: number): Promise<Member | undefined> {
+    const member = await this.dataSource
+      .createQueryBuilder()
+      .from(Member, 'member')
+      .where('member.id = :memberId', { memberId })
+      .andWhere('member.deletedAt IS NULL')
+      .select('member')
+      .getOne();
+
+    return plainToInstance(Member, member);
+  }
 }

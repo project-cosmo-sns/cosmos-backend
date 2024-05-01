@@ -41,6 +41,10 @@ import { FollowController } from './controller/follow.controller';
 import { FollowService } from './service/follow.service';
 import { FollowQueryRepository } from './repository/follow.query-repository';
 import { FeedEmoji } from './entity/feed_emoji.entity';
+import { Notification } from './entity/notification.entity';
+import { NotificationController } from './controller/notification.controller';
+import { NotificationService } from './service/notification.service';
+import { NotificationQueryRepository } from './repository/notification.query-repository';
 
 @Module({
   imports: [
@@ -64,6 +68,7 @@ import { FeedEmoji } from './entity/feed_emoji.entity';
       Follow,
       PostView,
       PostEmoji,
+      Notification,
     ]),
     PassportModule.register({
       session: true,
@@ -76,6 +81,7 @@ import { FeedEmoji } from './entity/feed_emoji.entity';
     PostController,
     ImageController,
     FollowController,
+    NotificationController,
   ],
   providers: [
     // Service
@@ -87,6 +93,7 @@ import { FeedEmoji } from './entity/feed_emoji.entity';
     PostService,
     ImageService,
     FollowService,
+    NotificationService,
 
     // QueryRepository
     MemberQueryRepository,
@@ -94,6 +101,7 @@ import { FeedEmoji } from './entity/feed_emoji.entity';
     FeedCommentQueryRepository,
     PostQueryRepository,
     FollowQueryRepository,
+    NotificationQueryRepository,
 
     // Strategy
     GithubStrategy,

@@ -26,6 +26,7 @@ import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
 import { Roles } from 'src/common/roles/roles.decorator';
+import { PostFeedCommentRequestDto } from 'src/dto/request/post-feed-comment.request';
 import { PostFeedRequestDto } from 'src/dto/request/post-feed.request.dto';
 import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
@@ -133,9 +134,9 @@ export class FeedController {
   async postFeedComment(
     @Param('feedId', ParseIntPipe) feedId: number,
     @Req() req,
-    @Body('content') content: string,
+    @Body() body: PostFeedCommentRequestDto,
   ): Promise<void> {
-    return this.feedCommentService.postFeedComment(feedId, req.user.id, content);
+    return this.feedCommentService.postFeedComment(feedId, req.user.id, body.content);
   }
 
   @ApiOperation({ summary: '피드 댓글 수정' })
