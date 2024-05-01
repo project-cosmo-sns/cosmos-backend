@@ -79,6 +79,18 @@ export class FeedController {
     return this.feedService.deleteFeed(feedId, req.user.id);
   }
 
+  @ApiOperation({ summary: '피드 이모지 추가' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
+  @ApiGoneResponse({ status: 410, description: '피드가 삭제되었을 경우' })
+  @Post(':feedId/emoji')
+  async createPostEmoji(
+    @Req() req,
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @Body('emoji') emoji: string,
+  ): Promise<void> {
+    return this.feedService.postFeedEmoji(feedId, req.user.id, emoji);
+  }
+
   @ApiOperation({ summary: '피드 댓글 목록' })
   @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
   @ApiPaginatedResponse(GetFeedCommentResponseDto)

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
 import { Feed } from 'src/entity/feed.entity';
+import { FeedEmoji } from 'src/entity/feed_emoji.entity';
 import { FeedQueryRepository } from 'src/repository/feed.query-repository';
 import { Repository } from 'typeorm';
 
@@ -10,6 +11,7 @@ import { Repository } from 'typeorm';
 export class FeedService {
   constructor(
     @InjectRepository(Feed) private readonly feedRepository: Repository<Feed>,
+    @InjectRepository(FeedEmoji) private readonly feedEmojiRepository: Repository<FeedEmoji>,
     private readonly feedQueryRepository: FeedQueryRepository,
   ) {}
 
@@ -90,6 +92,23 @@ export class FeedService {
     feedInfo.deleteFeed(new Date());
 
     await this.feedRepository.save(feedInfo);
+  }
+
+  async postFeedEmoji(feedId: number, memberId: number, emoji: string) {
+    const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
+
+    if (!feed) {
+      throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
+    }
+
+    feed.plusEmojiCount(feed.emojiCount);
+    await this.feedRepository.save(feed);
+
+    await this.feedEmojiRepository.save({
+      feedId,
+      memberId,
+      emoji,
+    });
   }
 }
 
