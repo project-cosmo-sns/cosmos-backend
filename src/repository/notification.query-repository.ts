@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { plainToInstance } from 'class-transformer';
+import { Transform, plainToInstance } from 'class-transformer';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { Member } from 'src/entity/member.entity';
 import { Notification } from 'src/entity/notification.entity';
@@ -46,6 +46,7 @@ class GetNotificationTuple {
   notificationId: number;
   content: string;
   notificationType: string;
+  @Transform(({ value }) => Boolean(value))
   isConfirmed: boolean;
   createdAt: Date;
 }
