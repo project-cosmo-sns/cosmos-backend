@@ -43,6 +43,8 @@ import { FollowQueryRepository } from './repository/follow.query-repository';
 import { FeedEmoji } from './entity/feed_emoji.entity';
 import { Notification } from './entity/notification.entity';
 import { NotificationController } from './controller/notification.controller';
+import { NotificationService } from './service/notification.service';
+import { NotificationQueryRepository } from './repository/notification.query-repository';
 
 @Module({
   imports: [
@@ -91,6 +93,7 @@ import { NotificationController } from './controller/notification.controller';
     PostService,
     ImageService,
     FollowService,
+    NotificationService,
 
     // QueryRepository
     MemberQueryRepository,
@@ -98,6 +101,7 @@ import { NotificationController } from './controller/notification.controller';
     FeedCommentQueryRepository,
     PostQueryRepository,
     FollowQueryRepository,
+    NotificationQueryRepository,
 
     // Strategy
     GithubStrategy,

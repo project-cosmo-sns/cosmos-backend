@@ -31,7 +31,7 @@ export class FollowService {
     }
     await this.followRepository.save({ followerMemberId, followingMemberId });
 
-    this.followNotification(followingMemberId, followerMemberId);
+    // this.followNotification(followingMemberId, followerMemberId);
   }
 
   async unFollowMember(followingMemberId: number, followerMemberId: number): Promise<void> {
