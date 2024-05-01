@@ -5,6 +5,7 @@ import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
 import { Feed } from 'src/entity/feed.entity';
 import { FeedComment } from 'src/entity/feed_comment.entity';
+import { FeedCommentHeart } from 'src/entity/feed_comment_heart';
 import { FeedQueryRepository } from 'src/repository/feed.query-repository';
 import { Repository } from 'typeorm';
 
@@ -13,6 +14,7 @@ export class FeedCommentService {
   constructor(
     @InjectRepository(Feed) private readonly feedRepository: Repository<Feed>,
     @InjectRepository(FeedComment) private readonly feedCommentRepository: Repository<FeedComment>,
+    @InjectRepository(FeedCommentHeart) private readonly feedCommentHeartRepository: Repository<FeedCommentHeart>,
     private readonly feedQueryRepository: FeedQueryRepository,
     private readonly feedCommentQueryRepository: FeedCommentQueryRepository,
   ) {}
@@ -112,6 +114,48 @@ export class FeedCommentService {
 
     comment.deleteComment(new Date());
     await this.feedCommentRepository.save(comment);
+  }
+
+  async likeFeedComment(feedId: number, commentId: number, memberId: number): Promise<void> {
+    const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
+
+    if (!feed) {
+      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+    }
+
+    const comment = await this.feedCommentQueryRepository.getIsNotDeletedFeedComment(feedId);
+
+    if (!comment) {
+      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+    }
+
+    comment.plusCommentHeartCount(comment.heartCount);
+    await this.feedCommentRepository.save(comment);
+    await this.feedCommentHeartRepository.save({ commentId, memberId });
+  }
+
+  async unlikeFeedComment(feedId: number, commentId: number, memberId: number) {
+    const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
+
+    if (!feed) {
+      throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
+    }
+
+    const comment = await this.feedCommentQueryRepository.getIsNotDeletedFeedComment(commentId);
+
+    if (!comment) {
+      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+    }
+
+    const commentHeart = await this.feedCommentHeartRepository.findOneBy({ commentId, memberId });
+
+    if (!commentHeart) {
+      throw new NotFoundException('해당 댓글 좋아요를 찾을 수 없습니다.');
+    }
+
+    comment.minusCommentHeartCount(comment.heartCount);
+    await this.feedCommentRepository.save(comment);
+    await this.feedCommentHeartRepository.remove(commentHeart);
   }
 }
 
