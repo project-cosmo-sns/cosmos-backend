@@ -25,4 +25,8 @@ export class Notification {
 
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', nullable: false })
   updatedAt!: Date;
+
+  confirmNotification() {
+    this.isConfirmed = true;
+  }
 }

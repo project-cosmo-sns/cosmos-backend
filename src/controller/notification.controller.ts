@@ -1,5 +1,5 @@
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, ParseIntPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { ApiNotFoundResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
@@ -30,5 +30,13 @@ export class NotificationController {
       options: paginationRequest,
       totalCount,
     });
+  }
+
+  @ApiOperation({ summary: '알림 확인' })
+  @ApiUnauthorizedResponse({ status: 401, description: '해당 알림을 받은 사람이 아닐 경우' })
+  @ApiNotFoundResponse({ status: 404, description: '해당 알림을 찾을 수 없는 경우' })
+  @Post('/:notificationId/confirm')
+  async confirmNotification(@Req() req, @Param('notificationId', ParseIntPipe) notificationId: number): Promise<void> {
+    await this.notificationService.confirmNotification(req.user.id, notificationId);
   }
 }
