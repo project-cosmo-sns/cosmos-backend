@@ -40,6 +40,7 @@ import { PostEmoji } from './entity/post_emoji.entity';
 import { FollowController } from './controller/follow.controller';
 import { FollowService } from './service/follow.service';
 import { FollowQueryRepository } from './repository/follow.query-repository';
+import { FeedEmoji } from './entity/feed_emoji.entity';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { FollowQueryRepository } from './repository/follow.query-repository';
     TypeOrmModule.forFeature([
       Member,
       Feed,
+      FeedEmoji,
       FeedComment,
       FeedCommentHeart,
       Post,
@@ -104,4 +106,4 @@ import { FollowQueryRepository } from './repository/follow.query-repository';
     Logger,
   ],
 })
-export class AppModule { }
+export class AppModule {}
