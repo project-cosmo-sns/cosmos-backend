@@ -110,6 +110,29 @@ export class FeedService {
       emoji,
     });
   }
+
+  async deleteFeedEmoji(feedId: number, memberId: number, emojiId: number) {
+    const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
+
+    if (!feed) {
+      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+    }
+
+    const emoji = await this.feedEmojiRepository.findOneBy({ id: emojiId });
+
+    if (!emoji) {
+      throw new NotFoundException('해당 이모지를 찾을 수 없습니다.');
+    }
+
+    if (emoji.memberId !== memberId) {
+      throw new UnauthorizedException('삭제 권한이 없습니다.');
+    }
+
+    feed.minusEmojiCount(feed.emojiCount);
+    await this.feedRepository.save(feed);
+
+    await this.feedEmojiRepository.remove(emoji);
+  }
 }
 
 export class FeedWriterDto {
