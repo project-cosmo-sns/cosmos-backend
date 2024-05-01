@@ -133,6 +133,30 @@ export class FeedCommentService {
     await this.feedCommentRepository.save(comment);
     await this.feedCommentHeartRepository.save({ commentId, memberId });
   }
+
+  async unlikeFeedComment(feedId: number, commentId: number, memberId: number) {
+    const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
+
+    if (!feed) {
+      throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
+    }
+
+    const comment = await this.feedCommentQueryRepository.getIsNotDeletedFeedComment(commentId);
+
+    if (!comment) {
+      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+    }
+
+    const commentHeart = await this.feedCommentHeartRepository.findOneBy({ commentId, memberId });
+
+    if (!commentHeart) {
+      throw new NotFoundException('해당 댓글 좋아요를 찾을 수 없습니다.');
+    }
+
+    comment.minusCommentHeartCount(comment.heartCount);
+    await this.feedCommentRepository.save(comment);
+    await this.feedCommentHeartRepository.remove(commentHeart);
+  }
 }
 
 export class FeedCommentWriterDto {
