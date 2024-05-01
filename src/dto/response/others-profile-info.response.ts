@@ -16,6 +16,8 @@ export class OthersProfileInfoResponse {
   followerCount!: number;
   @ApiProperty()
   followingCount!: number;
+  @ApiProperty()
+  isFollowed!: boolean;
 
   constructor(
     memberId: number,
@@ -24,7 +26,8 @@ export class OthersProfileInfoResponse {
     profileImageUrl: string,
     introduce: string,
     followerCount: number,
-    followingCount: number
+    followingCount: number,
+    isFollowed: boolean
   ) {
     this.memberId = memberId;
     this.nickname = nickname;
@@ -33,6 +36,7 @@ export class OthersProfileInfoResponse {
     this.introduce = introduce;
     this.followerCount = followerCount;
     this.followingCount = followingCount;
+    this.isFollowed = isFollowed;
   }
 
   static from(getOthersProfileDto: GetOthersProfileDto) {
@@ -43,7 +47,8 @@ export class OthersProfileInfoResponse {
       getOthersProfileDto.profileImageUrl,
       getOthersProfileDto.introduce,
       getOthersProfileDto.followerCount,
-      getOthersProfileDto.followingCount
+      getOthersProfileDto.followingCount,
+      getOthersProfileDto.isFollowed
     )
   }
 

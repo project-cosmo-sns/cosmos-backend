@@ -8,6 +8,7 @@ export class GetOthersProfileDto {
   introduce!: string;
   followerCount!: number;
   followingCount!: number;
+  isFollowed!: boolean;
 
   constructor(
     memberId: number,
@@ -16,7 +17,8 @@ export class GetOthersProfileDto {
     profileImageUrl: string,
     introduce: string,
     followerCount: number,
-    followingCount: number
+    followingCount: number,
+    isFollowed: boolean,
   ) {
     this.memberId = memberId;
     this.nickname = nickname;
@@ -25,6 +27,7 @@ export class GetOthersProfileDto {
     this.introduce = introduce;
     this.followerCount = followerCount;
     this.followingCount = followingCount;
+    this.isFollowed = isFollowed;
   }
 
   static from(tuple: GetOthersProfileTuple) {
@@ -35,7 +38,8 @@ export class GetOthersProfileDto {
       tuple.profileImageUrl,
       tuple.introduce,
       tuple.followerCount,
-      tuple.followingCount
+      tuple.followingCount,
+      tuple.isFollowed
     );
   }
 }
