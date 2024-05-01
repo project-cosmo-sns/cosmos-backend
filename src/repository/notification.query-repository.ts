@@ -16,6 +16,7 @@ export class NotificationQueryRepository {
         'notification.id as notificationId',
         'notification.content as content',
         'notification.notificationType as notificationType',
+        'notification.isConfirmed as isConfirmed',
         'notification.createdAt as createdAt',
         'member.profileImageUrl as profileImageUrl',
       ])
@@ -45,5 +46,6 @@ class GetNotificationTuple {
   notificationId: number;
   content: string;
   notificationType: string;
+  isConfirmed: boolean;
   createdAt: Date;
 }

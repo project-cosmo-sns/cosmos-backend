@@ -13,6 +13,7 @@ export class GetNotificationResponseDto {
       id: { type: 'number' },
       content: { type: 'string' },
       notificationType: { type: 'object' },
+      isConfirmed: { type: 'boolean' },
       createdAt: { type: 'string' },
     },
   })

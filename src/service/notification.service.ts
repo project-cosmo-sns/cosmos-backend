@@ -26,6 +26,7 @@ export class NotificationService {
         id: item.notificationId,
         content: item.content,
         notificationType: JSON.parse(item.notificationType),
+        isConfirmed: item.isConfirmed,
         createdAt: item.createdAt,
       };
 
@@ -44,5 +45,6 @@ export class NotificationDto {
   id: number;
   content: string;
   notificationType: Record<string, string>;
+  isConfirmed: boolean;
   createdAt: Date;
 }
