@@ -40,6 +40,9 @@ import { PostEmoji } from './entity/post_emoji.entity';
 import { FollowController } from './controller/follow.controller';
 import { FollowService } from './service/follow.service';
 import { FollowQueryRepository } from './repository/follow.query-repository';
+import { ProfileController } from './controller/profile.controller';
+import { ProfileService } from './service/profile.service';
+import { ProfileQueryRepository } from './repository/profile.query-repository';
 
 @Module({
   imports: [
@@ -74,6 +77,7 @@ import { FollowQueryRepository } from './repository/follow.query-repository';
     PostController,
     ImageController,
     FollowController,
+    ProfileController,
   ],
   providers: [
     // Service
@@ -85,6 +89,7 @@ import { FollowQueryRepository } from './repository/follow.query-repository';
     PostService,
     ImageService,
     FollowService,
+    ProfileService,
 
     // QueryRepository
     MemberQueryRepository,
@@ -92,6 +97,7 @@ import { FollowQueryRepository } from './repository/follow.query-repository';
     FeedCommentQueryRepository,
     PostQueryRepository,
     FollowQueryRepository,
+    ProfileQueryRepository,
 
     // Strategy
     GithubStrategy,
