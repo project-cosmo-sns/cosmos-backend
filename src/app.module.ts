@@ -40,6 +40,11 @@ import { PostEmoji } from './entity/post_emoji.entity';
 import { FollowController } from './controller/follow.controller';
 import { FollowService } from './service/follow.service';
 import { FollowQueryRepository } from './repository/follow.query-repository';
+import { FeedEmoji } from './entity/feed_emoji.entity';
+import { Notification } from './entity/notification.entity';
+import { NotificationController } from './controller/notification.controller';
+import { NotificationService } from './service/notification.service';
+import { NotificationQueryRepository } from './repository/notification.query-repository';
 import { ProfileController } from './controller/profile.controller';
 import { ProfileService } from './service/profile.service';
 import { ProfileQueryRepository } from './repository/profile.query-repository';
@@ -55,6 +60,7 @@ import { ProfileQueryRepository } from './repository/profile.query-repository';
     TypeOrmModule.forFeature([
       Member,
       Feed,
+      FeedEmoji,
       FeedComment,
       FeedCommentHeart,
       Post,
@@ -65,6 +71,7 @@ import { ProfileQueryRepository } from './repository/profile.query-repository';
       Follow,
       PostView,
       PostEmoji,
+      Notification,
     ]),
     PassportModule.register({
       session: true,
@@ -77,6 +84,7 @@ import { ProfileQueryRepository } from './repository/profile.query-repository';
     PostController,
     ImageController,
     FollowController,
+    NotificationController,
     ProfileController,
   ],
   providers: [
@@ -89,6 +97,7 @@ import { ProfileQueryRepository } from './repository/profile.query-repository';
     PostService,
     ImageService,
     FollowService,
+    NotificationService,
     ProfileService,
 
     // QueryRepository
@@ -97,6 +106,7 @@ import { ProfileQueryRepository } from './repository/profile.query-repository';
     FeedCommentQueryRepository,
     PostQueryRepository,
     FollowQueryRepository,
+    NotificationQueryRepository,
     ProfileQueryRepository,
 
     // Strategy
@@ -110,4 +120,4 @@ import { ProfileQueryRepository } from './repository/profile.query-repository';
     Logger,
   ],
 })
-export class AppModule { }
+export class AppModule {}

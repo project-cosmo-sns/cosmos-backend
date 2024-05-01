@@ -26,6 +26,7 @@ import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
 import { Roles } from 'src/common/roles/roles.decorator';
+import { PostFeedCommentRequestDto } from 'src/dto/request/post-feed-comment.request';
 import { PostFeedRequestDto } from 'src/dto/request/post-feed.request.dto';
 import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
@@ -79,6 +80,32 @@ export class FeedController {
     return this.feedService.deleteFeed(feedId, req.user.id);
   }
 
+  @ApiOperation({ summary: '피드 이모지 추가' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
+  @ApiGoneResponse({ status: 410, description: '피드가 삭제되었을 경우' })
+  @Post(':feedId/emoji')
+  async createPostEmoji(
+    @Req() req,
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @Body('emoji') emoji: string,
+  ): Promise<void> {
+    return this.feedService.postFeedEmoji(feedId, req.user.id, emoji);
+  }
+
+  @ApiOperation({ summary: '피드 이모지 삭제' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
+  @ApiParam({ name: 'emojiId', required: true, description: '피드 이모지 id' })
+  @ApiUnauthorizedResponse({ status: 401, description: '해당 이모지를 추가한 유저가 아닐 경우' })
+  @ApiGoneResponse({ status: 410, description: '피드가 삭제되었을 경우' })
+  @Delete(':feedId/emoji/:emojiId')
+  async deletePostEmoji(
+    @Req() req,
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @Param('emojiId', ParseIntPipe) emojiId: number,
+  ): Promise<void> {
+    return this.feedService.deleteFeedEmoji(feedId, req.user.id, emojiId);
+  }
+
   @ApiOperation({ summary: '피드 댓글 목록' })
   @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
   @ApiPaginatedResponse(GetFeedCommentResponseDto)
@@ -107,9 +134,9 @@ export class FeedController {
   async postFeedComment(
     @Param('feedId', ParseIntPipe) feedId: number,
     @Req() req,
-    @Body('content') content: string,
+    @Body() body: PostFeedCommentRequestDto,
   ): Promise<void> {
-    return this.feedCommentService.postFeedComment(feedId, req.user.id, content);
+    return this.feedCommentService.postFeedComment(feedId, req.user.id, body.content);
   }
 
   @ApiOperation({ summary: '피드 댓글 수정' })
@@ -148,6 +175,49 @@ export class FeedController {
   ): Promise<void> {
     try {
       return this.feedCommentService.deleteFeedComment(feedId, commentId, req.user.id);
+    } catch (error) {
+      if (error instanceof UnauthorizedException || error instanceof GoneException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('서버 오류가 발생했습니다.');
+      }
+    }
+  }
+
+  @ApiOperation({ summary: '피드 댓글 좋아요' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
+  @ApiParam({ name: 'commentId', required: true, description: '피드 댓글 id' })
+  @ApiGoneResponse({ status: 410, description: '피드가 삭제되었거나, 댓글이 삭제된 경우' })
+  @Post(':feedId/comment/:commentId/like')
+  async likeFeedComment(
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Req() req,
+  ): Promise<void> {
+    try {
+      return this.feedCommentService.likeFeedComment(feedId, commentId, req.user.id);
+    } catch (error) {
+      if (error instanceof GoneException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException('서버 오류가 발생했습니다.');
+      }
+    }
+  }
+
+  @ApiOperation({ summary: '피드 댓글 좋아요 취소' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
+  @ApiParam({ name: 'commentId', required: true, description: '피드 댓글 id' })
+  @ApiUnauthorizedResponse({ status: 401, description: '해당 댓글 좋아요를 누른 사람이 아닐 경우' })
+  @ApiGoneResponse({ status: 410, description: '피드가 삭제되었거나, 댓글이 삭제된 경우' })
+  @Delete(':feedId/comment/:commentId/like')
+  async removePostCommentHeart(
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Req() req,
+  ): Promise<void> {
+    try {
+      return this.feedCommentService.unlikeFeedComment(feedId, commentId, req.user.id);
     } catch (error) {
       if (error instanceof UnauthorizedException || error instanceof GoneException) {
         throw error;
