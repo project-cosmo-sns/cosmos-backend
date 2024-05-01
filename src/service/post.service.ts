@@ -11,7 +11,7 @@ import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
 import { GetPostList } from 'src/dto/get-post-list.dto';
 import { GetPostDetailDto } from 'src/dto/get-post-detail.dto';
-import { ListSortBy } from 'src/entity/common/Enums';
+import { ListSortBy, NotificationType } from 'src/entity/common/Enums';
 import { PostView } from 'src/entity/post_view.entity';
 import { PostComment } from 'src/entity/post_comment.entity';
 import { PostCommentHeart } from 'src/entity/post_comment_heart.entity';
@@ -20,6 +20,7 @@ import { GetPostCommentList } from 'src/dto/get-post-comment-list.dto';
 import { HashTagSearchRequest } from 'src/dto/request/hash-tag-search.request';
 import { GetHashTagSearch } from 'src/dto/get-hash-tag-search.dto';
 import { PostEmoji } from 'src/entity/post_emoji.entity';
+import { NotificationDomainService } from 'src/\bdomain-service/notification.domain-service';
 
 @Injectable()
 export class PostService {
@@ -33,7 +34,8 @@ export class PostService {
     @InjectRepository(PostCommentHeart) private readonly postCommentHeartRepository: Repository<PostCommentHeart>,
     @InjectRepository(PostEmoji) private readonly postEmojiRepository: Repository<PostEmoji>,
     private readonly postQueryRepository: PostQueryRepository,
-  ) { }
+    private readonly notificationDomainService: NotificationDomainService,
+  ) {}
 
   async createPost(memberId: number, dto: CreatePostInfoDto): Promise<void> {
     const member = await this.memberRepository.findOneBy({ id: memberId });
@@ -44,8 +46,8 @@ export class PostService {
       memberId,
       category: dto.category,
       title: dto.title,
-      content: dto.content
-    })
+      content: dto.content,
+    });
     await this.saveHashTags(post.id, dto.hashTags);
   }
 
@@ -55,10 +57,14 @@ export class PostService {
       throw new UnauthorizedException('로그인이 필요합니다.');
     }
     const postListTuples = await this.postQueryRepository.getPostList(memberId, sortPostList, sortBy, userGeneration);
-    const totalCount = await this.postQueryRepository.getAllPostListTotalCount(memberId, sortPostList, sortBy, userGeneration);
+    const totalCount = await this.postQueryRepository.getAllPostListTotalCount(
+      memberId,
+      sortPostList,
+      sortBy,
+      userGeneration,
+    );
 
-    const postInfo = postListTuples.map((postList) =>
-      GetPostList.from(postList));
+    const postInfo = postListTuples.map((postList) => GetPostList.from(postList));
 
     return { postInfo, totalCount };
   }
@@ -91,7 +97,7 @@ export class PostService {
       throw new UnauthorizedException('권한이 없습니다.');
     }
 
-    postInfo.deletePostInfo(new Date())
+    postInfo.deletePostInfo(new Date());
     await this.postRepository.save(postInfo);
   }
 
@@ -110,7 +116,7 @@ export class PostService {
     await this.postEmojiRepository.save({
       postId,
       memberId,
-      emoji
+      emoji,
     });
   }
 
@@ -153,29 +159,30 @@ export class PostService {
   }
 
   private async saveHashTags(postId: number, hashTags: HashTagDto[]): Promise<void> {
-    await Promise.all(hashTags.map(async (hashTagDto) => {
-      let tagId = hashTagDto.hashTagId;
-      if (!hashTagDto.hashTagId) {
-        const newHashTag = await this.hashTagRepository.save({
-          tagName: hashTagDto.tagName,
-          color: hashTagDto.color,
-        });
-        tagId = newHashTag.id;
-      }
+    await Promise.all(
+      hashTags.map(async (hashTagDto) => {
+        let tagId = hashTagDto.hashTagId;
+        if (!hashTagDto.hashTagId) {
+          const newHashTag = await this.hashTagRepository.save({
+            tagName: hashTagDto.tagName,
+            color: hashTagDto.color,
+          });
+          tagId = newHashTag.id;
+        }
 
-      await this.postHashTagRepository.save({
-        postId,
-        hashTagId: tagId,
-      });
-    }));
+        await this.postHashTagRepository.save({
+          postId,
+          hashTagId: tagId,
+        });
+      }),
+    );
   }
 
   async getPostCommentList(postId: number, memberId: number, paginationRequest: PaginationRequest) {
     const postCommentList = await this.postQueryRepository.getPostCommentList(postId, memberId, paginationRequest);
     const totalCount = await this.postQueryRepository.getPostCommentListCount(postId);
 
-    const postCommentInfo = postCommentList.map((commentList) =>
-      GetPostCommentList.from(commentList));
+    const postCommentInfo = postCommentList.map((commentList) => GetPostCommentList.from(commentList));
     return { postCommentInfo, totalCount };
   }
 
@@ -189,11 +196,17 @@ export class PostService {
     }
     post.plusCommentCount(post.commentCount);
     await this.postRepository.save(post);
-    await this.postCommentRepository.save({
+    const comment = await this.postCommentRepository.save({
       postId: postId,
       memberId: memberId,
-      content: content
-    })
+      content: content,
+    });
+
+    this.notificationDomainService.postNotification(post.memberId, memberId, {
+      type: NotificationType.CREATE_POST_COMMENT,
+      postId: post.id,
+      commentId: comment.id,
+    });
   }
 
   async patchPostComment(postId: number, commentId: number, memberId: number, content: string): Promise<void> {
