@@ -20,6 +20,11 @@ export class ProfileService {
       throw new GoneException('탈퇴한 유저입니다.');
     }
     const othersProfileInfo = await this.profileQueryRepository.getOthersProfileInfo(memberId, myMemberId);
+    const othersFollowerCount = await this.profileQueryRepository.getProfileFollowerCount(memberId);
+    const othersFollowingCount = await this.profileQueryRepository.getProfileFollowingCount(memberId);
+
+    othersProfileInfo.followerCount = othersFollowerCount;
+    othersProfileInfo.followingCount = othersFollowingCount;
 
     return GetOthersProfileDto.from(othersProfileInfo);
   }

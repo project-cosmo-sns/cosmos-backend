@@ -23,14 +23,30 @@ export class ProfileQueryRepository {
         'member.generation as generation',
         'member.profile_image_url as profileImageUrl',
         'member.introduce as introduce',
-        '(SELECT COUNT(*) FROM follow WHERE follow.following_member_id = member.id) AS followingCount',
-        '(SELECT COUNT(*) FROM follow WHERE follow.follower_member_id = member.id) AS followerCount',
         'CASE WHEN follow.following_member_id IS NOT NULL THEN true ELSE false END as isFollowed',
 
       ])
       .where('member.id = :memberId', { memberId })
       .getRawOne()
     return plainToInstance(GetOthersProfileTuple, othersProfile);
+  }
+
+  async getProfileFollowerCount(memberId: number): Promise<number> {
+    const followerCount = await this.dataSource
+      .createQueryBuilder()
+      .from(Follow, 'follow')
+      .where('follow.follower_member_id = :memberId', { memberId })
+      .getCount()
+    return followerCount;
+  }
+
+  async getProfileFollowingCount(memberId: number): Promise<number> {
+    const followingCount = await this.dataSource
+      .createQueryBuilder()
+      .from(Follow, 'follow')
+      .where('follow.following_member_id = :memberId', { memberId })
+      .getCount()
+    return followingCount;
   }
 }
 
@@ -44,4 +60,12 @@ export class GetOthersProfileTuple {
   followingCount!: number;
   @Transform(({ value }) => value === '1')
   isFollowed!: boolean;
+}
+
+export class FollowerCountTuple {
+  followerCount!: number;
+}
+
+export class FollowingCountTuple {
+  followingCount!: number;
 }
