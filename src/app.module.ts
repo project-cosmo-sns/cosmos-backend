@@ -51,6 +51,7 @@ import { SearchQueryRepository } from './repository/search.query-repository';
 import { ProfileController } from './controller/profile.controller';
 import { ProfileService } from './service/profile.service';
 import { ProfileQueryRepository } from './repository/profile.query-repository';
+import { FeedDomainService } from './domain-service/feed.domain-service';
 
 @Module({
   imports: [
@@ -104,6 +105,9 @@ import { ProfileQueryRepository } from './repository/profile.query-repository';
     NotificationService,
     SearchService,
     ProfileService,
+
+    // DomainService
+    FeedDomainService,
 
     // QueryRepository
     MemberQueryRepository,
