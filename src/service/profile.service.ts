@@ -1,7 +1,8 @@
-import { GoneException, Injectable } from "@nestjs/common";
+import { GoneException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { GetMyProfileDto } from 'src/dto/get-my-profile';
 import { GetOthersProfileDto } from "src/dto/get-others-profile";
+import { profileInfoRequestDto } from 'src/dto/request/profile-info.request';
 import { Member } from "src/entity/member.entity";
 import { MemberQueryRepository } from "src/repository/member.query-repository";
 import { ProfileQueryRepository } from "src/repository/profile.query-repository";
@@ -39,5 +40,14 @@ export class ProfileService {
     myProfileInfo.followingCount = myFollowingCount;
 
     return GetMyProfileDto.from(myProfileInfo);
+  }
+
+  async modifyMyProfile(memberId: number, nickname: string, profileImageUrl: string, introduce: string): Promise<void> {
+    const memberInfo = await this.memberRepository.findOneBy({ id: memberId });
+    if (!memberInfo) {
+      throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
+    }
+    memberInfo.setProfileInfo(nickname, profileImageUrl, introduce);
+    await this.memberRepository.save(memberInfo);
   }
 }

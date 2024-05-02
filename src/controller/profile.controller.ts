@@ -1,6 +1,7 @@
-import { Controller, Get, Param, ParseIntPipe, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Req, UseGuards } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Roles } from "src/common/roles/roles.decorator";
+import { profileInfoRequestDto } from 'src/dto/request/profile-info.request';
 import { MyProfileInfoResponse } from 'src/dto/response/my-profile-info.response';
 import { OthersProfileInfoResponse } from "src/dto/response/others-profile-info.response";
 import { RolesGuard } from "src/guard/roles.guard";
@@ -31,6 +32,19 @@ export class ProfileController {
     return OthersProfileInfoResponse.from(othersProfileInfo);
   }
 
+
+  @ApiOperation({ summary: '나의 프로필 수정' })
+  @Patch('my-profile')
+  async patchMyProfile(
+    @Req() req,
+    @Body() profileInfoRequestDto: profileInfoRequestDto): Promise<void> {
+    return this.profileService.modifyMyProfile(
+      req.user.id,
+      profileInfoRequestDto.nickname,
+      profileInfoRequestDto.profileImageUrl,
+      profileInfoRequestDto.introduce
+    );
+  }
 
 
 }

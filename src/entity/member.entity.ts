@@ -47,9 +47,10 @@ export class Member {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp', nullable: false })
   updatedAt!: Date;
 
-  setProfileInfo(nickname: string, profileImageUrl: string) {
+  setProfileInfo(nickname: string, profileImageUrl: string, introduce: string) {
     this.nickname = nickname;
     this.profileImageUrl = profileImageUrl;
+    this.introduce = introduce;
   }
 
   // setMyPageInfo(
@@ -74,4 +75,6 @@ export class Member {
     this.externalId = null;
     this.deletedAt = deletedAt;
   }
+
+
 }
