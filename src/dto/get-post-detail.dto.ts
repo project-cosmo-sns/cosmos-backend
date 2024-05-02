@@ -12,6 +12,7 @@ export class GetPostDetailDto {
 export class GetPostDetail {
   memberId!: number;
   nickname!: string;
+  generation!: number;
   profileImageUrl!: string;
   createdAt!: Date;
   postId!: number;
@@ -24,6 +25,7 @@ export class GetPostDetail {
   constructor(
     memberId: number,
     nickname: string,
+    generation: number,
     profileImageUrl: string,
     createdAt: Date,
     postId: number,
@@ -35,6 +37,7 @@ export class GetPostDetail {
   ) {
     this.memberId = memberId;
     this.nickname = nickname;
+    this.generation = generation;
     this.profileImageUrl = profileImageUrl;
     this.createdAt = createdAt;
     this.postId = postId;

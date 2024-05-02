@@ -7,6 +7,8 @@ export class PostDetail {
   @ApiProperty()
   nickname!: string;
   @ApiProperty()
+  generation!: number;
+  @ApiProperty()
   profileImageUrl!: string;
   @ApiProperty()
   createdAt!: Date;
@@ -26,6 +28,7 @@ export class PostDetail {
   constructor(
     memberId: number,
     nickname: string,
+    generation: number,
     profileImageUrl: string,
     createdAt: Date,
     postId: number,
@@ -37,6 +40,7 @@ export class PostDetail {
   ) {
     this.memberId = memberId;
     this.nickname = nickname;
+    this.generation = generation;
     this.profileImageUrl = profileImageUrl;
     this.createdAt = createdAt;
     this.postId = postId;
@@ -75,6 +79,7 @@ export class PostDetailResponse {
     const postDetail = new PostDetail(
       getPostDetail.postDetail.memberId,
       getPostDetail.postDetail.nickname,
+      getPostDetail.postDetail.generation,
       getPostDetail.postDetail.profileImageUrl,
       getPostDetail.postDetail.createdAt,
       getPostDetail.postDetail.postId,
