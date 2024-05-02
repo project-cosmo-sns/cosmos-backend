@@ -39,8 +39,9 @@ export class PostController {
     const userGeneration = req.user?.generation;
     try {
       const { postInfo, totalCount } = await this.postService.getPostList(userId, userGeneration, sortPostList);
+      const postData = postInfo.map((info) => PostListResponse.from(info));
       return PaginationResponse.of({
-        data: PostListResponse.from(postInfo),
+        data: postData,
         options: sortPostList,
         totalCount,
       });
@@ -117,8 +118,9 @@ export class PostController {
     @Param('postId', ParseIntPipe) postId: number
   ): Promise<PaginationResponse<PostCommentListResponse>> {
     const { postCommentInfo, totalCount } = await this.postService.getPostCommentList(postId, req.user.id, paginationRequest);
+    const postCommentData = postCommentInfo.map((info) => PostCommentListResponse.from(info));
     return PaginationResponse.of({
-      data: PostCommentListResponse.from(postCommentInfo),
+      data: postCommentData,
       options: paginationRequest,
       totalCount,
     })

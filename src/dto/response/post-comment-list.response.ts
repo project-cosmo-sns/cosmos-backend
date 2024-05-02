@@ -1,62 +1,32 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { GetPostCommentList } from '../get-post-comment-list.dto';
+import { PostCommentDto, PostCommentWriterDto} from 'src/service/post.service';
 
 export class PostCommentListResponse {
-  @ApiProperty()
-  memberId!: number;
-  @ApiProperty()
-  nickname!: string;
-  @ApiProperty()
-  generation!: number;
-  @ApiProperty()
-  profileImageUrl!: string;
-  @ApiProperty()
-  commentId!: number;
-  @ApiProperty()
-  content!: string;
-  @ApiProperty()
-  heartCount!: number;
-  @ApiProperty()
-  createdAt!: Date;
-  @ApiProperty()
-  isHearted!: Boolean;
-
-  constructor(
-    memberId: number,
-    nickname: string,
-    generation: number,
-    profileImageUrl: string,
-    commentId: number,
-    content: string,
-    heartCount: number,
-    createdAt: Date,
-    isHearted: boolean,
-  ) {
-    this.memberId = memberId;
-    this.nickname = nickname;
-    this.generation = generation;
-    this.profileImageUrl = profileImageUrl;
-    this.commentId = commentId;
-    this.content = content;
-    this.heartCount = heartCount;
-    this.createdAt = createdAt;
-    this.isHearted = isHearted;
+  @ApiProperty({
+    type: {
+      id: { type: 'number' },
+      nickname: { type: 'string' },
+      generation: { type: 'number' },
+      profileImageUrl: { type: 'string' },
+    },
+  })
+  writer: PostCommentWriterDto;
+  @ApiProperty({
+    type: {
+      id: { type: 'number' },
+      content: { type: 'string' },
+      heartCount: { type: 'number' },
+      isHearted: { type: 'boolean' },
+      createdAt: { type: 'string' },
+    },
+  })
+  comment: PostCommentDto;
+  constructor(writer: PostCommentWriterDto, comment: PostCommentDto) {
+    this.writer = writer;
+    this.comment = comment;
   }
 
-  static from(getPostCommentLists: GetPostCommentList[]) {
-    return getPostCommentLists.map(
-      (commentLists) =>
-        new PostCommentListResponse(
-          commentLists.memberId,
-          commentLists.nickname,
-          commentLists.generation,
-          commentLists.profileImageUrl,
-          commentLists.commentId,
-          commentLists.content,
-          commentLists.heartCount,
-          commentLists.createdAt,
-          commentLists.isHearted
-        )
-    )
+  static from({ writer, comment }: { writer: PostCommentWriterDto; comment: PostCommentDto }) {
+    return new PostCommentListResponse(writer, comment);
   }
 }

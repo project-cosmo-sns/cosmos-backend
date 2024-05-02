@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
 import { GetPostList } from 'src/dto/get-post-list.dto';
-import { GetPostDetailDto } from 'src/dto/get-post-detail.dto';
+import { GetPostDetail, GetPostDetailDto } from 'src/dto/get-post-detail.dto';
 import { ListSortBy, NotificationType } from 'src/entity/common/Enums';
 import { PostView } from 'src/entity/post_view.entity';
 import { PostComment } from 'src/entity/post_comment.entity';
@@ -37,7 +37,7 @@ export class PostService {
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
     private readonly postQueryRepository: PostQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
-  ) {}
+  ) { }
 
   async createPost(memberId: number, dto: CreatePostInfoDto): Promise<void> {
     const member = await this.memberRepository.findOneBy({ id: memberId });
@@ -87,7 +87,8 @@ export class PostService {
 
     const postDetailHashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postId);
 
-    return new GetPostDetailDto(postDetailInfo, postDetailHashTagInfo);
+    const postDetail = GetPostDetail.from(postDetailInfo);
+    return new GetPostDetailDto(postDetail, postDetailHashTagInfo);
   }
 
   async deletePost(postId: number, memberId: number): Promise<void> {
@@ -336,4 +337,36 @@ export class PostService {
       console.error(e);
     }
   }
+}
+
+export class PostWriterDto {
+  id: number;
+  nickname: string;
+  generation: number;
+  profileImageUrl: string;
+}
+
+export class PostDto {
+  id: number;
+  title: string;
+  content: string;
+  viewCount: number;
+  commentCount: number;
+  emojiCount: number;
+  createdAt: Date;
+}
+
+export class PostCommentWriterDto {
+  id: number;
+  nickname: string;
+  generation: number;
+  profileImageUrl: string;
+}
+
+export class PostCommentDto {
+  id: number;
+  content: string;
+  heartCount: number;
+  isHearted: boolean;
+  createdAt: Date;
 }

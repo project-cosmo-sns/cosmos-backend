@@ -1,16 +1,10 @@
 import { GetPostCommentTuple } from "src/repository/post.query-repository";
+import { PostCommentDto, PostCommentWriterDto } from 'src/service/post.service';
 
 
 export class GetPostCommentList {
-  memberId!: number;
-  nickname!: string;
-  generation!: number;
-  profileImageUrl!: string;
-  commentId!: number;
-  content!: string;
-  heartCount!: number;
-  createdAt!: Date;
-  isHearted!: boolean;
+  writer: PostCommentWriterDto;
+  comment: PostCommentDto;
 
   constructor(
     memberId: number,
@@ -23,15 +17,19 @@ export class GetPostCommentList {
     createdAt: Date,
     isHearted: boolean,
   ) {
-    this.memberId = memberId;
-    this.nickname = nickname;
-    this.generation = generation;
-    this.profileImageUrl = profileImageUrl;
-    this.commentId = commentId;
-    this.content = content;
-    this.heartCount = heartCount;
-    this.createdAt = createdAt;
-    this.isHearted = isHearted;
+    this.writer = {
+      id: memberId,
+      nickname,
+      generation,
+      profileImageUrl,
+    };
+    this.comment = {
+      id: commentId,
+      content,
+      heartCount,
+      createdAt,
+      isHearted,
+    }
   }
 
   static from(tuple: GetPostCommentTuple) {

@@ -1,3 +1,6 @@
+import { GetPostDetailTuple } from 'src/repository/post.query-repository';
+import { PostDto, PostWriterDto } from 'src/service/post.service';
+
 export class GetPostDetailDto {
   postDetail!: GetPostDetail;
   hashTag!: GetHashTagInfo[];
@@ -10,17 +13,8 @@ export class GetPostDetailDto {
 
 
 export class GetPostDetail {
-  memberId!: number;
-  nickname!: string;
-  generation!: number;
-  profileImageUrl!: string;
-  createdAt!: Date;
-  postId!: number;
-  title!: string;
-  content!: string;
-  emojiCount!: number;
-  commentCount!: number;
-  viewCount!: number;
+  writer: PostWriterDto;
+  post: PostDto;
 
   constructor(
     memberId: number,
@@ -35,17 +29,37 @@ export class GetPostDetail {
     commentCount: number,
     viewCount: number,
   ) {
-    this.memberId = memberId;
-    this.nickname = nickname;
-    this.generation = generation;
-    this.profileImageUrl = profileImageUrl;
-    this.createdAt = createdAt;
-    this.postId = postId;
-    this.title = title;
-    this.content = content;
-    this.emojiCount = emojiCount;
-    this.commentCount = commentCount;
-    this.viewCount = viewCount;
+    this.writer = {
+      id: memberId,
+      nickname,
+      generation,
+      profileImageUrl,
+    };
+    this.post = {
+      id: postId,
+      title,
+      content,
+      emojiCount,
+      commentCount,
+      viewCount,
+      createdAt,
+    };
+  }
+
+  static from(tuple: GetPostDetailTuple) {
+    return new GetPostDetail(
+      tuple.memberId,
+      tuple.nickname,
+      tuple.generation,
+      tuple.profileImageUrl,
+      tuple.createdAt,
+      tuple.postId,
+      tuple.title,
+      tuple.content,
+      tuple.emojiCount,
+      tuple.commentCount,
+      tuple.viewCount,
+    );
   }
 
 }
