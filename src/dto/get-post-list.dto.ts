@@ -1,18 +1,9 @@
 import { GetPostListTuple } from 'src/repository/post.query-repository';
+import { PostDto, PostWriterDto } from 'src/service/post.service';
 
 export class GetPostList {
-
-  memberId!: number;
-  nickname!: string;
-  generation!: number;
-  profileImageUrl!: string;
-  createdAt!: Date;
-  postId!: number;
-  title!: string;
-  content!: string;
-  emojiCount!: number;
-  commentCount!: number;
-  viewCount!: number;
+  writer: PostWriterDto;
+  post: PostDto;
 
   constructor(
     memberId: number,
@@ -27,17 +18,21 @@ export class GetPostList {
     commentCount: number,
     viewCount: number,
   ) {
-    this.memberId = memberId;
-    this.nickname = nickname;
-    this.generation = generation;
-    this.profileImageUrl = profileImageUrl;
-    this.createdAt = createdAt;
-    this.postId = postId;
-    this.title = title;
-    this.content = content;
-    this.emojiCount = emojiCount;
-    this.commentCount = commentCount;
-    this.viewCount = viewCount;
+    this.writer = {
+      id: memberId,
+      nickname,
+      generation,
+      profileImageUrl,
+    };
+    this.post = {
+      id: postId,
+      title,
+      content,
+      emojiCount,
+      commentCount,
+      viewCount,
+      createdAt,
+    };
   }
 
   static from(tuple: GetPostListTuple) {

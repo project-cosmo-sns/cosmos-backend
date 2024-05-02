@@ -39,8 +39,9 @@ export class PostController {
     const userGeneration = req.user?.generation;
     try {
       const { postInfo, totalCount } = await this.postService.getPostList(userId, userGeneration, sortPostList);
+      const postData = postInfo.map((info) => PostListResponse.from(info));
       return PaginationResponse.of({
-        data: PostListResponse.from(postInfo),
+        data: postData,
         options: sortPostList,
         totalCount,
       });

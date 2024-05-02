@@ -37,7 +37,7 @@ export class PostService {
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
     private readonly postQueryRepository: PostQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
-  ) {}
+  ) { }
 
   async createPost(memberId: number, dto: CreatePostInfoDto): Promise<void> {
     const member = await this.memberRepository.findOneBy({ id: memberId });
@@ -336,4 +336,21 @@ export class PostService {
       console.error(e);
     }
   }
+}
+
+export class PostWriterDto {
+  id: number;
+  nickname: string;
+  generation: number;
+  profileImageUrl: string;
+}
+
+export class PostDto {
+  id: number;
+  title: string;
+  content: string;
+  viewCount: number;
+  commentCount: number;
+  emojiCount: number;
+  createdAt: Date;
 }
