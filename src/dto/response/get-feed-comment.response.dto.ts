@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { FeedCommentDto, FeedCommentWriterDto } from 'src/service/feed-comment.service';
-import { FeedDto, FeedWriterDto } from 'src/service/feed.service';
+import { FeedWriterDto } from 'src/service/feed.service';
 
 export class GetFeedCommentResponseDto {
   @ApiProperty({

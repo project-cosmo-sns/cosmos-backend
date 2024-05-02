@@ -67,7 +67,7 @@ export class FeedController {
   @ApiOperation({ summary: '피드 상세' })
   @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
   @ApiResponse({ type: GetFeedResponseDto })
-  @Get('/:feedId/detail')
+  @Get('/:feedId')
   async getFeedDetail(@Param('feedId', ParseIntPipe) feedId: number): Promise<GetFeedResponseDto> {
     const feed = await this.feedService.getFeedDetail(feedId);
 
