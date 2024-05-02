@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { GetPostList } from '../get-post-list.dto';
-import { PostDto, PostWriterDto } from 'src/service/post.service';
+import { PostListDto, PostWriterDto } from 'src/service/post.service';
 
 export class PostListResponse {
   @ApiProperty({
@@ -23,14 +22,14 @@ export class PostListResponse {
       createdAt: { type: 'string' },
     },
   })
-  post: PostDto;
+  post: PostListDto;
 
-  constructor(writer: PostWriterDto, post: PostDto) {
+  constructor(writer: PostWriterDto, post: PostListDto) {
     this.writer = writer;
     this.post = post;
   }
 
-  static from({ writer, post }: { writer: PostWriterDto; post: PostDto }) {
+  static from({ writer, post }: { writer: PostWriterDto; post: PostListDto }) {
     return new PostListResponse(writer, post);
   }
 }

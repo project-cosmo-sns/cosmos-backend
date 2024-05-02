@@ -97,6 +97,7 @@ export class PostQueryRepository {
         'member.generation as generation',
         'member.profile_image_url as profileImageUrl',
         'post.id as postId',
+        'post.category as category',
         'post.title as title',
         'post.content as content',
         'post.emoji_count as emojiCount',
@@ -202,6 +203,7 @@ export class GetPostDetailTuple {
   profileImageUrl!: string;
   createdAt!: Date;
   postId!: number;
+  category!: string;
   title!: string;
   content!: string;
   emojiCount!: number;

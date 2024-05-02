@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { GetPostDetail, GetPostDetailDto } from '../get-post-detail.dto';
-import { PostDto, PostWriterDto } from 'src/service/post.service';
+import { GetPostDetailDto } from '../get-post-detail.dto';
+import { PostDetailDto, PostWriterDto } from 'src/service/post.service';
 
 export class PostDetail {
   @ApiProperty({
@@ -15,6 +15,7 @@ export class PostDetail {
   @ApiProperty({
     type: {
       id: { type: 'number' },
+      category: { type: 'string' },
       title: { type: 'string' },
       content: { type: 'string' },
       viewCount: { type: 'number' },
@@ -23,9 +24,9 @@ export class PostDetail {
       createdAt: { type: 'string' },
     },
   })
-  post: PostDto;
+  post: PostDetailDto;
 
-  constructor(writer: PostWriterDto, post: PostDto) {
+  constructor(writer: PostWriterDto, post: PostDetailDto) {
     this.writer = writer;
     this.post = post;
   }

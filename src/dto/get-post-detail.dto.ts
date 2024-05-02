@@ -1,5 +1,5 @@
 import { GetPostDetailTuple } from 'src/repository/post.query-repository';
-import { PostDto, PostWriterDto } from 'src/service/post.service';
+import { PostDetailDto, PostWriterDto } from 'src/service/post.service';
 
 export class GetPostDetailDto {
   postDetail!: GetPostDetail;
@@ -14,7 +14,7 @@ export class GetPostDetailDto {
 
 export class GetPostDetail {
   writer: PostWriterDto;
-  post: PostDto;
+  post: PostDetailDto;
 
   constructor(
     memberId: number,
@@ -23,6 +23,7 @@ export class GetPostDetail {
     profileImageUrl: string,
     createdAt: Date,
     postId: number,
+    category: string,
     title: string,
     content: string,
     emojiCount: number,
@@ -37,6 +38,7 @@ export class GetPostDetail {
     };
     this.post = {
       id: postId,
+      category,
       title,
       content,
       emojiCount,
@@ -54,6 +56,7 @@ export class GetPostDetail {
       tuple.profileImageUrl,
       tuple.createdAt,
       tuple.postId,
+      tuple.category,
       tuple.title,
       tuple.content,
       tuple.emojiCount,

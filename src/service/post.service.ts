@@ -346,8 +346,19 @@ export class PostWriterDto {
   profileImageUrl: string;
 }
 
-export class PostDto {
+export class PostListDto {
   id: number;
+  title: string;
+  content: string;
+  viewCount: number;
+  commentCount: number;
+  emojiCount: number;
+  createdAt: Date;
+}
+
+export class PostDetailDto {
+  id: number;
+  category: string;
   title: string;
   content: string;
   viewCount: number;

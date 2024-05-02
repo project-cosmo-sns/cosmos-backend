@@ -1,9 +1,9 @@
 import { GetPostListTuple } from 'src/repository/post.query-repository';
-import { PostDto, PostWriterDto } from 'src/service/post.service';
+import { PostListDto, PostWriterDto } from 'src/service/post.service';
 
 export class GetPostList {
   writer: PostWriterDto;
-  post: PostDto;
+  post: PostListDto;
 
   constructor(
     memberId: number,
