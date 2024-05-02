@@ -45,6 +45,9 @@ import { Notification } from './entity/notification.entity';
 import { NotificationController } from './controller/notification.controller';
 import { NotificationService } from './service/notification.service';
 import { NotificationQueryRepository } from './repository/notification.query-repository';
+import { ProfileController } from './controller/profile.controller';
+import { ProfileService } from './service/profile.service';
+import { ProfileQueryRepository } from './repository/profile.query-repository';
 
 @Module({
   imports: [
@@ -82,6 +85,7 @@ import { NotificationQueryRepository } from './repository/notification.query-rep
     ImageController,
     FollowController,
     NotificationController,
+    ProfileController,
   ],
   providers: [
     // Service
@@ -94,6 +98,7 @@ import { NotificationQueryRepository } from './repository/notification.query-rep
     ImageService,
     FollowService,
     NotificationService,
+    ProfileService,
 
     // QueryRepository
     MemberQueryRepository,
@@ -102,6 +107,7 @@ import { NotificationQueryRepository } from './repository/notification.query-rep
     PostQueryRepository,
     FollowQueryRepository,
     NotificationQueryRepository,
+    ProfileQueryRepository,
 
     // Strategy
     GithubStrategy,
