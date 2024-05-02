@@ -15,6 +15,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBody,
   ApiGoneResponse,
   ApiOperation,
   ApiParam,
@@ -41,7 +42,7 @@ export class FeedController {
   constructor(
     private readonly feedService: FeedService,
     private readonly feedCommentService: FeedCommentService,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: '피드 작성' })
   @Post('')
@@ -83,6 +84,7 @@ export class FeedController {
   @ApiOperation({ summary: '피드 이모지 추가' })
   @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
   @ApiGoneResponse({ status: 410, description: '피드가 삭제되었을 경우' })
+  @ApiBody({ description: '이모지 정보', schema: { type: 'object', properties: { emoji: { type: 'string' } } } })
   @Post(':feedId/emoji')
   async createPostEmoji(
     @Req() req,
@@ -144,6 +146,7 @@ export class FeedController {
   @ApiParam({ name: 'commentId', required: true, description: '피드 댓글 id' })
   @ApiUnauthorizedResponse({ status: 401, description: '해당 댓글을 작성한 사람이 아닐 경우' })
   @ApiGoneResponse({ status: 410, description: '피드가 삭제되었거나, 댓글이 삭제된 경우' })
+  @ApiBody({ description: '댓글 내용', schema: { type: 'object', properties: { content: { type: 'string' } } } })
   @Patch(':feedId/comment/:commentId')
   async patchFeedComment(
     @Param('feedId', ParseIntPipe) feedId: number,
