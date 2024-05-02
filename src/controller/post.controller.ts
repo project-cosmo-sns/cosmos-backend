@@ -118,8 +118,9 @@ export class PostController {
     @Param('postId', ParseIntPipe) postId: number
   ): Promise<PaginationResponse<PostCommentListResponse>> {
     const { postCommentInfo, totalCount } = await this.postService.getPostCommentList(postId, req.user.id, paginationRequest);
+    const postCommentData = postCommentInfo.map((info) => PostCommentListResponse.from(info));
     return PaginationResponse.of({
-      data: PostCommentListResponse.from(postCommentInfo),
+      data: postCommentData,
       options: paginationRequest,
       totalCount,
     })

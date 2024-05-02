@@ -354,3 +354,18 @@ export class PostDto {
   emojiCount: number;
   createdAt: Date;
 }
+
+export class PostCommentWriterDto {
+  id: number;
+  nickname: string;
+  generation: number;
+  profileImageUrl: string;
+}
+
+export class PostCommentDto {
+  id: number;
+  content: string;
+  heartCount: number;
+  isHearted: boolean;
+  createdAt: Date;
+}
