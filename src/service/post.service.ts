@@ -22,6 +22,7 @@ import { GetHashTagSearch } from 'src/dto/get-hash-tag-search.dto';
 import { PostEmoji } from 'src/entity/post_emoji.entity';
 import { MemberQueryRepository } from 'src/repository/member.query-repository';
 import { Notification } from 'src/entity/notification.entity';
+import { CreatePostResponse } from 'src/dto/response/create-post.response';
 
 @Injectable()
 export class PostService {
@@ -39,7 +40,7 @@ export class PostService {
     private readonly memberQueryRepository: MemberQueryRepository,
   ) { }
 
-  async createPost(memberId: number, dto: CreatePostInfoDto): Promise<void> {
+  async createPost(memberId: number, dto: CreatePostInfoDto): Promise<CreatePostResponse> {
     const member = await this.memberRepository.findOneBy({ id: memberId });
     if (member === null) {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
@@ -51,6 +52,8 @@ export class PostService {
       content: dto.content,
     });
     await this.saveHashTags(post.id, dto.hashTags);
+
+    return new CreatePostResponse(post.id);
   }
 
   async getPostList(memberId: number, userGeneration: number, sortPostList: SortPostList) {

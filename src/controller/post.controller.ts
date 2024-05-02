@@ -7,6 +7,7 @@ import { Roles } from 'src/common/roles/roles.decorator';
 import { CreatePostInfoDto } from 'src/dto/request/create-post-dto';
 import { HashTagSearchRequest } from 'src/dto/request/hash-tag-search.request';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
+import { CreatePostResponse } from 'src/dto/response/create-post.response';
 import { HashTagSearchResponse } from 'src/dto/response/hash-tag-search.response';
 import { PostCommentListResponse } from 'src/dto/response/post-comment-list.response';
 import { PostDetailResponse } from 'src/dto/response/post-detail.response';
@@ -21,9 +22,10 @@ export class PostController {
   constructor(private readonly postService: PostService) { }
 
   @ApiOperation({ summary: '포스트 작성' })
+  @ApiResponse({ type: CreatePostResponse })
   @Post('create')
-  async createPost(@Req() req, @Body() createPostInfo: CreatePostInfoDto): Promise<void> {
-    return this.postService.createPost(req.user.id, createPostInfo);
+  async createPost(@Req() req, @Body() createPostInfo: CreatePostInfoDto): Promise<CreatePostResponse> {
+    return await this.postService.createPost(req.user.id, createPostInfo);
   }
 
   @Roles('anyone')
