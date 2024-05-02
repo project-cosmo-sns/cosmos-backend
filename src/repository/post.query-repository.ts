@@ -74,8 +74,8 @@ export class PostQueryRepository {
 
 
     if (sortPostList === ListSortBy.BY_FOLLOW) {
-      query = query.innerJoin(Follow, 'follow', 'following_member_id = member.id')
-        .andWhere('follower_member_id = :memberId', { memberId });
+      query = query.innerJoin(Follow, 'follow', 'follower_member_id = member.id')
+        .andWhere('following_member_id = :memberId', { memberId });
     }
 
     else if (sortPostList === ListSortBy.BY_GENERATION) {
