@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, GoneException, InternalServerErrorException, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
-import { ApiGoneResponse, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBody, ApiGoneResponse, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
@@ -73,6 +73,7 @@ export class PostController {
   @ApiOperation({ summary: '포스트 이모지 추가' })
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
   @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었을 경우' })
+  @ApiBody({ description: '이모지 정보', schema: { type: 'object', properties: { emoji: { type: 'string' } } } })
   @Post(':postId/emoji')
   async createPostEmoji(
     @Req() req,
@@ -125,6 +126,7 @@ export class PostController {
 
   @ApiOperation({ summary: '포스트 댓글 쓰기' })
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @ApiBody({ description: '댓글 내용', schema: { type: 'object', properties: { content: { type: 'string' } } } })
   @Post(':postId/comment/write')
   async writePostComment(
     @Param('postId', ParseIntPipe) postId: number,
@@ -139,6 +141,7 @@ export class PostController {
   @ApiParam({ name: 'commentId', required: true, description: '포스트 댓글 id' })
   @ApiUnauthorizedResponse({ status: 401, description: '해당 댓글을 작성한 사람이 아닐 경우' })
   @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었거나, 댓글이 삭제된 경우' })
+  @ApiBody({ description: '댓글 내용', schema: { type: 'object', properties: { content: { type: 'string' } } } })
   @Patch(':postId/comment/:commentId/modify')
   async modifyPostComment(
     @Param('postId', ParseIntPipe) postId: number,
