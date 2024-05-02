@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
+import { FeedDomainService } from 'src/domain-service/feed.domain-service';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
 import { Feed } from 'src/entity/feed.entity';
 import { FeedEmoji } from 'src/entity/feed_emoji.entity';
@@ -13,6 +14,7 @@ export class FeedService {
     @InjectRepository(Feed) private readonly feedRepository: Repository<Feed>,
     @InjectRepository(FeedEmoji) private readonly feedEmojiRepository: Repository<FeedEmoji>,
     private readonly feedQueryRepository: FeedQueryRepository,
+    private readonly feedDomainService: FeedDomainService,
   ) {}
 
   async postFeed(memberId: number, content: string): Promise<void> {
@@ -112,11 +114,7 @@ export class FeedService {
   }
 
   async deleteFeedEmoji(feedId: number, memberId: number, emojiId: number) {
-    const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
-
-    if (!feed) {
-      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
-    }
+    const feed = await this.feedDomainService.getFeedIsNotDeleted(feedId);
 
     const emoji = await this.feedEmojiRepository.findOneBy({ id: emojiId });
 

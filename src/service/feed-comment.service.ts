@@ -2,6 +2,7 @@ import { FeedCommentQueryRepository } from './../repository/feed-comment.query-r
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
+import { FeedDomainService } from 'src/domain-service/feed.domain-service';
 import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
 import { NotificationType } from 'src/entity/common/Enums';
 import { Feed } from 'src/entity/feed.entity';
@@ -19,6 +20,7 @@ export class FeedCommentService {
     @InjectRepository(FeedComment) private readonly feedCommentRepository: Repository<FeedComment>,
     @InjectRepository(FeedCommentHeart) private readonly feedCommentHeartRepository: Repository<FeedCommentHeart>,
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
+    private readonly feedDomainService: FeedDomainService,
     private readonly feedQueryRepository: FeedQueryRepository,
     private readonly feedCommentQueryRepository: FeedCommentQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
@@ -79,11 +81,7 @@ export class FeedCommentService {
   }
 
   async patchFeedComment(feedId: number, commentId: number, memberId: number, content: string): Promise<void> {
-    const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
-
-    if (!feed) {
-      throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
-    }
+    await this.feedDomainService.getFeedIsNotDeleted(feedId);
 
     const comment = await this.feedCommentQueryRepository.getIsNotDeletedFeedComment(commentId);
 
@@ -100,11 +98,7 @@ export class FeedCommentService {
   }
 
   async deleteFeedComment(feedId: number, commentId: number, memberId: number): Promise<void> {
-    const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
-
-    if (!feed) {
-      throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
-    }
+    const feed = await this.feedDomainService.getFeedIsNotDeleted(feedId);
 
     const comment = await this.feedCommentQueryRepository.getIsNotDeletedFeedComment(commentId);
 
@@ -124,11 +118,7 @@ export class FeedCommentService {
   }
 
   async likeFeedComment(feedId: number, commentId: number, memberId: number): Promise<void> {
-    const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
-
-    if (!feed) {
-      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
-    }
+    await this.feedDomainService.getFeedIsNotDeleted(feedId);
 
     const comment = await this.feedCommentQueryRepository.getIsNotDeletedFeedComment(feedId);
 
@@ -142,11 +132,7 @@ export class FeedCommentService {
   }
 
   async unlikeFeedComment(feedId: number, commentId: number, memberId: number) {
-    const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
-
-    if (!feed) {
-      throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
-    }
+    await this.feedDomainService.getFeedIsNotDeleted(feedId);
 
     const comment = await this.feedCommentQueryRepository.getIsNotDeletedFeedComment(commentId);
 
