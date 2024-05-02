@@ -45,6 +45,9 @@ import { Notification } from './entity/notification.entity';
 import { NotificationController } from './controller/notification.controller';
 import { NotificationService } from './service/notification.service';
 import { NotificationQueryRepository } from './repository/notification.query-repository';
+import { SearchController } from './controller/search.controller';
+import { SearchService } from './service/search.service';
+import { SearchQueryRepository } from './repository/search.query-repository';
 import { ProfileController } from './controller/profile.controller';
 import { ProfileService } from './service/profile.service';
 import { ProfileQueryRepository } from './repository/profile.query-repository';
@@ -85,6 +88,7 @@ import { ProfileQueryRepository } from './repository/profile.query-repository';
     ImageController,
     FollowController,
     NotificationController,
+    SearchController,
     ProfileController,
   ],
   providers: [
@@ -98,6 +102,7 @@ import { ProfileQueryRepository } from './repository/profile.query-repository';
     ImageService,
     FollowService,
     NotificationService,
+    SearchService,
     ProfileService,
 
     // QueryRepository
@@ -107,6 +112,7 @@ import { ProfileQueryRepository } from './repository/profile.query-repository';
     PostQueryRepository,
     FollowQueryRepository,
     NotificationQueryRepository,
+    SearchQueryRepository,
     ProfileQueryRepository,
 
     // Strategy
