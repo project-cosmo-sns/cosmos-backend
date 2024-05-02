@@ -48,6 +48,9 @@ import { NotificationQueryRepository } from './repository/notification.query-rep
 import { SearchController } from './controller/search.controller';
 import { SearchService } from './service/search.service';
 import { SearchQueryRepository } from './repository/search.query-repository';
+import { ProfileController } from './controller/profile.controller';
+import { ProfileService } from './service/profile.service';
+import { ProfileQueryRepository } from './repository/profile.query-repository';
 
 @Module({
   imports: [
@@ -86,6 +89,7 @@ import { SearchQueryRepository } from './repository/search.query-repository';
     FollowController,
     NotificationController,
     SearchController,
+    ProfileController,
   ],
   providers: [
     // Service
@@ -99,6 +103,7 @@ import { SearchQueryRepository } from './repository/search.query-repository';
     FollowService,
     NotificationService,
     SearchService,
+    ProfileService,
 
     // QueryRepository
     MemberQueryRepository,
@@ -108,6 +113,7 @@ import { SearchQueryRepository } from './repository/search.query-repository';
     FollowQueryRepository,
     NotificationQueryRepository,
     SearchQueryRepository,
+    ProfileQueryRepository,
 
     // Strategy
     GithubStrategy,

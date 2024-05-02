@@ -19,7 +19,7 @@ export class FollowController {
   async postFollow(
     @Param('memberId', ParseIntPipe) memberId: number,
     @Req() req,): Promise<void> {
-    return this.followService.followMember(memberId, req.user.id);
+    return this.followService.followMember(req.user.id, memberId);
   }
 
   @ApiOperation({ summary: '언팔로우' })
@@ -30,7 +30,7 @@ export class FollowController {
   async deleteFollow(
     @Param('memberId', ParseIntPipe) memberId: number,
     @Req() req): Promise<void> {
-    return this.followService.unFollowMember(memberId, req.user.id);
+    return this.followService.unFollowMember(req.user.id, memberId);
   }
 
 
