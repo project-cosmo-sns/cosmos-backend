@@ -94,6 +94,7 @@ export class PostQueryRepository {
       .select([
         'member.id as memberId',
         'member.nickname as nickname',
+        'member.generation as generation',
         'member.profile_image_url as profileImageUrl',
         'post.id as postId',
         'post.title as title',
@@ -197,6 +198,7 @@ export class GetPostListTuple {
 export class GetPostDetailTuple {
   memberId!: number;
   nickname!: string;
+  generation!: number;
   profileImageUrl!: string;
   createdAt!: Date;
   postId!: number;

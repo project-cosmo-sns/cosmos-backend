@@ -1,7 +1,7 @@
 import { GoneException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashTagDto } from 'src/dto/hash-tag-dto';
-import { CreatePostInfoDto } from 'src/dto/create-post-dto';
+import { CreatePostInfoDto } from 'src/dto/request/create-post-dto';
 import { HashTag } from 'src/entity/hash_tag.entity';
 import { Member } from 'src/entity/member.entity';
 import { Post } from 'src/entity/post.entity';

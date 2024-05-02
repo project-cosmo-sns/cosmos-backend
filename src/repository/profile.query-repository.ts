@@ -31,6 +31,22 @@ export class ProfileQueryRepository {
     return plainToInstance(GetOthersProfileTuple, othersProfile);
   }
 
+  async getMyProfileInfo(memberId: number): Promise<GetMyProfileTuple> {
+    const myProfile = await this.dataSource
+      .createQueryBuilder()
+      .from(Member, 'member')
+      .select([
+        'member.id as memberId',
+        'member.nickname as nickname',
+        'member.generation as generation',
+        'member.profile_image_url as profileImageUrl',
+        'member.introduce as introduce',
+      ])
+      .where('member.id = :memberId', { memberId })
+      .getRawOne()
+    return plainToInstance(GetMyProfileTuple, myProfile);
+  }
+
   async getProfileFollowerCount(memberId: number): Promise<number> {
     const followerCount = await this.dataSource
       .createQueryBuilder()
@@ -60,6 +76,16 @@ export class GetOthersProfileTuple {
   followingCount!: number;
   @Transform(({ value }) => value === '1')
   isFollowed!: boolean;
+}
+
+export class GetMyProfileTuple {
+  memberId!: number;
+  nickname!: string;
+  generation!: number;
+  profileImageUrl!: string;
+  introduce!: string;
+  followerCount!: number;
+  followingCount!: number;
 }
 
 export class FollowerCountTuple {
