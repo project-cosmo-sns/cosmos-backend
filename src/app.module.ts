@@ -52,6 +52,7 @@ import { ProfileController } from './controller/profile.controller';
 import { ProfileService } from './service/profile.service';
 import { ProfileQueryRepository } from './repository/profile.query-repository';
 import { FeedDomainService } from './domain-service/feed.domain-service';
+import { FeedImage } from './entity/feed_image.entity';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { FeedDomainService } from './domain-service/feed.domain-service';
     TypeOrmModule.forFeature([
       Member,
       Feed,
+      FeedImage,
       FeedEmoji,
       FeedComment,
       FeedCommentHeart,

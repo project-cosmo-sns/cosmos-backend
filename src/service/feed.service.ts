@@ -5,6 +5,7 @@ import { FeedDomainService } from 'src/domain-service/feed.domain-service';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
 import { Feed } from 'src/entity/feed.entity';
 import { FeedEmoji } from 'src/entity/feed_emoji.entity';
+import { FeedImage } from 'src/entity/feed_image.entity';
 import { FeedQueryRepository } from 'src/repository/feed.query-repository';
 import { Repository } from 'typeorm';
 
@@ -12,18 +13,29 @@ import { Repository } from 'typeorm';
 export class FeedService {
   constructor(
     @InjectRepository(Feed) private readonly feedRepository: Repository<Feed>,
+    @InjectRepository(FeedImage) private readonly feedImageRepository: Repository<FeedImage>,
     @InjectRepository(FeedEmoji) private readonly feedEmojiRepository: Repository<FeedEmoji>,
     private readonly feedQueryRepository: FeedQueryRepository,
     private readonly feedDomainService: FeedDomainService,
   ) {}
 
-  async postFeed(memberId: number, content: string): Promise<void> {
+  async postFeed(memberId: number, content: string, imageUrls: string[]): Promise<void> {
     const feed = new Feed();
 
     feed.memberId = memberId;
     feed.content = content;
 
     await this.feedRepository.save(feed);
+
+    await Promise.all(
+      imageUrls.map(async (imageUrl) => {
+        const feedImage = new FeedImage();
+        feedImage.feedId = feed.id;
+        feedImage.imageUrl = imageUrl;
+
+        await this.feedImageRepository.save(feedImage);
+      }),
+    );
   }
 
   async getFeedList(
