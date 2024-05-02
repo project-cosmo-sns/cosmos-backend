@@ -30,9 +30,6 @@ export class ProfileQueryRepository {
       ])
       .where('member.id = :memberId', { memberId })
       .getRawOne()
-    if (othersProfile) {
-      othersProfile.isFollowed = othersProfile.isFollowed === '1' ? true : false;
-    }
     return plainToInstance(GetOthersProfileTuple, othersProfile);
   }
 }
@@ -45,5 +42,6 @@ export class GetOthersProfileTuple {
   introduce!: string;
   followerCount!: number;
   followingCount!: number;
+  @Transform(({ value }) => value === '1')
   isFollowed!: boolean;
 }
