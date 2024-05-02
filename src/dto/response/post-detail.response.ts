@@ -1,57 +1,34 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { GetPostDetail, GetPostDetailDto } from '../get-post-detail.dto';
+import { PostDto, PostWriterDto } from 'src/service/post.service';
 
 export class PostDetail {
-  @ApiProperty()
-  memberId!: number;
-  @ApiProperty()
-  nickname!: string;
-  @ApiProperty()
-  generation!: number;
-  @ApiProperty()
-  profileImageUrl!: string;
-  @ApiProperty()
-  createdAt!: Date;
-  @ApiProperty()
-  postId!: number;
-  @ApiProperty()
-  title!: string;
-  @ApiProperty()
-  content!: string;
-  @ApiProperty()
-  emojiCount!: number;
-  @ApiProperty()
-  commentCount!: number;
-  @ApiProperty()
-  viewCount!: number;
+  @ApiProperty({
+    type: {
+      id: { type: 'number' },
+      nickname: { type: 'string' },
+      generation: { type: 'number' },
+      profileImageUrl: { type: 'string' },
+    },
+  })
+  writer: PostWriterDto;
+  @ApiProperty({
+    type: {
+      id: { type: 'number' },
+      title: { type: 'string' },
+      content: { type: 'string' },
+      viewCount: { type: 'number' },
+      commentCount: { type: 'number' },
+      emojiCount: { type: 'number' },
+      createdAt: { type: 'string' },
+    },
+  })
+  post: PostDto;
 
-  constructor(
-    memberId: number,
-    nickname: string,
-    generation: number,
-    profileImageUrl: string,
-    createdAt: Date,
-    postId: number,
-    title: string,
-    content: string,
-    emojiCount: number,
-    commentCount: number,
-    viewCount: number,
-  ) {
-    this.memberId = memberId;
-    this.nickname = nickname;
-    this.generation = generation;
-    this.profileImageUrl = profileImageUrl;
-    this.createdAt = createdAt;
-    this.postId = postId;
-    this.title = title;
-    this.content = content;
-    this.emojiCount = emojiCount;
-    this.commentCount = commentCount;
-    this.viewCount = viewCount;
+  constructor(writer: PostWriterDto, post: PostDto) {
+    this.writer = writer;
+    this.post = post;
   }
-
-
 }
 export class PostDetailHashTag {
   @ApiProperty()
@@ -77,17 +54,8 @@ export class PostDetailResponse {
 
   static from(getPostDetail: GetPostDetailDto) {
     const postDetail = new PostDetail(
-      getPostDetail.postDetail.memberId,
-      getPostDetail.postDetail.nickname,
-      getPostDetail.postDetail.generation,
-      getPostDetail.postDetail.profileImageUrl,
-      getPostDetail.postDetail.createdAt,
-      getPostDetail.postDetail.postId,
-      getPostDetail.postDetail.title,
-      getPostDetail.postDetail.content,
-      getPostDetail.postDetail.emojiCount,
-      getPostDetail.postDetail.commentCount,
-      getPostDetail.postDetail.viewCount
+      getPostDetail.postDetail.writer,
+      getPostDetail.postDetail.post,
     );
     return new PostDetailResponse(postDetail, getPostDetail.hashTag)
   }

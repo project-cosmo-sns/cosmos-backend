@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
 import { GetPostList } from 'src/dto/get-post-list.dto';
-import { GetPostDetailDto } from 'src/dto/get-post-detail.dto';
+import { GetPostDetail, GetPostDetailDto } from 'src/dto/get-post-detail.dto';
 import { ListSortBy, NotificationType } from 'src/entity/common/Enums';
 import { PostView } from 'src/entity/post_view.entity';
 import { PostComment } from 'src/entity/post_comment.entity';
@@ -87,7 +87,8 @@ export class PostService {
 
     const postDetailHashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postId);
 
-    return new GetPostDetailDto(postDetailInfo, postDetailHashTagInfo);
+    const postDetail = GetPostDetail.from(postDetailInfo);
+    return new GetPostDetailDto(postDetail, postDetailHashTagInfo);
   }
 
   async deletePost(postId: number, memberId: number): Promise<void> {
