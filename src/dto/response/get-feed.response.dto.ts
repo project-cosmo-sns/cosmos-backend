@@ -19,6 +19,7 @@ export class GetFeedResponseDto {
       commentCount: { type: 'number' },
       emojiCount: { type: 'number' },
       createdAt: { type: 'string' },
+      imageUrls: { type: 'array', items: { type: 'string' } },
     },
   })
   feed: FeedDto;
