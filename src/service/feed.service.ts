@@ -44,25 +44,30 @@ export class FeedService {
     const getFeedListTuple = await this.feedQueryRepository.getFeedList(paginationRequest);
     const totalCount = await this.feedQueryRepository.getFeedListCount();
 
-    const feedList = getFeedListTuple.map((item) => {
-      const writer = {
-        id: item.writerId,
-        nickname: item.writerNickname,
-        generation: item.writerGeneration,
-        profileImageUrl: item.writerProfileImageUrl,
-      };
+    const feedList = await Promise.all(
+      getFeedListTuple.map(async (item) => {
+        const writer = {
+          id: item.writerId,
+          nickname: item.writerNickname,
+          generation: item.writerGeneration,
+          profileImageUrl: item.writerProfileImageUrl,
+        };
 
-      const feed = {
-        id: item.feedId,
-        content: item.feedContent,
-        viewCount: item.feedViewCount,
-        commentCount: item.feedCommentCount,
-        emojiCount: item.feedEmojiCount,
-        createdAt: item.feedCreatedAt,
-      };
+        const feedImages = await this.feedImageRepository.findBy({ feedId: item.feedId });
 
-      return GetFeedResponseDto.from({ writer, feed });
-    });
+        const feed = {
+          id: item.feedId,
+          content: item.feedContent,
+          viewCount: item.feedViewCount,
+          commentCount: item.feedCommentCount,
+          emojiCount: item.feedEmojiCount,
+          createdAt: item.feedCreatedAt,
+          imageUrls: feedImages.map((feedImage) => feedImage.imageUrl),
+        };
+
+        return GetFeedResponseDto.from({ writer, feed });
+      }),
+    );
 
     return { feedList, totalCount };
   }
@@ -73,6 +78,8 @@ export class FeedService {
     if (!feed) {
       throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
     }
+
+    const feedImages = await this.feedImageRepository.findBy({ feedId });
 
     return new GetFeedResponseDto(
       {
@@ -88,6 +95,7 @@ export class FeedService {
         commentCount: feed.feedCommentCount,
         emojiCount: feed.feedEmojiCount,
         createdAt: feed.feedCreatedAt,
+        imageUrls: feedImages.map((feedImage) => feedImage.imageUrl),
       },
     );
   }
@@ -159,4 +167,5 @@ export class FeedDto {
   commentCount: number;
   emojiCount: number;
   createdAt: Date;
+  imageUrls: string[];
 }
