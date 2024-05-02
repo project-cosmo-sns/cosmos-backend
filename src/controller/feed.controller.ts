@@ -42,12 +42,12 @@ export class FeedController {
   constructor(
     private readonly feedService: FeedService,
     private readonly feedCommentService: FeedCommentService,
-  ) { }
+  ) {}
 
   @ApiOperation({ summary: '피드 작성' })
   @Post('')
   async postFeed(@Req() req, @Body() body: PostFeedRequestDto): Promise<void> {
-    return this.feedService.postFeed(req.user.id, body.content);
+    return this.feedService.postFeed(req.user.id, body.content, body.imageUrls ?? []);
   }
 
   @Roles('anyone')
