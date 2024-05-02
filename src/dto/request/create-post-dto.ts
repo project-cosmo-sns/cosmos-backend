@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsString, ValidateNested } from 'class-validator';
-import { HashTagDto } from './hash-tag-dto';
+import { HashTagDto } from '../hash-tag-dto';
 import { Type } from 'class-transformer';
 
 export class CreatePostInfoDto {

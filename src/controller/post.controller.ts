@@ -4,7 +4,7 @@ import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
 import { Roles } from 'src/common/roles/roles.decorator';
-import { CreatePostInfoDto } from 'src/dto/create-post-dto';
+import { CreatePostInfoDto } from 'src/dto/request/create-post-dto';
 import { HashTagSearchRequest } from 'src/dto/request/hash-tag-search.request';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { HashTagSearchResponse } from 'src/dto/response/hash-tag-search.response';
