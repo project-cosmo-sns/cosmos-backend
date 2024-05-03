@@ -1,5 +1,17 @@
 import { GetPostListTuple } from 'src/repository/post.query-repository';
 import { PostListDto, PostWriterDto } from 'src/service/post.service';
+import { GetHashTagInfo } from './get-post-detail.dto';
+
+export class GetPostListDto {
+  postList!: GetPostList;
+  hashTag!: GetHashTagInfo[];
+
+  constructor(postList: GetPostList, hashTag: GetHashTagInfo[]) {
+    this.postList = postList;
+    this.hashTag = hashTag;
+  }
+}
+
 
 export class GetPostList {
   writer: PostWriterDto;
