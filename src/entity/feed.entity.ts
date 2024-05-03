@@ -29,6 +29,10 @@ export class Feed {
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', nullable: false })
   updatedAt!: Date;
 
+  updateFeed(content: string) {
+    this.content = content;
+  }
+
   deleteFeed(deletedAt?: Date) {
     this.deletedAt = deletedAt;
   }

@@ -50,6 +50,34 @@ export class FeedController {
     return this.feedService.postFeed(req.user.id, body.content, body.imageUrls ?? []);
   }
 
+  @ApiOperation({ summary: '피드 상세' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
+  @ApiResponse({ type: GetFeedResponseDto })
+  @Get('/:feedId/detail')
+  async getFeedDetail(@Param('feedId', ParseIntPipe) feedId: number): Promise<GetFeedResponseDto> {
+    const feed = await this.feedService.getFeedDetail(feedId);
+
+    return feed;
+  }
+
+  @ApiOperation({ summary: '피드 수정' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
+  @Patch('/:feedId')
+  async patchFeed(
+    @Req() req,
+    @Body() body: PostFeedRequestDto,
+    @Param('feedId', ParseIntPipe) feedId: number,
+  ): Promise<void> {
+    return this.feedService.patchFeed(req.user.id, feedId, body.content, body.imageUrls ?? []);
+  }
+
+  @ApiOperation({ summary: '피드 삭제' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
+  @Delete(':feedId')
+  async deleteFeed(@Req() req, @Param('feedId', ParseIntPipe) feedId: number): Promise<void> {
+    return this.feedService.deleteFeed(feedId, req.user.id);
+  }
+
   @Roles('anyone')
   @ApiOperation({ summary: '피드 목록' })
   @ApiPaginatedResponse(GetFeedResponseDto)
@@ -62,23 +90,6 @@ export class FeedController {
       options: paginationRequest,
       totalCount,
     });
-  }
-
-  @ApiOperation({ summary: '피드 상세' })
-  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
-  @ApiResponse({ type: GetFeedResponseDto })
-  @Get('/:feedId')
-  async getFeedDetail(@Param('feedId', ParseIntPipe) feedId: number): Promise<GetFeedResponseDto> {
-    const feed = await this.feedService.getFeedDetail(feedId);
-
-    return feed;
-  }
-
-  @ApiOperation({ summary: '피드 삭제' })
-  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
-  @Delete(':feedId')
-  async deleteFeed(@Req() req, @Param('feedId', ParseIntPipe) feedId: number): Promise<void> {
-    return this.feedService.deleteFeed(feedId, req.user.id);
   }
 
   @ApiOperation({ summary: '피드 이모지 추가' })
