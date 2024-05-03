@@ -14,6 +14,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   ApiBody,
   ApiGoneResponse,
@@ -27,13 +28,16 @@ import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
 import { Roles } from 'src/common/roles/roles.decorator';
+import { DeleteImageRequestDto } from 'src/dto/request/delete-image.request.dto';
 import { PostFeedCommentRequestDto } from 'src/dto/request/post-feed-comment.request';
 import { PostFeedRequestDto } from 'src/dto/request/post-feed.request.dto';
 import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
+import { ImageResponse } from 'src/dto/response/image.response';
 import { RolesGuard } from 'src/guard/roles.guard';
 import { FeedCommentService } from 'src/service/feed-comment.service';
 import { FeedService } from 'src/service/feed.service';
+import { ImageService } from 'src/service/image.service';
 
 @ApiTags('피드')
 @Controller('feed')
@@ -42,6 +46,8 @@ export class FeedController {
   constructor(
     private readonly feedService: FeedService,
     private readonly feedCommentService: FeedCommentService,
+    private readonly imageService: ImageService,
+    private readonly configService: ConfigService,
   ) {}
 
   @ApiOperation({ summary: '피드 작성' })
@@ -239,5 +245,23 @@ export class FeedController {
         throw new InternalServerErrorException('서버 오류가 발생했습니다.');
       }
     }
+  }
+
+  @ApiOperation({ summary: '이미지 url 불러오기' })
+  @Post('/image')
+  async createUploadURL(): Promise<ImageResponse> {
+    const bucket = this.configService.get('AWS_S3_UPLOAD_BUCKET_FEED');
+
+    const uploadUrl = await this.imageService.createUploadURL(bucket);
+    return new ImageResponse(uploadUrl);
+  }
+
+  @ApiOperation({ summary: '이미지 삭제' })
+  @ApiParam({ name: 'url', required: true, description: '이미지 url' })
+  @Delete('/image')
+  async deleteImage(@Query() queryParam: DeleteImageRequestDto): Promise<void> {
+    const bucket = this.configService.get('AWS_S3_UPLOAD_BUCKET_FEED');
+
+    await this.imageService.deleteImage(queryParam.imageUrl, bucket);
   }
 }
