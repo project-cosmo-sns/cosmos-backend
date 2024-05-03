@@ -38,7 +38,7 @@ export class ProfileController {
 
 
   @ApiOperation({ summary: '나의 프로필 수정' })
-  @Patch('my-profile')
+  @Patch('mine')
   async patchMyProfile(
     @Req() req,
     @Body() profileInfoRequestDto: profileInfoRequestDto): Promise<void> {
@@ -65,6 +65,8 @@ export class ProfileController {
       totalCount,
     })
   }
+
+
 
   @ApiOperation({ summary: '타 유저 프로필 포스트 목록' })
   @ApiPaginatedResponse(ProfilePostResponse)
