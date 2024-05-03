@@ -1,10 +1,13 @@
 import { GoneException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { GetMyProfileDto } from 'src/dto/get-my-profile';
 import { GetOthersProfileDto } from "src/dto/get-others-profile";
+import { GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
 import { profileInfoRequestDto } from 'src/dto/request/profile-info.request';
 import { Member } from "src/entity/member.entity";
 import { MemberQueryRepository } from "src/repository/member.query-repository";
+import { PostQueryRepository } from 'src/repository/post.query-repository';
 import { ProfileQueryRepository } from "src/repository/profile.query-repository";
 import { Repository } from "typeorm";
 
@@ -13,7 +16,8 @@ export class ProfileService {
   constructor(
     @InjectRepository(Member) private readonly memberRepository: Repository<Member>,
     private readonly memberQueryRepository: MemberQueryRepository,
-    private readonly profileQueryRepository: ProfileQueryRepository
+    private readonly profileQueryRepository: ProfileQueryRepository,
+    private readonly postQueryRepository: PostQueryRepository,
   ) { }
 
   async getOthersProfileInfo(memberId: number, myMemberId: number): Promise<GetOthersProfileDto> {
@@ -49,5 +53,18 @@ export class ProfileService {
     }
     memberInfo.setProfileInfo(nickname, profileImageUrl, introduce);
     await this.memberRepository.save(memberInfo);
+  }
+
+  async getPostList(memberId: number, paginationRequest: PaginationRequest) {
+    const postListTuples = await this.profileQueryRepository.getPostList(memberId, paginationRequest);
+    const totalCount = await this.profileQueryRepository.getAllPostListTotalCount(memberId);
+
+    const postInfo = await Promise.all(postListTuples.map(async (postList) => {
+      const post = GetPostList.from(postList);
+      const hashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postList.postId);
+      return new GetPostListDto(post, hashTagInfo);
+    }))
+
+    return { postInfo, totalCount };
   }
 }

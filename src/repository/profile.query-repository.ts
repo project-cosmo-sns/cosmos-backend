@@ -1,8 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { Transform, plainToInstance } from "class-transformer";
+import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { Follow } from "src/entity/follow.entity";
 import { Member } from "src/entity/member.entity";
 import { DataSource } from "typeorm";
+import { GetPostListTuple } from './post.query-repository';
+import { Post } from 'src/entity/post.entity';
 
 @Injectable()
 export class ProfileQueryRepository {
@@ -63,6 +66,43 @@ export class ProfileQueryRepository {
       .where('follow.following_member_id = :memberId', { memberId })
       .getCount()
     return followingCount;
+  }
+
+  async getPostList(
+    memberId: number,
+    paginationRequest: PaginationRequest): Promise<GetPostListTuple[]> {
+    const postListQuery = await this.getPostListBaseQuery(memberId)
+      .select([
+        'member.id as memberId',
+        'member.nickname as nickname',
+        'member.generation as generation',
+        'member.profile_image_url as profileImageUrl',
+        'post.id as postId',
+        'post.title as title',
+        'post.content as content',
+        'post.emoji_count as emojiCount',
+        'post.comment_count as commentCount',
+        'post.view_count as viewCount'
+      ])
+      .limit(paginationRequest.take)
+      .offset(paginationRequest.getSkip())
+      .orderBy('post.created_at', paginationRequest.order)
+      .getRawMany()
+    return plainToInstance(GetPostListTuple, postListQuery);
+  }
+
+  async getAllPostListTotalCount(memberId: number,): Promise<number> {
+    return await this.getPostListBaseQuery(memberId).getCount();
+  }
+
+  private getPostListBaseQuery(memberId: number) {
+    return this.dataSource
+      .createQueryBuilder()
+      .from(Post, 'post')
+      .innerJoin(Member, 'member', 'post.member_id=member.id')
+      .where('post.deleted_at IS NULL')
+      .andWhere('member.deleted_at IS NULL')
+      .andWhere('post.member_id = :memberId', { memberId });
   }
 }
 
