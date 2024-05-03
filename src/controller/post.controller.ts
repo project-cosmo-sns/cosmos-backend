@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, GoneException, InternalServerErrorException, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiGoneResponse, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBody, ApiGoneResponse, ApiNotFoundResponse, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
@@ -63,6 +63,19 @@ export class PostController {
   async getPostDetail(@Param('postId', ParseIntPipe) postId: number): Promise<PostDetailResponse> {
     const postDetail = await this.postService.getPostDetail(postId);
     return PostDetailResponse.from(postDetail);
+  }
+
+  @ApiOperation({ summary: '포스트 수정' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @ApiNotFoundResponse({ status: 404, description: '해당 postId값을 가진 포스트가 없거나 삭제된 경우' })
+  @ApiUnauthorizedResponse({ status: 401, description: '포스트 쓴 유저가 아닐 경우' })
+  @Patch(':postId')
+  async modifyPostInfo(
+    @Param('postId', ParseIntPipe) postId: number,
+    @Req() req,
+    @Body() createPostInfo: CreatePostInfoDto,
+  ): Promise<void> {
+    return await this.postService.modifyPost(postId, req.user.id, createPostInfo);
   }
 
   @ApiOperation({ summary: '포스트 삭제' })

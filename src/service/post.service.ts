@@ -98,6 +98,23 @@ export class PostService {
     return new GetPostDetailDto(postDetail, postDetailHashTagInfo);
   }
 
+  async modifyPost(postId: number, memberId: number, dto: CreatePostInfoDto): Promise<void> {
+    const postInfo = await this.postRepository.findOneBy({ id: postId });
+    if (!postInfo || postInfo.deletedAt !== null) {
+      throw new NotFoundException('해당 포스트가 없거나 삭제되었습니다.');
+    }
+    if (postInfo.memberId !== memberId) {
+      throw new UnauthorizedException('권한이 없습니다.');
+    }
+    const hashTags = await this.postHashTagRepository.findBy({ postId });
+
+    postInfo.setPostInfo(dto.category, dto.title, dto.content);
+    await this.postRepository.save(postInfo);
+
+    await Promise.all(hashTags.map(tag => this.postHashTagRepository.remove(tag)));
+    await this.saveHashTags(postInfo.id, dto.hashTags);
+  }
+
   async deletePost(postId: number, memberId: number): Promise<void> {
     const postInfo = await this.postRepository.findOneBy({ id: postId });
     if (!postInfo) {
@@ -166,26 +183,6 @@ export class PostService {
     }
     postInfo.plusPostViewCount(postInfo.viewCount);
     await this.postRepository.save(postInfo);
-  }
-
-  private async saveHashTags(postId: number, hashTags: HashTagDto[]): Promise<void> {
-    await Promise.all(
-      hashTags.map(async (hashTagDto) => {
-        let tagId = hashTagDto.hashTagId;
-        if (!hashTagDto.hashTagId) {
-          const newHashTag = await this.hashTagRepository.save({
-            tagName: hashTagDto.tagName,
-            color: hashTagDto.color,
-          });
-          tagId = newHashTag.id;
-        }
-
-        await this.postHashTagRepository.save({
-          postId,
-          hashTagId: tagId,
-        });
-      }),
-    );
   }
 
   async getPostCommentList(postId: number, memberId: number, paginationRequest: PaginationRequest) {
@@ -314,6 +311,26 @@ export class PostService {
     const hashTagSearchTuples = await this.postQueryRepository.getHashTagSearchList(hashTagResult);
     const hashTagSearchInfo = hashTagSearchTuples.map((hashTagSearch) => GetHashTagSearch.from(hashTagSearch));
     return hashTagSearchInfo;
+  }
+
+  private async saveHashTags(postId: number, hashTags: HashTagDto[]): Promise<void> {
+    await Promise.all(
+      hashTags.map(async (hashTagDto) => {
+        let tagId = hashTagDto.hashTagId;
+        if (!tagId) {
+          const newHashTag = await this.hashTagRepository.save({
+            tagName: hashTagDto.tagName,
+            color: hashTagDto.color,
+          });
+          tagId = newHashTag.id;
+        }
+
+        await this.postHashTagRepository.save({
+          postId,
+          hashTagId: tagId,
+        });
+      }),
+    );
   }
 
   private async newPostCommentNotification(receivedMemberId, sendMemberId, postId, commentId) {
