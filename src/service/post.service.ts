@@ -9,7 +9,7 @@ import { PostHashTag } from 'src/entity/post_hash_tag.entity';
 import { Repository } from 'typeorm';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
-import { GetPostList } from 'src/dto/get-post-list.dto';
+import { GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
 import { GetPostDetail, GetPostDetailDto } from 'src/dto/get-post-detail.dto';
 import { ListSortBy, NotificationType } from 'src/entity/common/Enums';
 import { PostView } from 'src/entity/post_view.entity';
@@ -69,7 +69,11 @@ export class PostService {
       userGeneration,
     );
 
-    const postInfo = postListTuples.map((postList) => GetPostList.from(postList));
+    const postInfo = await Promise.all(postListTuples.map(async (postList) => {
+      const post = GetPostList.from(postList);
+      const hashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postList.postId);
+      return new GetPostListDto(post, hashTagInfo);
+    }));
 
     return { postInfo, totalCount };
   }

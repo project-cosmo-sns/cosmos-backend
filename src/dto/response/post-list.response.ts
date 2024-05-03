@@ -1,7 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PostListDto, PostWriterDto } from 'src/service/post.service';
+import { PostDetailHashTag } from './post-detail.response';
+import { GetPostList, GetPostListDto } from '../get-post-list.dto';
 
-export class PostListResponse {
+export class PostListInfo {
   @ApiProperty({
     type: {
       id: { type: 'number' },
@@ -28,8 +30,25 @@ export class PostListResponse {
     this.writer = writer;
     this.post = post;
   }
+}
 
-  static from({ writer, post }: { writer: PostWriterDto; post: PostListDto }) {
-    return new PostListResponse(writer, post);
+export class PostListResponse {
+  @ApiProperty({ type: PostListInfo })
+  postListInfo!: PostListInfo;
+  @ApiProperty({ type: [PostDetailHashTag] })
+  postDetailHashTag!: PostDetailHashTag[];
+
+
+  constructor(postListInfo: PostListInfo, postDetailHashTag: PostDetailHashTag[]) {
+    this.postListInfo = postListInfo;
+    this.postDetailHashTag = postDetailHashTag;
+  }
+
+  static from(getPostList: GetPostListDto) {
+    const postList = new PostListInfo(
+      getPostList.postList.writer,
+      getPostList.postList.post,
+    );
+    return new PostListResponse(postList, getPostList.hashTag)
   }
 }
