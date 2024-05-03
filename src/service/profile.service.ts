@@ -5,6 +5,8 @@ import { GetMyProfileDto } from 'src/dto/get-my-profile';
 import { GetOthersProfileDto } from "src/dto/get-others-profile";
 import { GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
 import { profileInfoRequestDto } from 'src/dto/request/profile-info.request';
+import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
+import { FeedImage } from 'src/entity/feed_image.entity';
 import { Member } from "src/entity/member.entity";
 import { MemberQueryRepository } from "src/repository/member.query-repository";
 import { PostQueryRepository } from 'src/repository/post.query-repository';
@@ -15,6 +17,7 @@ import { Repository } from "typeorm";
 export class ProfileService {
   constructor(
     @InjectRepository(Member) private readonly memberRepository: Repository<Member>,
+    @InjectRepository(FeedImage) private readonly feedImageRepository: Repository<FeedImage>,
     private readonly memberQueryRepository: MemberQueryRepository,
     private readonly profileQueryRepository: ProfileQueryRepository,
     private readonly postQueryRepository: PostQueryRepository,
@@ -66,5 +69,40 @@ export class ProfileService {
     }))
 
     return { postInfo, totalCount };
+  }
+
+  async getFeedList(
+    memberId: number,
+    paginationRequest: PaginationRequest,
+  ): Promise<{ feedList: GetFeedResponseDto[]; totalCount: number }> {
+    const getFeedListTuple = await this.profileQueryRepository.getFeedList(memberId, paginationRequest);
+    const totalCount = await this.profileQueryRepository.getFeedListCount(memberId);
+
+    const feedList = await Promise.all(
+      getFeedListTuple.map(async (item) => {
+        const writer = {
+          id: item.writerId,
+          nickname: item.writerNickname,
+          generation: item.writerGeneration,
+          profileImageUrl: item.writerProfileImageUrl,
+        };
+
+        const feedImages = await this.feedImageRepository.findBy({ feedId: item.feedId });
+
+        const feed = {
+          id: item.feedId,
+          content: item.feedContent,
+          viewCount: item.feedViewCount,
+          commentCount: item.feedCommentCount,
+          emojiCount: item.feedEmojiCount,
+          createdAt: item.feedCreatedAt,
+          imageUrls: feedImages.map((feedImage) => feedImage.imageUrl),
+        };
+
+        return GetFeedResponseDto.from({ writer, feed });
+      }),
+    );
+
+    return { feedList, totalCount };
   }
 }

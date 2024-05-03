@@ -5,6 +5,7 @@ import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
 import { Roles } from "src/common/roles/roles.decorator";
 import { profileInfoRequestDto } from 'src/dto/request/profile-info.request';
+import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
 import { MyProfileInfoResponse } from 'src/dto/response/my-profile-info.response';
 import { OthersProfileInfoResponse } from "src/dto/response/others-profile-info.response";
 import { ProfilePostResponse } from 'src/dto/response/profile/my-profile-post.response';
@@ -50,6 +51,22 @@ export class ProfileController {
     );
   }
 
+  @ApiOperation({ summary: '나의 프로필 피드 목록' })
+  @ApiPaginatedResponse(GetFeedResponseDto)
+  @Get('mine/feed')
+  async getMyFeedList(
+    @Req() req,
+    @Query() paginationRequest: PaginationRequest
+  ): Promise<PaginationResponse<GetFeedResponseDto>> {
+    const { feedList, totalCount } = await this.profileService.getFeedList(req.user.id, paginationRequest);
+
+    return PaginationResponse.of({
+      data: feedList,
+      options: paginationRequest,
+      totalCount,
+    });
+  }
+
   @ApiOperation({ summary: '나의 프로필 포스트 목록' })
   @ApiPaginatedResponse(ProfilePostResponse)
   @Get('mine/post')
@@ -66,10 +83,9 @@ export class ProfileController {
     })
   }
 
-
-
   @ApiOperation({ summary: '타 유저 프로필 포스트 목록' })
   @ApiPaginatedResponse(ProfilePostResponse)
+  @ApiParam({ name: 'postId', required: true, description: '멤버 id' })
   @Get(':memberId/post')
   async othersProifilePost(
     @Param('memberId', ParseIntPipe) memberId: number,

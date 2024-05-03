@@ -6,6 +6,8 @@ import { Member } from "src/entity/member.entity";
 import { DataSource } from "typeorm";
 import { GetPostListTuple } from './post.query-repository';
 import { Post } from 'src/entity/post.entity';
+import { Feed } from 'src/entity/feed.entity';
+import { GetFeedTuple } from './feed.query-repository';
 
 @Injectable()
 export class ProfileQueryRepository {
@@ -91,7 +93,7 @@ export class ProfileQueryRepository {
     return plainToInstance(GetPostListTuple, postListQuery);
   }
 
-  async getAllPostListTotalCount(memberId: number,): Promise<number> {
+  async getAllPostListTotalCount(memberId: number): Promise<number> {
     return await this.getPostListBaseQuery(memberId).getCount();
   }
 
@@ -103,6 +105,42 @@ export class ProfileQueryRepository {
       .where('post.deleted_at IS NULL')
       .andWhere('member.deleted_at IS NULL')
       .andWhere('post.member_id = :memberId', { memberId });
+  }
+
+  async getFeedList(memberId: number, paginationRequest: PaginationRequest): Promise<GetFeedTuple[]> {
+    const feedList = await this.getFeedBaseQuery(memberId)
+      .select([
+        'member.id as writerId',
+        'member.nickname as writerNickname',
+        'member.generation as writerGeneration',
+        'member.profileImageUrl as writerProfileImageUrl',
+        'feed.id as feedId',
+        'feed.content as feedContent',
+        'feed.viewCount as feedViewCount',
+        'feed.commentCount as feedCommentCount',
+        'feed.emojiCount as feedEmojiCount',
+        'feed.createdAt as feedCreatedAt',
+      ])
+      .limit(paginationRequest.take)
+      .offset(paginationRequest.getSkip())
+      .orderBy('feed.createdAt', paginationRequest.order)
+      .getRawMany();
+
+    return plainToInstance(GetFeedTuple, feedList);
+  }
+
+  async getFeedListCount(memberId: number): Promise<number> {
+    return await this.getFeedBaseQuery(memberId).getCount();
+  }
+
+  private getFeedBaseQuery(memberId: number) {
+    return this.dataSource
+      .createQueryBuilder()
+      .from(Feed, 'feed')
+      .innerJoin(Member, 'member', 'feed.memberId = member.id')
+      .where('feed.deletedAt IS NULL')
+      .andWhere('member.deletedAt IS NULL')
+      .andWhere('feed.member_id = :memberId', { memberId });
   }
 }
 
