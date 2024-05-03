@@ -38,6 +38,30 @@ export class FeedService {
     );
   }
 
+  async patchFeed(memberId: number, feedId: number, content: string, imageUrls: string[]): Promise<void> {
+    const feed = await this.feedDomainService.getFeedIsNotDeleted(feedId);
+
+    if (feed.memberId !== memberId) {
+      throw new UnauthorizedException('권한이 없습니다.');
+    }
+
+    feed.updateFeed(content);
+
+    await this.feedRepository.save(feed);
+
+    await Promise.all([
+      await this.feedImageRepository.remove(await this.feedImageRepository.findBy({ feedId })),
+
+      ...imageUrls.map(async (imageUrl) => {
+        const feedImage = new FeedImage();
+        feedImage.feedId = feed.id;
+        feedImage.imageUrl = imageUrl;
+
+        await this.feedImageRepository.save(feedImage);
+      }),
+    ]);
+  }
+
   async getFeedList(
     paginationRequest: PaginationRequest,
   ): Promise<{ feedList: GetFeedResponseDto[]; totalCount: number }> {
