@@ -317,7 +317,7 @@ export class PostService {
     await Promise.all(
       hashTags.map(async (hashTagDto) => {
         let tagId = hashTagDto.hashTagId;
-        if (!hashTagDto.hashTagId) {
+        if (!tagId) {
           const newHashTag = await this.hashTagRepository.save({
             tagName: hashTagDto.tagName,
             color: hashTagDto.color,
