@@ -3,7 +3,7 @@ import { PostListInfo } from '../post-list.response';
 import { PostDetailHashTag } from '../post-detail.response';
 import { GetPostListDto } from 'src/dto/get-post-list.dto';
 
-export class MyProfilePostResponse {
+export class ProfilePostResponse {
   @ApiProperty({ type: PostListInfo })
   postListInfo!: PostListInfo;
   @ApiProperty({ type: [PostDetailHashTag] })
@@ -19,6 +19,6 @@ export class MyProfilePostResponse {
       getPostList.postList.writer,
       getPostList.postList.post,
     );
-    return new MyProfilePostResponse(postList, getPostList.hashTag)
+    return new ProfilePostResponse(postList, getPostList.hashTag)
   }
 }
