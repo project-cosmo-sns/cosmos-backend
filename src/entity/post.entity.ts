@@ -58,4 +58,10 @@ export class Post {
   minusEmojiCount(emojiCount: number) {
     this.emojiCount = emojiCount - 1;
   }
+
+  setPostInfo(category: string, title: string, content: string) {
+    this.category = category;
+    this.title = title;
+    this.content = content;
+  }
 }
