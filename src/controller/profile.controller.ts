@@ -83,6 +83,23 @@ export class ProfileController {
     })
   }
 
+  @ApiOperation({ summary: '타 유저 프로필 피드 목록' })
+  @ApiPaginatedResponse(GetFeedResponseDto)
+  @ApiParam({ name: 'postId', required: true, description: '멤버 id' })
+  @Get(':memberId/feed')
+  async getOthersFeedList(
+    @Param('memberId', ParseIntPipe) memberId: number,
+    @Query() paginationRequest: PaginationRequest
+  ): Promise<PaginationResponse<GetFeedResponseDto>> {
+    const { feedList, totalCount } = await this.profileService.getFeedList(memberId, paginationRequest);
+
+    return PaginationResponse.of({
+      data: feedList,
+      options: paginationRequest,
+      totalCount,
+    });
+  }
+
   @ApiOperation({ summary: '타 유저 프로필 포스트 목록' })
   @ApiPaginatedResponse(ProfilePostResponse)
   @ApiParam({ name: 'postId', required: true, description: '멤버 id' })
