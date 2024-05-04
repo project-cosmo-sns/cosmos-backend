@@ -12,3 +12,12 @@ export enum NotificationType {
   CREATE_POST_COMMENT = 'CREATE_POST_COMMENT',
   FOLLOW = 'FOLLOW',
 }
+
+export enum EmojiType {
+  HEART = 'HEART',
+  THUMBSUP = 'THUMBSUP',
+  LAUGH = 'LAUGH',
+  SAD = 'SAD',
+  CHECK = 'CHECK',
+  ME = 'ME'
+}
