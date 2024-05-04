@@ -10,6 +10,7 @@ import { Member } from 'src/entity/member.entity';
 import { Post } from 'src/entity/post.entity';
 import { PostComment } from 'src/entity/post_comment.entity';
 import { PostCommentHeart } from 'src/entity/post_comment_heart.entity';
+import { PostEmoji } from 'src/entity/post_emoji.entity';
 import { PostHashTag } from 'src/entity/post_hash_tag.entity';
 import { DataSource } from 'typeorm';
 
@@ -124,6 +125,8 @@ export class PostQueryRepository {
   }
 
 
+
+
   async getPostCommentList(
     postId: number,
     memberId: number,
@@ -183,6 +186,28 @@ export class PostQueryRepository {
 
     return plainToInstance(GetHashTagSearchTuple, searchResult);
   }
+
+  async getPostDetailEmoji(postId: number, memberId: number): Promise<GetPostDetailEmojiTuple[]> {
+    const emojiInfo = await this.dataSource
+      .createQueryBuilder()
+      .from(PostEmoji, 'post_emoji')
+      .select('post_emoji.emoji as emojiType')
+      .addSelect('COUNT(*) as emojiCount')
+      .addSelect('CASE WHEN SUM(CASE WHEN post_emoji.member_id = :memberId THEN 1 ELSE 0 END) > 0 THEN true ELSE false END as isClicked')
+      .where('post_emoji.post_id = :postId')
+      .groupBy('post_emoji.emoji')
+      .setParameters({ memberId, postId })
+      .getRawMany();
+
+    const emojiObject = emojiInfo.reduce((acc, { emojiType, emojiCount, isClicked }) => {
+      acc[emojiType] = { emojiCount, isClicked: isClicked === '1' };
+      return acc;
+    }, {});
+
+    return emojiObject;
+
+  }
+
 }
 
 export class GetPostListTuple {
@@ -236,4 +261,9 @@ export class GetPostCommentTuple {
 export class GetHashTagSearchTuple {
   tagName!: string;
   color!: string;
+}
+
+export class GetPostDetailEmojiTuple {
+  emojiCount!: number;
+  isClicked!: boolean;
 }
