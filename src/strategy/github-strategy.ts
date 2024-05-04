@@ -15,7 +15,8 @@ export class GithubStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(accessToken: string, profile: Profile, done: VerifyCallback): Promise<void> {
+  // refreshToken은 사용하지 않아도 매개변수 순서때문에 지우면 안됨.
+  async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback): Promise<void> {
     const { id, displayName, username } = profile;
 
     const socialLoginInfo: SocialLoginDto = {
