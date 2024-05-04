@@ -173,7 +173,10 @@ export class PostQueryRepository {
     const searchResult = await this.dataSource
       .createQueryBuilder()
       .from(HashTag, 'hash_Tag')
-      .select(['tag_name as tagName'])
+      .select([
+        'tag_name as tagName',
+        'color as color'
+      ])
       .where(`tag_name LIKE '%${search.searchWord}%'`)
       .limit(10)
       .getRawMany()
@@ -232,4 +235,5 @@ export class GetPostCommentTuple {
 
 export class GetHashTagSearchTuple {
   tagName!: string;
+  color!: string;
 }

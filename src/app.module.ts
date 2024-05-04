@@ -52,6 +52,7 @@ import { ProfileService } from './service/profile.service';
 import { ProfileQueryRepository } from './repository/profile.query-repository';
 import { FeedDomainService } from './domain-service/feed.domain-service';
 import { FeedImage } from './entity/feed_image.entity';
+import { MemberController } from './controller/member.controller';
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { FeedImage } from './entity/feed_image.entity';
     NotificationController,
     SearchController,
     ProfileController,
+    MemberController,
   ],
   providers: [
     // Service

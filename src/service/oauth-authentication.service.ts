@@ -12,7 +12,7 @@ export class OauthAuthenticationService {
     private readonly memberQueryRepository: MemberQueryRepository,
   ) {}
   async validateAndSaveUser(socialLoginDto: SocialLoginDto) {
-    const { nickname, profileImageUrl, socialProvider, externalId } = socialLoginDto;
+    const { nickname, socialProvider, externalId } = socialLoginDto;
 
     const member = await this.memberQueryRepository.getMember(externalId);
 
@@ -22,7 +22,6 @@ export class OauthAuthenticationService {
       const newMember = new Member();
 
       newMember.nickname = nickname;
-      newMember.profileImageUrl = profileImageUrl;
       newMember.socialProvider = socialProvider;
       newMember.externalId = externalId;
 
