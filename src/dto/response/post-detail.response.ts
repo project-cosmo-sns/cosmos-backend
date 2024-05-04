@@ -1,6 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { GetPostDetailDto } from '../get-post-detail.dto';
 import { PostDetailDto, PostWriterDto } from 'src/service/post.service';
+import { EmojiListResponse } from './emoji-list.response';
+
+
+export class PostDetailHashTag {
+  @ApiProperty()
+  tagName?: string;
+  @ApiProperty()
+  color?: string;
+  constructor(tagName: string, color: string) {
+    this.tagName = tagName;
+    this.color = color;
+  }
+}
 
 export class PostDetail {
   @ApiProperty({
@@ -25,39 +38,36 @@ export class PostDetail {
     },
   })
   post: PostDetailDto;
+  @ApiProperty({ type: [PostDetailHashTag] })
+  hashTag!: PostDetailHashTag[];
 
-  constructor(writer: PostWriterDto, post: PostDetailDto) {
+  @ApiProperty({ type: [EmojiListResponse] })
+  emoji!: EmojiListResponse[];
+
+  constructor(writer: PostWriterDto, post: PostDetailDto, hashTag: PostDetailHashTag[], emoji: EmojiListResponse[]) {
     this.writer = writer;
     this.post = post;
+    this.hashTag = hashTag;
+    this.emoji = emoji;
   }
 }
-export class PostDetailHashTag {
-  @ApiProperty()
-  tagName?: string;
-  @ApiProperty()
-  color?: string;
-  constructor(tagName: string, color: string) {
-    this.tagName = tagName;
-    this.color = color;
-  }
-}
+
 
 export class PostDetailResponse {
   @ApiProperty({ type: PostDetail })
   postDetail!: PostDetail;
-  @ApiProperty({ type: [PostDetailHashTag] })
-  postDetailHashTag!: PostDetailHashTag[];
 
-  constructor(postDetail: PostDetail, postDetailHashTag: PostDetailHashTag[]) {
+  constructor(postDetail: PostDetail) {
     this.postDetail = postDetail;
-    this.postDetailHashTag = postDetailHashTag;
   }
 
   static from(getPostDetail: GetPostDetailDto) {
     const postDetail = new PostDetail(
       getPostDetail.postDetail.writer,
       getPostDetail.postDetail.post,
+      getPostDetail.hashTag,
+      getPostDetail.emoji
     );
-    return new PostDetailResponse(postDetail, getPostDetail.hashTag)
+    return new PostDetailResponse(postDetail);
   }
 }
