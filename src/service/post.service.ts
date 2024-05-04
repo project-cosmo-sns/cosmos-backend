@@ -96,7 +96,6 @@ export class PostService {
     const postDetailEmojiInfo = await this.postQueryRepository.getPostDetailEmoji(postId, memberId);
 
     const postDetail = GetPostDetail.from(postDetailInfo);
-    console.log(postDetailEmojiInfo);
     return new GetPostDetailDto(postDetail, postDetailHashTagInfo, postDetailEmojiInfo);
   }
 

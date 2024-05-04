@@ -1,3 +1,4 @@
+import { EmojiType } from 'src/entity/common/Enums';
 import { GetPostDetailTuple } from 'src/repository/post.query-repository';
 import { PostDetailDto, PostWriterDto } from 'src/service/post.service';
 
@@ -78,10 +79,11 @@ export class GetHashTagInfo {
 }
 
 export class GetEmojiInfo {
+  emojiCode: EmojiType;
   emojiCount: number;
   isClicked: boolean;
 
-  constructor(emojiCount: number, isClicked: boolean) {
-    this.emojiCount = emojiCount, this.isClicked = isClicked;
+  constructor(emojiCode: EmojiType, emojiCount: number, isClicked: boolean) {
+    this.emojiCode = emojiCode; this.emojiCount = emojiCount; this.isClicked = isClicked;
   }
 }

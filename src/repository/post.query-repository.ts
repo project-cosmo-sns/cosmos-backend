@@ -3,7 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { Transform, plainToInstance } from 'class-transformer';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { HashTagSearchRequest } from 'src/dto/request/hash-tag-search.request';
-import { ListSortBy } from 'src/entity/common/Enums';
+import { EmojiType, ListSortBy } from 'src/entity/common/Enums';
 import { Follow } from 'src/entity/follow.entity';
 import { HashTag } from 'src/entity/hash_tag.entity';
 import { Member } from 'src/entity/member.entity';
@@ -191,7 +191,7 @@ export class PostQueryRepository {
     const emojiInfo = await this.dataSource
       .createQueryBuilder()
       .from(PostEmoji, 'post_emoji')
-      .select('post_emoji.emoji as emojiType')
+      .select('post_emoji.emoji as emojiCode')
       .addSelect('COUNT(*) as emojiCount')
       .addSelect('CASE WHEN SUM(CASE WHEN post_emoji.member_id = :memberId THEN 1 ELSE 0 END) > 0 THEN true ELSE false END as isClicked')
       .where('post_emoji.post_id = :postId')
@@ -199,12 +199,7 @@ export class PostQueryRepository {
       .setParameters({ memberId, postId })
       .getRawMany();
 
-    const emojiObject = emojiInfo.reduce((acc, { emojiType, emojiCount, isClicked }) => {
-      acc[emojiType] = { emojiCount, isClicked: isClicked === '1' };
-      return acc;
-    }, {});
-
-    return emojiObject;
+    return plainToInstance(GetPostDetailEmojiTuple, emojiInfo);
 
   }
 
@@ -264,6 +259,8 @@ export class GetHashTagSearchTuple {
 }
 
 export class GetPostDetailEmojiTuple {
+  emojiCode!: EmojiType;
   emojiCount!: number;
+  @Transform(({ value }) => value === '1')
   isClicked!: boolean;
 }
