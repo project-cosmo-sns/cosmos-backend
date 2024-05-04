@@ -11,8 +11,8 @@ export class Member {
   @Column({ name: 'nickname', length: 45, nullable: false })
   nickname: string;
 
-  @Column({ name: 'profile_image_url', length: 200, nullable: false })
-  profileImageUrl: string;
+  @Column({ name: 'profile_image_url', length: 200, nullable: true })
+  profileImageUrl?: string;
 
   @Column({ name: 'generation', type: 'int', nullable: true })
   generation: number;
@@ -57,6 +57,4 @@ export class Member {
     this.externalId = null;
     this.deletedAt = deletedAt;
   }
-
-
 }

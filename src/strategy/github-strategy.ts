@@ -15,12 +15,11 @@ export class GithubStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback): Promise<void> {
-    const { id, displayName, username, photos } = profile;
+  async validate(accessToken: string, profile: Profile, done: VerifyCallback): Promise<void> {
+    const { id, displayName, username } = profile;
 
     const socialLoginInfo: SocialLoginDto = {
       nickname: displayName ?? username,
-      profileImageUrl: photos[0].value ?? '',
       socialProvider: SocialProvider.GITHUB,
       externalId: id,
     };

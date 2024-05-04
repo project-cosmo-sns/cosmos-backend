@@ -5,9 +5,6 @@ export class SocialLoginDto {
   @IsString()
   nickname: string;
 
-  @IsString()
-  profileImageUrl: string;
-
   @IsEnum(SocialProvider)
   socialProvider: SocialProvider;
 
