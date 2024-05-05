@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { Transform, plainToInstance } from "class-transformer";
+import { Injectable } from '@nestjs/common';
+import { Transform, plainToInstance } from 'class-transformer';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
-import { Follow } from "src/entity/follow.entity";
-import { Member } from "src/entity/member.entity";
-import { DataSource } from "typeorm";
+import { Follow } from 'src/entity/follow.entity';
+import { Member } from 'src/entity/member.entity';
+import { DataSource } from 'typeorm';
 import { GetPostListTuple } from './post.query-repository';
 import { Post } from 'src/entity/post.entity';
 import { Feed } from 'src/entity/feed.entity';
@@ -11,7 +11,7 @@ import { GetFeedTuple } from './feed.query-repository';
 
 @Injectable()
 export class ProfileQueryRepository {
-  constructor(private readonly dataSource: DataSource) { }
+  constructor(private readonly dataSource: DataSource) {}
 
   async getOthersProfileInfo(memberId: number, myMemberId: number): Promise<GetOthersProfileTuple> {
     const othersProfile = await this.dataSource
@@ -20,7 +20,8 @@ export class ProfileQueryRepository {
       .leftJoin(
         Follow,
         'follow',
-        'follow.following_member_id = :myMemberId AND follow.follower_member_id = member.id', { myMemberId }
+        'follow.following_member_id = :myMemberId AND follow.follower_member_id = member.id',
+        { myMemberId },
       )
       .select([
         'member.id as memberId',
@@ -29,10 +30,9 @@ export class ProfileQueryRepository {
         'member.profile_image_url as profileImageUrl',
         'member.introduce as introduce',
         'CASE WHEN follow.following_member_id IS NOT NULL THEN true ELSE false END as isFollowed',
-
       ])
       .where('member.id = :memberId', { memberId })
-      .getRawOne()
+      .getRawOne();
     return plainToInstance(GetOthersProfileTuple, othersProfile);
   }
 
@@ -41,14 +41,13 @@ export class ProfileQueryRepository {
       .createQueryBuilder()
       .from(Member, 'member')
       .select([
-        'member.id as memberId',
         'member.nickname as nickname',
         'member.generation as generation',
         'member.profile_image_url as profileImageUrl',
         'member.introduce as introduce',
       ])
       .where('member.id = :memberId', { memberId })
-      .getRawOne()
+      .getRawOne();
     return plainToInstance(GetMyProfileTuple, myProfile);
   }
 
@@ -57,7 +56,7 @@ export class ProfileQueryRepository {
       .createQueryBuilder()
       .from(Follow, 'follow')
       .where('follow.follower_member_id = :memberId', { memberId })
-      .getCount()
+      .getCount();
     return followerCount;
   }
 
@@ -66,13 +65,11 @@ export class ProfileQueryRepository {
       .createQueryBuilder()
       .from(Follow, 'follow')
       .where('follow.following_member_id = :memberId', { memberId })
-      .getCount()
+      .getCount();
     return followingCount;
   }
 
-  async getPostList(
-    memberId: number,
-    paginationRequest: PaginationRequest): Promise<GetPostListTuple[]> {
+  async getPostList(memberId: number, paginationRequest: PaginationRequest): Promise<GetPostListTuple[]> {
     const postListQuery = await this.getPostListBaseQuery(memberId)
       .select([
         'member.id as memberId',
@@ -84,12 +81,12 @@ export class ProfileQueryRepository {
         'post.content as content',
         'post.emoji_count as emojiCount',
         'post.comment_count as commentCount',
-        'post.view_count as viewCount'
+        'post.view_count as viewCount',
       ])
       .limit(paginationRequest.take)
       .offset(paginationRequest.getSkip())
       .orderBy('post.created_at', paginationRequest.order)
-      .getRawMany()
+      .getRawMany();
     return plainToInstance(GetPostListTuple, postListQuery);
   }
 
@@ -157,7 +154,6 @@ export class GetOthersProfileTuple {
 }
 
 export class GetMyProfileTuple {
-  memberId!: number;
   nickname!: string;
   generation!: number;
   profileImageUrl!: string;

@@ -4,11 +4,11 @@ import { PostDetailDto, PostWriterDto } from 'src/service/post.service';
 
 export class GetPostDetailDto {
   postDetail!: GetPostDetail;
-  hashTag!: GetHashTagInfo[];
+  hashTags!: GetHashTagInfo[];
   emoji!: GetEmojiInfo[];
-  constructor(postDetail: GetPostDetail, hashTag: GetHashTagInfo[], emoji: GetEmojiInfo[]) {
+  constructor(postDetail: GetPostDetail, hashTags: GetHashTagInfo[], emoji: GetEmojiInfo[]) {
     this.postDetail = postDetail;
-    this.hashTag = hashTag;
+    this.hashTags = hashTags;
     this.emoji = emoji;
   }
 }
