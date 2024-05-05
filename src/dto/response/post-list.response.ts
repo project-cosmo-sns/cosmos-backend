@@ -16,6 +16,7 @@ export class PostListInfo {
   @ApiProperty({
     type: {
       id: { type: 'number' },
+      category: { type: 'string' },
       title: { type: 'string' },
       content: { type: 'string' },
       viewCount: { type: 'number' },

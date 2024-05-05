@@ -373,6 +373,7 @@ export class PostWriterDto {
 
 export class PostListDto {
   id: number;
+  category: string;
   title: string;
   content: string;
   viewCount: number;
