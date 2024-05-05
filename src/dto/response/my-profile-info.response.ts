@@ -14,6 +14,8 @@ export class MyProfileInfoResponse {
   followerCount!: number;
   @ApiProperty()
   followingCount!: number;
+  @ApiProperty()
+  isAuthorized!: boolean;
 
   constructor(
     nickname: string,
@@ -22,6 +24,7 @@ export class MyProfileInfoResponse {
     introduce: string,
     followerCount: number,
     followingCount: number,
+    isAuthorized: boolean,
   ) {
     this.nickname = nickname;
     this.generation = generation;
@@ -29,6 +32,7 @@ export class MyProfileInfoResponse {
     this.introduce = introduce;
     this.followerCount = followerCount;
     this.followingCount = followingCount;
+    this.isAuthorized = isAuthorized;
   }
 
   static from(getMyProfileDto: GetMyProfileDto) {
@@ -39,6 +43,7 @@ export class MyProfileInfoResponse {
       getMyProfileDto.introduce,
       getMyProfileDto.followerCount,
       getMyProfileDto.followingCount,
+      getMyProfileDto.isAuthorized,
     );
   }
 }

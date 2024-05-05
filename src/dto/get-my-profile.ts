@@ -7,6 +7,7 @@ export class GetMyProfileDto {
   introduce!: string;
   followerCount!: number;
   followingCount!: number;
+  isAuthorized!: boolean;
 
   constructor(
     nickname: string,
@@ -15,6 +16,7 @@ export class GetMyProfileDto {
     introduce: string,
     followerCount: number,
     followingCount: number,
+    isAuthorized: boolean,
   ) {
     this.nickname = nickname;
     this.generation = generation;
@@ -22,6 +24,7 @@ export class GetMyProfileDto {
     this.introduce = introduce;
     this.followerCount = followerCount;
     this.followingCount = followingCount;
+    this.isAuthorized = isAuthorized;
   }
 
   static from(tuple: GetMyProfileTuple) {
@@ -32,6 +35,7 @@ export class GetMyProfileDto {
       tuple.introduce,
       tuple.followerCount,
       tuple.followingCount,
+      tuple.isAuthorized,
     );
   }
 }
