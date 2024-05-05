@@ -56,7 +56,6 @@ export class FollowController {
   }
 
   @ApiOperation({ summary: '내 팔로워 목록 (나를 팔로우 하는 유저)' })
-  @ApiParam({ name: 'memberId', required: true, description: '멤버 id' })
   @ApiResponse({ type: FollowerResponse })
   @Get('/follower/mine')
   async getFollowerListMine(@Req() req): Promise<FollowerResponse[]> {
@@ -65,7 +64,6 @@ export class FollowController {
   }
 
   @ApiOperation({ summary: '내 팔로잉 목록 (내가 팔로우 하는 유저)' })
-  @ApiParam({ name: 'memberId', required: true, description: '멤버 id' })
   @ApiResponse({ type: FollowingResponse })
   @Get('/following/mine')
   async getFollowingListMine(@Req() req): Promise<FollowingResponse[]> {
