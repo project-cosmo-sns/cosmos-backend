@@ -5,14 +5,13 @@ import { PostDetailDto, PostWriterDto } from 'src/service/post.service';
 export class GetPostDetailDto {
   postDetail!: GetPostDetail;
   hashTag!: GetHashTagInfo[];
-  emoji!: GetEmojiInfo[]
+  emoji!: GetEmojiInfo[];
   constructor(postDetail: GetPostDetail, hashTag: GetHashTagInfo[], emoji: GetEmojiInfo[]) {
     this.postDetail = postDetail;
     this.hashTag = hashTag;
     this.emoji = emoji;
   }
 }
-
 
 export class GetPostDetail {
   writer: PostWriterDto;
@@ -31,6 +30,7 @@ export class GetPostDetail {
     emojiCount: number,
     commentCount: number,
     viewCount: number,
+    isMine: boolean,
   ) {
     this.writer = {
       id: memberId,
@@ -47,6 +47,7 @@ export class GetPostDetail {
       commentCount,
       viewCount,
       createdAt,
+      isMine,
     };
   }
 
@@ -64,9 +65,9 @@ export class GetPostDetail {
       tuple.emojiCount,
       tuple.commentCount,
       tuple.viewCount,
+      tuple.isMine,
     );
   }
-
 }
 
 export class GetHashTagInfo {
@@ -84,6 +85,8 @@ export class GetEmojiInfo {
   isClicked: boolean;
 
   constructor(emojiCode: EmojiType, emojiCount: number, isClicked: boolean) {
-    this.emojiCode = emojiCode; this.emojiCount = emojiCount; this.isClicked = isClicked;
+    this.emojiCode = emojiCode;
+    this.emojiCount = emojiCount;
+    this.isClicked = isClicked;
   }
 }

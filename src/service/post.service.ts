@@ -38,7 +38,7 @@ export class PostService {
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
     private readonly postQueryRepository: PostQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
-  ) { }
+  ) {}
 
   async createPost(memberId: number, dto: CreatePostInfoDto): Promise<CreatePostResponse> {
     const member = await this.memberRepository.findOneBy({ id: memberId });
@@ -69,11 +69,13 @@ export class PostService {
       userGeneration,
     );
 
-    const postInfo = await Promise.all(postListTuples.map(async (postList) => {
-      const post = GetPostList.from(postList);
-      const hashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postList.postId);
-      return new GetPostListDto(post, hashTagInfo);
-    }));
+    const postInfo = await Promise.all(
+      postListTuples.map(async (postList) => {
+        const post = GetPostList.from(postList);
+        const hashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postList.postId);
+        return new GetPostListDto(post, hashTagInfo);
+      }),
+    );
 
     return { postInfo, totalCount };
   }
@@ -86,7 +88,7 @@ export class PostService {
     if (isDeletedPost.deletedAt !== null) {
       throw new GoneException('해당 포스트는 삭제되었습니다.');
     }
-    const postDetailInfo = await this.postQueryRepository.getPostDetail(postId);
+    const postDetailInfo = await this.postQueryRepository.getPostDetail(postId, memberId);
 
     if (postDetailInfo.memberDeletedAt !== null) {
       throw new GoneException('해당 글 작성자가 존재하지 않습니다.');
@@ -112,7 +114,7 @@ export class PostService {
     postInfo.setPostInfo(dto.category, dto.title, dto.content);
     await this.postRepository.save(postInfo);
 
-    await Promise.all(hashTags.map(tag => this.postHashTagRepository.remove(tag)));
+    await Promise.all(hashTags.map((tag) => this.postHashTagRepository.remove(tag)));
     await this.saveHashTags(postInfo.id, dto.hashTags);
   }
 
@@ -391,6 +393,7 @@ export class PostDetailDto {
   commentCount: number;
   emojiCount: number;
   createdAt: Date;
+  isMine: boolean;
 }
 
 export class PostCommentWriterDto {

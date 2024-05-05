@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { plainToInstance } from 'class-transformer';
+import { Transform, plainToInstance } from 'class-transformer';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { Feed } from 'src/entity/feed.entity';
 import { Member } from 'src/entity/member.entity';
@@ -36,7 +36,7 @@ export class FeedQueryRepository {
     return await this.getFeedBaseQuery().getCount();
   }
 
-  async getFeedDetail(feedId: number): Promise<GetFeedTuple> {
+  async getFeedDetail(feedId: number, memberId: number): Promise<GetFeedTuple> {
     const feed = await this.getFeedBaseQuery()
       .andWhere('feed.id = :feedId', { feedId })
       .select([
@@ -50,7 +50,9 @@ export class FeedQueryRepository {
         'feed.commentCount as feedCommentCount',
         'feed.emojiCount as feedEmojiCount',
         'feed.createdAt as feedCreatedAt',
+        'CASE WHEN feed.member_id = :memberId THEN 1 ELSE 0 END as isMine',
       ])
+      .setParameters({ memberId })
       .getRawOne();
 
     return plainToInstance(GetFeedTuple, feed);
@@ -89,4 +91,6 @@ export class GetFeedTuple {
   feedCommentCount: number;
   feedEmojiCount: number;
   feedCreatedAt: Date;
+  @Transform(({ value }) => value === '1')
+  isMine: boolean;
 }
