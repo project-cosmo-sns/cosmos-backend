@@ -319,18 +319,22 @@ export class PostService {
   private async saveHashTags(postId: number, hashTags: HashTagDto[]): Promise<void> {
     await Promise.all(
       hashTags.map(async (hashTagDto) => {
-        let tagId = hashTagDto.hashTagId;
-        if (!tagId) {
+        const hashTag = await this.hashTagRepository.findOneBy({ tagName: hashTagDto.tagName });
+        let hashTagId = 0;
+
+        if (!hashTag) {
           const newHashTag = await this.hashTagRepository.save({
             tagName: hashTagDto.tagName,
             color: hashTagDto.color,
           });
-          tagId = newHashTag.id;
+          hashTagId = newHashTag.id;
+        } else {
+          hashTagId = hashTag.id;
         }
 
         await this.postHashTagRepository.save({
           postId,
-          hashTagId: tagId,
+          hashTagId,
         });
       }),
     );
