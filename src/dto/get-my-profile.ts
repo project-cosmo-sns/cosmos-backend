@@ -1,7 +1,6 @@
 import { GetMyProfileTuple } from 'src/repository/profile.query-repository';
 
 export class GetMyProfileDto {
-  memberId!: number;
   nickname!: string;
   generation!: number;
   profileImageUrl!: string;
@@ -10,7 +9,6 @@ export class GetMyProfileDto {
   followingCount!: number;
 
   constructor(
-    memberId: number,
     nickname: string,
     generation: number,
     profileImageUrl: string,
@@ -18,7 +16,6 @@ export class GetMyProfileDto {
     followerCount: number,
     followingCount: number,
   ) {
-    this.memberId = memberId;
     this.nickname = nickname;
     this.generation = generation;
     this.profileImageUrl = profileImageUrl;
@@ -29,7 +26,6 @@ export class GetMyProfileDto {
 
   static from(tuple: GetMyProfileTuple) {
     return new GetMyProfileDto(
-      tuple.memberId,
       tuple.nickname,
       tuple.generation,
       tuple.profileImageUrl,
