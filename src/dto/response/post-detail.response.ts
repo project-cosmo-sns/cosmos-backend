@@ -39,15 +39,15 @@ export class PostDetail {
   })
   post: PostDetailDto;
   @ApiProperty({ type: [PostDetailHashTag] })
-  hashTag!: PostDetailHashTag[];
+  hashTags!: PostDetailHashTag[];
 
   @ApiProperty({ type: [EmojiListResponse] })
   emoji!: EmojiListResponse[];
 
-  constructor(writer: PostWriterDto, post: PostDetailDto, hashTag: PostDetailHashTag[], emoji: EmojiListResponse[]) {
+  constructor(writer: PostWriterDto, post: PostDetailDto, hashTags: PostDetailHashTag[], emoji: EmojiListResponse[]) {
     this.writer = writer;
     this.post = post;
-    this.hashTag = hashTag;
+    this.hashTags = hashTags;
     this.emoji = emoji;
   }
 }
@@ -64,7 +64,7 @@ export class PostDetailResponse {
     const postDetail = new PostDetail(
       getPostDetail.postDetail.writer,
       getPostDetail.postDetail.post,
-      getPostDetail.hashTag,
+      getPostDetail.hashTags,
       getPostDetail.emoji,
     );
     return new PostDetailResponse(postDetail);
