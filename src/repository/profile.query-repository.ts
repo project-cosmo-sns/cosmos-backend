@@ -52,24 +52,6 @@ export class ProfileQueryRepository {
     return plainToInstance(GetMyProfileTuple, myProfile);
   }
 
-  async getProfileFollowerCount(memberId: number): Promise<number> {
-    const followerCount = await this.dataSource
-      .createQueryBuilder()
-      .from(Follow, 'follow')
-      .where('follow.follower_member_id = :memberId', { memberId })
-      .getCount();
-    return followerCount;
-  }
-
-  async getProfileFollowingCount(memberId: number): Promise<number> {
-    const followingCount = await this.dataSource
-      .createQueryBuilder()
-      .from(Follow, 'follow')
-      .where('follow.following_member_id = :memberId', { memberId })
-      .getCount();
-    return followingCount;
-  }
-
   async getPostList(memberId: number, paginationRequest: PaginationRequest): Promise<GetPostListTuple[]> {
     const postListQuery = await this.getPostListBaseQuery(memberId)
       .select([
