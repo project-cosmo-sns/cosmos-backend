@@ -97,7 +97,7 @@ export class FeedService {
     return { feedList, totalCount };
   }
 
-  async getFeedDetail(feedId: number, memberId: number): Promise<GetFeedResponseDto> {
+  async getFeedDetail(feedId: number, memberId: number): Promise<GetFeedDetailResponseDto> {
     const feed = await this.feedQueryRepository.getFeedDetail(feedId, memberId);
 
     if (!feed) {

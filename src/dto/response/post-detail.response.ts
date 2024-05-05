@@ -3,7 +3,6 @@ import { GetPostDetailDto } from '../get-post-detail.dto';
 import { PostDetailDto, PostWriterDto } from 'src/service/post.service';
 import { EmojiListResponse } from './emoji-list.response';
 
-
 export class PostDetailHashTag {
   @ApiProperty()
   tagName?: string;
@@ -35,6 +34,7 @@ export class PostDetail {
       commentCount: { type: 'number' },
       emojiCount: { type: 'number' },
       createdAt: { type: 'string' },
+      isMine: { type: 'boolean' },
     },
   })
   post: PostDetailDto;
@@ -52,7 +52,6 @@ export class PostDetail {
   }
 }
 
-
 export class PostDetailResponse {
   @ApiProperty({ type: PostDetail })
   postDetail!: PostDetail;
@@ -66,7 +65,7 @@ export class PostDetailResponse {
       getPostDetail.postDetail.writer,
       getPostDetail.postDetail.post,
       getPostDetail.hashTag,
-      getPostDetail.emoji
+      getPostDetail.emoji,
     );
     return new PostDetailResponse(postDetail);
   }

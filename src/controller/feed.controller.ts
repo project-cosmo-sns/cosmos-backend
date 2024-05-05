@@ -31,6 +31,7 @@ import { Roles } from 'src/common/roles/roles.decorator';
 import { PostFeedCommentRequestDto } from 'src/dto/request/post-feed-comment.request';
 import { PostFeedRequestDto } from 'src/dto/request/post-feed.request.dto';
 import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
+import { GetFeedDetailResponseDto } from 'src/dto/response/get-feed-detail.response.dto';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
 import { ImageResponse } from 'src/dto/response/image.response';
 import { RolesGuard } from 'src/guard/roles.guard';
@@ -57,9 +58,9 @@ export class FeedController {
 
   @ApiOperation({ summary: '피드 상세' })
   @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
-  @ApiResponse({ type: GetFeedResponseDto })
+  @ApiResponse({ type: GetFeedDetailResponseDto })
   @Get('/:feedId/detail')
-  async getFeedDetail(@Req() req, @Param('feedId', ParseIntPipe) feedId: number): Promise<GetFeedResponseDto> {
+  async getFeedDetail(@Req() req, @Param('feedId', ParseIntPipe) feedId: number): Promise<GetFeedDetailResponseDto> {
     const feed = await this.feedService.getFeedDetail(feedId, req.user.id);
 
     return feed;
