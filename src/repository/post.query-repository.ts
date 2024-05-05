@@ -16,21 +16,15 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class PostQueryRepository {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) { }
+  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
 
   async getPostList(
     memberId: number,
     paginationRequest: PaginationRequest,
     sortPostList: ListSortBy,
     generation?: number,
-
   ): Promise<GetPostListTuple[]> {
-    let query = this.getPostListBaseQuery(
-      memberId,
-      paginationRequest,
-      sortPostList,
-      generation,
-    )
+    let query = this.getPostListBaseQuery(memberId, paginationRequest, sortPostList, generation)
       .select([
         'member.id as memberId',
         'member.nickname as nickname',
@@ -42,15 +36,14 @@ export class PostQueryRepository {
         'post.content as content',
         'post.emoji_count as emojiCount',
         'post.comment_count as commentCount',
-        'post.view_count as viewCount'
+        'post.view_count as viewCount',
       ])
       .limit(paginationRequest.take)
       .offset(paginationRequest.getSkip())
-      .orderBy('post.created_at', paginationRequest.order)
+      .orderBy('post.created_at', paginationRequest.order);
 
     const postList = await query.getRawMany();
     return plainToInstance(GetPostListTuple, postList);
-
   }
 
   async getAllPostListTotalCount(
@@ -68,26 +61,25 @@ export class PostQueryRepository {
     sortPostList: ListSortBy,
     generation?: number,
   ) {
-    let query = this.dataSource.createQueryBuilder()
+    let query = this.dataSource
+      .createQueryBuilder()
       .from(Post, 'post')
       .innerJoin(Member, 'member', 'post.member_id = member.id')
       .where('post.deleted_at IS NULL')
       .andWhere('member.deleted_at IS NULL');
 
-
     if (sortPostList === ListSortBy.BY_FOLLOW) {
-      query = query.innerJoin(Follow, 'follow', 'follower_member_id = member.id')
+      query = query
+        .innerJoin(Follow, 'follow', 'follower_member_id = member.id')
         .andWhere('following_member_id = :memberId', { memberId });
-    }
-
-    else if (sortPostList === ListSortBy.BY_GENERATION) {
+    } else if (sortPostList === ListSortBy.BY_GENERATION) {
       query = query.andWhere('member.generation = :generation', { generation });
     }
 
     return query;
   }
 
-  async getPostDetail(postId: number): Promise<GetPostDetailTuple> {
+  async getPostDetail(postId: number, memberId: number): Promise<GetPostDetailTuple> {
     const postDetail = await this.dataSource
       .createQueryBuilder()
       .from(Post, 'post')
@@ -105,9 +97,11 @@ export class PostQueryRepository {
         'post.emoji_count as emojiCount',
         'post.comment_count as commentCount',
         'post.view_count as viewCount',
-        'member.deleted_at as memberDeletedAt'
+        'member.deleted_at as memberDeletedAt',
+        'CASE WHEN post.member_id = :memberId THEN 1 ELSE 0 END as isMine',
       ])
-      .getRawOne()
+      .setParameters({ memberId })
+      .getRawOne();
     return plainToInstance(GetPostDetailTuple, postDetail);
   }
 
@@ -117,16 +111,10 @@ export class PostQueryRepository {
       .from(HashTag, 'hash_tag')
       .innerJoin(PostHashTag, 'post_hash_tag', 'post_hash_tag.hash_tag_id = hash_tag.id')
       .where('post_hash_tag.post_id = :postId', { postId })
-      .select([
-        'hash_tag.tagName as tagName',
-        'hash_tag.color as color'
-      ])
-      .getRawMany()
+      .select(['hash_tag.tagName as tagName', 'hash_tag.color as color'])
+      .getRawMany();
     return plainToInstance(GetPostDetailHashTagTuple, postDetailHashTag);
   }
-
-
-
 
   async getPostCommentList(
     postId: number,
@@ -137,7 +125,8 @@ export class PostQueryRepository {
       .leftJoin(
         PostCommentHeart,
         'post_comment_heart',
-        'post_comment_heart.comment_id = post_comment.id AND post_comment_heart.member_id = :memberId', { memberId }
+        'post_comment_heart.comment_id = post_comment.id AND post_comment_heart.member_id = :memberId',
+        { memberId },
       )
       .select([
         'member.id as memberId',
@@ -153,11 +142,10 @@ export class PostQueryRepository {
       .limit(paginationRequest.take)
       .offset(paginationRequest.getSkip())
       .orderBy('post_comment.createdAt', paginationRequest.order)
-      .getRawMany()
+      .getRawMany();
 
     return plainToInstance(GetPostCommentTuple, postCommentList);
   }
-
 
   async getPostCommentListCount(postId: number): Promise<number> {
     return await this.getPostCommentListBaseQuery(postId).getCount();
@@ -177,13 +165,10 @@ export class PostQueryRepository {
     const searchResult = await this.dataSource
       .createQueryBuilder()
       .from(HashTag, 'hash_Tag')
-      .select([
-        'tag_name as tagName',
-        'color as color'
-      ])
+      .select(['tag_name as tagName', 'color as color'])
       .where(`tag_name LIKE '%${search.searchWord}%'`)
       .limit(10)
-      .getRawMany()
+      .getRawMany();
 
     return plainToInstance(GetHashTagSearchTuple, searchResult);
   }
@@ -194,16 +179,16 @@ export class PostQueryRepository {
       .from(PostEmoji, 'post_emoji')
       .select('post_emoji.emoji as emojiCode')
       .addSelect('COUNT(*) as emojiCount')
-      .addSelect('CASE WHEN SUM(CASE WHEN post_emoji.member_id = :memberId THEN 1 ELSE 0 END) > 0 THEN true ELSE false END as isClicked')
+      .addSelect(
+        'CASE WHEN SUM(CASE WHEN post_emoji.member_id = :memberId THEN 1 ELSE 0 END) > 0 THEN true ELSE false END as isClicked',
+      )
       .where('post_emoji.post_id = :postId')
       .groupBy('post_emoji.emoji')
       .setParameters({ memberId, postId })
       .getRawMany();
 
     return plainToInstance(GetPostDetailEmojiTuple, emojiInfo);
-
   }
-
 }
 
 export class GetPostListTuple {
@@ -235,6 +220,8 @@ export class GetPostDetailTuple {
   commentCount!: number;
   viewCount!: number;
   memberDeletedAt!: Date;
+  @Transform(({ value }) => value === '1')
+  isMine: boolean;
 }
 
 export class GetPostDetailHashTagTuple {

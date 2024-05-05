@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { FeedDomainService } from 'src/domain-service/feed.domain-service';
+import { GetFeedDetailResponseDto } from 'src/dto/response/get-feed-detail.response.dto';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
 import { Feed } from 'src/entity/feed.entity';
 import { FeedEmoji } from 'src/entity/feed_emoji.entity';
@@ -96,8 +97,8 @@ export class FeedService {
     return { feedList, totalCount };
   }
 
-  async getFeedDetail(feedId: number) {
-    const feed = await this.feedQueryRepository.getFeedDetail(feedId);
+  async getFeedDetail(feedId: number, memberId: number): Promise<GetFeedResponseDto> {
+    const feed = await this.feedQueryRepository.getFeedDetail(feedId, memberId);
 
     if (!feed) {
       throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
@@ -105,7 +106,7 @@ export class FeedService {
 
     const feedImages = await this.feedImageRepository.findBy({ feedId });
 
-    return new GetFeedResponseDto(
+    return new GetFeedDetailResponseDto(
       {
         id: feed.writerId,
         nickname: feed.writerNickname,
@@ -120,6 +121,7 @@ export class FeedService {
         emojiCount: feed.feedEmojiCount,
         createdAt: feed.feedCreatedAt,
         imageUrls: feedImages.map((feedImage) => feedImage.imageUrl),
+        isMine: feed.isMine,
       },
     );
   }
@@ -192,4 +194,8 @@ export class FeedDto {
   emojiCount: number;
   createdAt: Date;
   imageUrls: string[];
+}
+
+export class FeedDetailDto extends FeedDto {
+  isMine: boolean;
 }
