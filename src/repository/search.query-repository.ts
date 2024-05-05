@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
+import { GetSearchMemberByNameRequestDto } from 'src/dto/request/get-search-member-by-name.request.dto';
 import { GetSearchPostByHashTagRequestDto } from 'src/dto/request/get-search-post-by-hash-tag.request.dto';
 import { HashTag } from 'src/entity/hash_tag.entity';
 import { Member } from 'src/entity/member.entity';
@@ -48,6 +49,44 @@ export class SearchQueryRepository {
       .innerJoin(Member, 'member', 'member.id = post.memberId')
       .where('hashTag.tagName LIKE :keyword', { keyword: `%${keyword}%` });
   }
+
+  async searchMemberByName(
+    requestDto: GetSearchMemberByNameRequestDto,
+    memberId: number,
+  ): Promise<GetSearchMemberByNameTuple[]> {
+    const memberList = await this.searchMemberByNameBaseQuery(requestDto.keyword, memberId)
+      .select([
+        'member.id as id',
+        'member.nickname as nickname',
+        'member.generation as generation',
+        'member.profile_image_url as profileImageUrl',
+        'member.introduce as introduce',
+        'CASE WHEN follow.follower_member_id IS NOT NULL THEN true ELSE false END as isFollowing',
+      ])
+      .limit(requestDto.take)
+      .offset(requestDto.getSkip())
+      .orderBy('member.nickname')
+      .getRawMany();
+
+    return plainToInstance(GetSearchMemberByNameTuple, memberList);
+  }
+
+  async searchMemberByNameTotalCount(keyword: string, memberId: number) {
+    return await this.searchMemberByNameBaseQuery(keyword, memberId).getCount();
+  }
+
+  private searchMemberByNameBaseQuery(keyword: string, memberId: number) {
+    return this.dataSource
+      .createQueryBuilder()
+      .from(Member, 'member')
+      .leftJoin(
+        'follow',
+        'follow',
+        'follow.following_member_id = :memberId AND follow.follower_member_id = member.id',
+        { memberId },
+      )
+      .where('member.nickname LIKE :keyword', { keyword: `%${keyword}%` });
+  }
 }
 
 export class GetSearchPostByHashTagTuple {
@@ -62,4 +101,13 @@ export class GetSearchPostByHashTagTuple {
   postCommentCount: number;
   postEmojiCount: number;
   postCreatedAt: string;
+}
+
+export class GetSearchMemberByNameTuple {
+  id: number;
+  nickname: string;
+  generation: number;
+  profileImageUrl: string;
+  introduce: string;
+  isFollowing: boolean;
 }
