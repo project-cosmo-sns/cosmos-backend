@@ -1,17 +1,18 @@
-import { GoneException, Injectable, NotFoundException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import { GoneException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { GetMyProfileDto } from 'src/dto/get-my-profile';
-import { GetOthersProfileDto } from "src/dto/get-others-profile";
+import { GetOthersProfileDto } from 'src/dto/get-others-profile';
 import { GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
 import { profileInfoRequestDto } from 'src/dto/request/profile-info.request';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
 import { FeedImage } from 'src/entity/feed_image.entity';
-import { Member } from "src/entity/member.entity";
-import { MemberQueryRepository } from "src/repository/member.query-repository";
+import { Member } from 'src/entity/member.entity';
+import { FollowQueryRepository } from 'src/repository/follow.query-repository';
+import { MemberQueryRepository } from 'src/repository/member.query-repository';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
-import { ProfileQueryRepository } from "src/repository/profile.query-repository";
-import { Repository } from "typeorm";
+import { ProfileQueryRepository } from 'src/repository/profile.query-repository';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProfileService {
@@ -21,7 +22,8 @@ export class ProfileService {
     private readonly memberQueryRepository: MemberQueryRepository,
     private readonly profileQueryRepository: ProfileQueryRepository,
     private readonly postQueryRepository: PostQueryRepository,
-  ) { }
+    private readonly followQueryRepository: FollowQueryRepository,
+  ) {}
 
   async getOthersProfileInfo(memberId: number, myMemberId: number): Promise<GetOthersProfileDto> {
     const isDeletedUser = await this.memberQueryRepository.getMemberIsNotDeletedById(memberId);
@@ -29,8 +31,8 @@ export class ProfileService {
       throw new GoneException('탈퇴한 유저입니다.');
     }
     const othersProfileInfo = await this.profileQueryRepository.getOthersProfileInfo(memberId, myMemberId);
-    const othersFollowerCount = await this.profileQueryRepository.getProfileFollowerCount(memberId);
-    const othersFollowingCount = await this.profileQueryRepository.getProfileFollowingCount(memberId);
+    const othersFollowerCount = await this.followQueryRepository.getFollowerCountByMemberId(memberId);
+    const othersFollowingCount = await this.followQueryRepository.getProfileFollowingCountByMemberId(memberId);
 
     othersProfileInfo.followerCount = othersFollowerCount;
     othersProfileInfo.followingCount = othersFollowingCount;
@@ -40,8 +42,8 @@ export class ProfileService {
 
   async getMyProfileInfo(memberId: number): Promise<GetMyProfileDto> {
     const myProfileInfo = await this.profileQueryRepository.getMyProfileInfo(memberId);
-    const myFollowerCount = await this.profileQueryRepository.getProfileFollowerCount(memberId);
-    const myFollowingCount = await this.profileQueryRepository.getProfileFollowingCount(memberId);
+    const myFollowerCount = await this.followQueryRepository.getFollowerCountByMemberId(memberId);
+    const myFollowingCount = await this.followQueryRepository.getProfileFollowingCountByMemberId(memberId);
 
     myProfileInfo.followerCount = myFollowerCount;
     myProfileInfo.followingCount = myFollowingCount;
@@ -62,11 +64,13 @@ export class ProfileService {
     const postListTuples = await this.profileQueryRepository.getPostList(memberId, paginationRequest);
     const totalCount = await this.profileQueryRepository.getAllPostListTotalCount(memberId);
 
-    const postInfo = await Promise.all(postListTuples.map(async (postList) => {
-      const post = GetPostList.from(postList);
-      const hashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postList.postId);
-      return new GetPostListDto(post, hashTagInfo);
-    }))
+    const postInfo = await Promise.all(
+      postListTuples.map(async (postList) => {
+        const post = GetPostList.from(postList);
+        const hashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postList.postId);
+        return new GetPostListDto(post, hashTagInfo);
+      }),
+    );
 
     return { postInfo, totalCount };
   }
