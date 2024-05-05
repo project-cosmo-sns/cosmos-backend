@@ -91,8 +91,11 @@ export class PostController {
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
   @ApiResponse({ type: PostDetailResponse })
   @Get(':postId/detail')
-  async getPostDetail(@Param('postId', ParseIntPipe) postId: number): Promise<PostDetailResponse> {
-    const postDetail = await this.postService.getPostDetail(postId);
+  async getPostDetail(
+    @Req() req,
+    @Param('postId', ParseIntPipe) postId: number
+  ): Promise<PostDetailResponse> {
+    const postDetail = await this.postService.getPostDetail(postId, req.user.id);
     return PostDetailResponse.from(postDetail);
   }
 

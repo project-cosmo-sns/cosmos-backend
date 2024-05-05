@@ -24,6 +24,7 @@ export class GetPostList {
     profileImageUrl: string,
     createdAt: Date,
     postId: number,
+    category: string,
     title: string,
     content: string,
     emojiCount: number,
@@ -38,6 +39,7 @@ export class GetPostList {
     };
     this.post = {
       id: postId,
+      category,
       title,
       content,
       emojiCount,
@@ -55,6 +57,7 @@ export class GetPostList {
       tuple.profileImageUrl,
       tuple.createdAt,
       tuple.postId,
+      tuple.category,
       tuple.title,
       tuple.content,
       tuple.emojiCount,

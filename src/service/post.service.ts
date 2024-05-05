@@ -78,7 +78,7 @@ export class PostService {
     return { postInfo, totalCount };
   }
 
-  async getPostDetail(postId: number): Promise<GetPostDetailDto> {
+  async getPostDetail(postId: number, memberId: number): Promise<GetPostDetailDto> {
     const isDeletedPost = await this.postRepository.findOneBy({ id: postId });
     if (!isDeletedPost) {
       throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
@@ -93,9 +93,10 @@ export class PostService {
     }
 
     const postDetailHashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postId);
+    const postDetailEmojiInfo = await this.postQueryRepository.getPostDetailEmoji(postId, memberId);
 
     const postDetail = GetPostDetail.from(postDetailInfo);
-    return new GetPostDetailDto(postDetail, postDetailHashTagInfo);
+    return new GetPostDetailDto(postDetail, postDetailHashTagInfo, postDetailEmojiInfo);
   }
 
   async modifyPost(postId: number, memberId: number, dto: CreatePostInfoDto): Promise<void> {
@@ -372,6 +373,7 @@ export class PostWriterDto {
 
 export class PostListDto {
   id: number;
+  category: string;
   title: string;
   content: string;
   viewCount: number;
