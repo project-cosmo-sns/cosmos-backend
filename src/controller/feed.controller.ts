@@ -14,6 +14,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   ApiBody,
   ApiGoneResponse,
@@ -31,9 +32,11 @@ import { PostFeedCommentRequestDto } from 'src/dto/request/post-feed-comment.req
 import { PostFeedRequestDto } from 'src/dto/request/post-feed.request.dto';
 import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
+import { ImageResponse } from 'src/dto/response/image.response';
 import { RolesGuard } from 'src/guard/roles.guard';
 import { FeedCommentService } from 'src/service/feed-comment.service';
 import { FeedService } from 'src/service/feed.service';
+import { ImageService } from 'src/service/image.service';
 
 @ApiTags('피드')
 @Controller('feed')
@@ -42,6 +45,8 @@ export class FeedController {
   constructor(
     private readonly feedService: FeedService,
     private readonly feedCommentService: FeedCommentService,
+    private readonly imageService: ImageService,
+    private readonly configService: ConfigService,
   ) {}
 
   @ApiOperation({ summary: '피드 작성' })
@@ -239,5 +244,23 @@ export class FeedController {
         throw new InternalServerErrorException('서버 오류가 발생했습니다.');
       }
     }
+  }
+
+  @ApiOperation({ summary: '피드 이미지 url 불러오기' })
+  @Get('/image/create')
+  async createUploadURL(): Promise<ImageResponse> {
+    const bucket = this.configService.get('AWS_S3_UPLOAD_BUCKET_FEED');
+
+    const uploadUrl = await this.imageService.createUploadURL(bucket);
+    return new ImageResponse(uploadUrl);
+  }
+
+  @ApiOperation({ summary: '피드 이미지 삭제' })
+  @ApiParam({ name: 'imageUrls', required: true, description: '이미지 urls' })
+  @Delete('/image/delete')
+  async deleteImage(@Query('imageUrls') imageUrls: string[]): Promise<void> {
+    const bucket = this.configService.get('AWS_S3_UPLOAD_BUCKET_FEED');
+
+    await this.imageService.deleteImage(imageUrls, bucket);
   }
 }

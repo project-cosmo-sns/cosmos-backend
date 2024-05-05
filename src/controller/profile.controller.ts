@@ -1,22 +1,29 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Query, Req, UseGuards } from "@nestjs/common";
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Query, Req, UseGuards } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
-import { Roles } from "src/common/roles/roles.decorator";
+import { Roles } from 'src/common/roles/roles.decorator';
 import { profileInfoRequestDto } from 'src/dto/request/profile-info.request';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
+import { ImageResponse } from 'src/dto/response/image.response';
 import { MyProfileInfoResponse } from 'src/dto/response/my-profile-info.response';
-import { OthersProfileInfoResponse } from "src/dto/response/others-profile-info.response";
+import { OthersProfileInfoResponse } from 'src/dto/response/others-profile-info.response';
 import { ProfilePostResponse } from 'src/dto/response/profile/my-profile-post.response';
-import { RolesGuard } from "src/guard/roles.guard";
-import { ProfileService } from "src/service/profile.service";
+import { RolesGuard } from 'src/guard/roles.guard';
+import { ImageService } from 'src/service/image.service';
+import { ProfileService } from 'src/service/profile.service';
 
 @ApiTags('프로필')
 @Controller('profile')
 @UseGuards(RolesGuard)
 export class ProfileController {
-  constructor(private readonly profileService: ProfileService) { }
+  constructor(
+    private readonly profileService: ProfileService,
+    private readonly imageService: ImageService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @ApiOperation({ summary: '나의 프로필 조회' })
   @ApiResponse({ type: MyProfileInfoResponse })
@@ -32,22 +39,20 @@ export class ProfileController {
   @Get(':memberId')
   async getOthersProfileInfo(
     @Param('memberId', ParseIntPipe) memberId: number,
-    @Req() req): Promise<OthersProfileInfoResponse> {
+    @Req() req,
+  ): Promise<OthersProfileInfoResponse> {
     const othersProfileInfo = await this.profileService.getOthersProfileInfo(memberId, req.user.id);
     return OthersProfileInfoResponse.from(othersProfileInfo);
   }
 
-
   @ApiOperation({ summary: '나의 프로필 수정' })
   @Patch('mine')
-  async patchMyProfile(
-    @Req() req,
-    @Body() profileInfoRequestDto: profileInfoRequestDto): Promise<void> {
+  async patchMyProfile(@Req() req, @Body() profileInfoRequestDto: profileInfoRequestDto): Promise<void> {
     return this.profileService.modifyMyProfile(
       req.user.id,
       profileInfoRequestDto.nickname,
       profileInfoRequestDto.profileImageUrl,
-      profileInfoRequestDto.introduce
+      profileInfoRequestDto.introduce,
     );
   }
 
@@ -56,7 +61,7 @@ export class ProfileController {
   @Get('mine/feed')
   async getMyFeedList(
     @Req() req,
-    @Query() paginationRequest: PaginationRequest
+    @Query() paginationRequest: PaginationRequest,
   ): Promise<PaginationResponse<GetFeedResponseDto>> {
     const { feedList, totalCount } = await this.profileService.getFeedList(req.user.id, paginationRequest);
 
@@ -80,7 +85,7 @@ export class ProfileController {
       data: postData,
       options: paginationRequest,
       totalCount,
-    })
+    });
   }
 
   @ApiOperation({ summary: '타 유저 프로필 피드 목록' })
@@ -89,7 +94,7 @@ export class ProfileController {
   @Get(':memberId/feed')
   async getOthersFeedList(
     @Param('memberId', ParseIntPipe) memberId: number,
-    @Query() paginationRequest: PaginationRequest
+    @Query() paginationRequest: PaginationRequest,
   ): Promise<PaginationResponse<GetFeedResponseDto>> {
     const { feedList, totalCount } = await this.profileService.getFeedList(memberId, paginationRequest);
 
@@ -114,7 +119,24 @@ export class ProfileController {
       data: postData,
       options: paginationRequest,
       totalCount,
-    })
+    });
   }
 
+  @ApiOperation({ summary: '프로필 이미지 url 불러오기' })
+  @Get('/image/create')
+  async createUploadURL(): Promise<ImageResponse> {
+    const bucket = this.configService.get('AWS_S3_UPLOAD_BUCKET_PROFILE');
+
+    const uploadUrl = await this.imageService.createUploadURL(bucket);
+    return new ImageResponse(uploadUrl);
+  }
+
+  @ApiOperation({ summary: '프로필 이미지 삭제' })
+  @ApiParam({ name: 'imageUrls', required: true, description: '이미지 urls' })
+  @Delete('/image/delete')
+  async deleteImage(@Query('imageUrls') imageUrls: string[]): Promise<void> {
+    const bucket = this.configService.get('AWS_S3_UPLOAD_BUCKET_PROFILE');
+
+    await this.imageService.deleteImage(imageUrls, bucket);
+  }
 }

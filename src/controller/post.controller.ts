@@ -1,5 +1,30 @@
-import { Body, Controller, Delete, Get, GoneException, InternalServerErrorException, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiGoneResponse, ApiNotFoundResponse, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  GoneException,
+  InternalServerErrorException,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import {
+  ApiBody,
+  ApiGoneResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
@@ -9,17 +34,23 @@ import { HashTagSearchRequest } from 'src/dto/request/hash-tag-search.request';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { CreatePostResponse } from 'src/dto/response/create-post.response';
 import { HashTagSearchResponse } from 'src/dto/response/hash-tag-search.response';
+import { ImageResponse } from 'src/dto/response/image.response';
 import { PostCommentListResponse } from 'src/dto/response/post-comment-list.response';
 import { PostDetailResponse } from 'src/dto/response/post-detail.response';
 import { PostListResponse } from 'src/dto/response/post-list.response';
 import { RolesGuard } from 'src/guard/roles.guard';
+import { ImageService } from 'src/service/image.service';
 import { PostService } from 'src/service/post.service';
 
 @ApiTags('포스트')
 @Controller('post')
 @UseGuards(RolesGuard)
 export class PostController {
-  constructor(private readonly postService: PostService) { }
+  constructor(
+    private readonly postService: PostService,
+    private readonly imageService: ImageService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @ApiOperation({ summary: '포스트 작성' })
   @ApiResponse({ type: CreatePostResponse })
@@ -33,10 +64,7 @@ export class PostController {
   @ApiPaginatedResponse(PostListResponse)
   @ApiResponse({ status: 401, description: '로그인 하지 않고 [기수순, 팔로우순]으로 정렬했을 경우' })
   @Get('list')
-  async getPostList(
-    @Req() req,
-    @Query() sortPostList: SortPostList
-  ): Promise<PaginationResponse<PostListResponse>> {
+  async getPostList(@Req() req, @Query() sortPostList: SortPostList): Promise<PaginationResponse<PostListResponse>> {
     const userId = req.user?.id;
     const userGeneration = req.user?.generation;
     try {
@@ -88,7 +116,6 @@ export class PostController {
     return this.postService.deletePost(postId, req.user.id);
   }
 
-
   @ApiOperation({ summary: '포스트 이모지 추가' })
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
   @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었을 경우' })
@@ -107,12 +134,11 @@ export class PostController {
   @ApiParam({ name: 'emojiId', required: true, description: '포스트 이모지 id' })
   @ApiUnauthorizedResponse({ status: 401, description: '해당 이모지를 추가한 유저가 아닐 경우' })
   @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었을 경우' })
-
   @Delete(':postId/emoji/:emojiId')
   async deletePostEmoji(
     @Req() req,
     @Param('postId', ParseIntPipe) postId: number,
-    @Param('emojiId', ParseIntPipe) emojiId: number
+    @Param('emojiId', ParseIntPipe) emojiId: number,
   ): Promise<void> {
     return this.postService.removePostEmoji(postId, req.user.id, emojiId);
   }
@@ -133,15 +159,19 @@ export class PostController {
   async getPostCommentList(
     @Req() req,
     @Query() paginationRequest: PaginationRequest,
-    @Param('postId', ParseIntPipe) postId: number
+    @Param('postId', ParseIntPipe) postId: number,
   ): Promise<PaginationResponse<PostCommentListResponse>> {
-    const { postCommentInfo, totalCount } = await this.postService.getPostCommentList(postId, req.user.id, paginationRequest);
+    const { postCommentInfo, totalCount } = await this.postService.getPostCommentList(
+      postId,
+      req.user.id,
+      paginationRequest,
+    );
     const postCommentData = postCommentInfo.map((info) => PostCommentListResponse.from(info));
     return PaginationResponse.of({
       data: postCommentData,
       options: paginationRequest,
       totalCount,
-    })
+    });
   }
 
   @ApiOperation({ summary: '포스트 댓글 쓰기' })
@@ -169,8 +199,9 @@ export class PostController {
     @Req() req,
     @Body('content') content: string,
   ): Promise<void> {
-    try { return this.postService.patchPostComment(postId, commentId, req.user.id, content); }
-    catch (error) {
+    try {
+      return this.postService.patchPostComment(postId, commentId, req.user.id, content);
+    } catch (error) {
       if (error instanceof UnauthorizedException || error instanceof GoneException) {
         throw error;
       } else {
@@ -188,11 +219,11 @@ export class PostController {
   async removePostComment(
     @Param('postId', ParseIntPipe) postId: number,
     @Param('commentId', ParseIntPipe) commentId: number,
-    @Req() req
+    @Req() req,
   ): Promise<void> {
-    try { return this.postService.deletePostComment(postId, commentId, req.user.id); }
-
-    catch (error) {
+    try {
+      return this.postService.deletePostComment(postId, commentId, req.user.id);
+    } catch (error) {
       if (error instanceof UnauthorizedException || error instanceof GoneException) {
         throw error;
       } else {
@@ -213,8 +244,7 @@ export class PostController {
   ): Promise<void> {
     try {
       return this.postService.heartPostComment(postId, commentId, req.user.id);
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof GoneException) {
         throw error;
       } else {
@@ -234,8 +264,9 @@ export class PostController {
     @Param('commentId', ParseIntPipe) commentId: number,
     @Req() req,
   ): Promise<void> {
-    try { return this.postService.deletePostCommentHeart(postId, commentId, req.user.id); }
-    catch (error) {
+    try {
+      return this.postService.deletePostCommentHeart(postId, commentId, req.user.id);
+    } catch (error) {
       if (error instanceof UnauthorizedException || error instanceof GoneException) {
         throw error;
       } else {
@@ -247,10 +278,17 @@ export class PostController {
   @ApiOperation({ summary: '해시태그 검색' })
   @ApiResponse({ type: HashTagSearchResponse })
   @Get('search/hashTag')
-  async searchHashTag(
-    @Query() hashTagSearchRequest: HashTagSearchRequest
-  ): Promise<HashTagSearchResponse[]> {
+  async searchHashTag(@Query() hashTagSearchRequest: HashTagSearchRequest): Promise<HashTagSearchResponse[]> {
     const hashTagSearchResult = await this.postService.getHashTagSearchInfo(hashTagSearchRequest);
     return HashTagSearchResponse.from(hashTagSearchResult);
+  }
+
+  @ApiOperation({ summary: '포스트 이미지 url 불러오기' })
+  @Get('/image/create')
+  async createUploadURL(): Promise<ImageResponse> {
+    const bucket = this.configService.get('AWS_S3_UPLOAD_BUCKET_FEED');
+
+    const uploadUrl = await this.imageService.createUploadURL(bucket);
+    return new ImageResponse(uploadUrl);
   }
 }

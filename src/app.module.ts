@@ -34,7 +34,6 @@ import { FeedCommentHeart } from './entity/feed_comment_heart';
 import { PostComment } from './entity/post_comment.entity';
 import { PostCommentHeart } from './entity/post_comment_heart.entity';
 import { PostView } from './entity/post_view.entity';
-import { ImageController } from './controller/image.controller';
 import { ImageService } from './service/image.service';
 import { PostEmoji } from './entity/post_emoji.entity';
 import { FollowController } from './controller/follow.controller';
@@ -89,7 +88,6 @@ import { MemberController } from './controller/member.controller';
     OauthAuthenticationController,
     FeedController,
     PostController,
-    ImageController,
     FollowController,
     NotificationController,
     SearchController,

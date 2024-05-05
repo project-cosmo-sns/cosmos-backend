@@ -6,7 +6,7 @@ import * as AWS from 'aws-sdk';
 export class ImageService {
   constructor(private readonly configService: ConfigService) {}
 
-  async createUploadURL(): Promise<string> {
+  async createUploadURL(bucket: string): Promise<string> {
     const S3_URL_EXPIRATION_SECONDS = 60 * 5;
     const randomId = Math.random() * 10000000;
     const key = `${randomId}.png`;
@@ -20,12 +20,33 @@ export class ImageService {
     });
 
     const s3Params = {
-      Bucket: this.configService.get('AWS_S3_UPLOAD_BUCKET'),
+      Bucket: bucket,
       Key: key,
       Expires: S3_URL_EXPIRATION_SECONDS,
       ContentType: 'image/png',
     };
 
     return s3.getSignedUrlPromise('putObject', s3Params);
+  }
+
+  async deleteImage(imageUrls: string[], bucket: string): Promise<void> {
+    const s3 = new AWS.S3({
+      credentials: {
+        accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID') || '',
+        secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY') || '',
+      },
+      region: this.configService.get('AWS_REGION'),
+    });
+
+    await Promise.all(
+      imageUrls.map(async (imageUrl) => {
+        const params = {
+          Bucket: bucket,
+          Key: imageUrl,
+        };
+
+        await s3.deleteObject(params).promise();
+      }),
+    );
   }
 }
