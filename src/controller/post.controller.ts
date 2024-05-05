@@ -5,7 +5,6 @@ import {
   Get,
   GoneException,
   InternalServerErrorException,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -22,7 +21,6 @@ import {
   ApiNotFoundResponse,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -32,7 +30,6 @@ import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
 import { Roles } from 'src/common/roles/roles.decorator';
 import { CreatePostInfoDto } from 'src/dto/request/create-post-dto';
-import { DeleteImageRequestDto } from 'src/dto/request/delete-image.request.dto';
 import { HashTagSearchRequest } from 'src/dto/request/hash-tag-search.request';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { CreatePostResponse } from 'src/dto/response/create-post.response';
@@ -286,10 +283,10 @@ export class PostController {
     return HashTagSearchResponse.from(hashTagSearchResult);
   }
 
-  @ApiOperation({ summary: '이미지 url 불러오기' })
-  @Post('/image')
+  @ApiOperation({ summary: '포스트 이미지 url 불러오기' })
+  @Get('/image/create')
   async createUploadURL(): Promise<ImageResponse> {
-    const bucket = this.configService.get('AWS_S3_UPLOAD_BUCKET_POST');
+    const bucket = this.configService.get('AWS_S3_UPLOAD_BUCKET_FEED');
 
     const uploadUrl = await this.imageService.createUploadURL(bucket);
     return new ImageResponse(uploadUrl);

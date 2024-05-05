@@ -28,7 +28,6 @@ import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
 import { Roles } from 'src/common/roles/roles.decorator';
-import { DeleteImageRequestDto } from 'src/dto/request/delete-image.request.dto';
 import { PostFeedCommentRequestDto } from 'src/dto/request/post-feed-comment.request';
 import { PostFeedRequestDto } from 'src/dto/request/post-feed.request.dto';
 import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
@@ -247,8 +246,8 @@ export class FeedController {
     }
   }
 
-  @ApiOperation({ summary: '이미지 url 불러오기' })
-  @Post('/image')
+  @ApiOperation({ summary: '피드 이미지 url 불러오기' })
+  @Get('/image/create')
   async createUploadURL(): Promise<ImageResponse> {
     const bucket = this.configService.get('AWS_S3_UPLOAD_BUCKET_FEED');
 
@@ -256,12 +255,12 @@ export class FeedController {
     return new ImageResponse(uploadUrl);
   }
 
-  @ApiOperation({ summary: '이미지 삭제' })
-  @ApiParam({ name: 'url', required: true, description: '이미지 url' })
-  @Delete('/image')
-  async deleteImage(@Query() queryParam: DeleteImageRequestDto): Promise<void> {
+  @ApiOperation({ summary: '피드 이미지 삭제' })
+  @ApiParam({ name: 'imageUrls', required: true, description: '이미지 urls' })
+  @Delete('/image/delete')
+  async deleteImage(@Query('imageUrls') imageUrls: string[]): Promise<void> {
     const bucket = this.configService.get('AWS_S3_UPLOAD_BUCKET_FEED');
 
-    await this.imageService.deleteImage(queryParam.imageUrl, bucket);
+    await this.imageService.deleteImage(imageUrls, bucket);
   }
 }

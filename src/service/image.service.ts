@@ -29,7 +29,7 @@ export class ImageService {
     return s3.getSignedUrlPromise('putObject', s3Params);
   }
 
-  async deleteImage(imageUrl: string, bucket: string): Promise<void> {
+  async deleteImage(imageUrls: string[], bucket: string): Promise<void> {
     const s3 = new AWS.S3({
       credentials: {
         accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID') || '',
@@ -38,11 +38,15 @@ export class ImageService {
       region: this.configService.get('AWS_REGION'),
     });
 
-    const params = {
-      Bucket: bucket,
-      Key: imageUrl,
-    };
+    await Promise.all(
+      imageUrls.map(async (imageUrl) => {
+        const params = {
+          Bucket: bucket,
+          Key: imageUrl,
+        };
 
-    await s3.deleteObject(params).promise();
+        await s3.deleteObject(params).promise();
+      }),
+    );
   }
 }
