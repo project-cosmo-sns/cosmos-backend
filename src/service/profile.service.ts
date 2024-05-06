@@ -23,7 +23,7 @@ export class ProfileService {
     private readonly profileQueryRepository: ProfileQueryRepository,
     private readonly postQueryRepository: PostQueryRepository,
     private readonly followQueryRepository: FollowQueryRepository,
-  ) {}
+  ) { }
 
   async getOthersProfileInfo(memberId: number, myMemberId: number): Promise<GetOthersProfileDto> {
     const isDeletedUser = await this.memberQueryRepository.getMemberIsNotDeletedById(memberId);
@@ -66,9 +66,11 @@ export class ProfileService {
 
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
-        const post = GetPostList.from(postList);
-        const hashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postList.postId);
-        return new GetPostListDto(post, hashTagInfo);
+        const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
+        const postListEmojiInfo = await this.postQueryRepository.getPostListEmoji(postList.postId, postList.memberId);
+        const post = GetPostList.from(postList, hashTagInfo);
+
+        return new GetPostListDto(post, postListEmojiInfo);
       }),
     );
 
