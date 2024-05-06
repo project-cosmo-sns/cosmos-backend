@@ -35,19 +35,17 @@ export class PostDetail {
       emojiCount: { type: 'number' },
       createdAt: { type: 'string' },
       isMine: { type: 'boolean' },
+      hashTags: { type: [PostDetailHashTag] }
     },
   })
   post: PostDetailDto;
-  @ApiProperty({ type: [PostDetailHashTag] })
-  hashTags!: PostDetailHashTag[];
 
   @ApiProperty({ type: [EmojiListResponse] })
   emoji!: EmojiListResponse[];
 
-  constructor(writer: PostWriterDto, post: PostDetailDto, hashTags: PostDetailHashTag[], emoji: EmojiListResponse[]) {
+  constructor(writer: PostWriterDto, post: PostDetailDto, emoji: EmojiListResponse[]) {
     this.writer = writer;
     this.post = post;
-    this.hashTags = hashTags;
     this.emoji = emoji;
   }
 }
@@ -64,7 +62,6 @@ export class PostDetailResponse {
     const postDetail = new PostDetail(
       getPostDetail.postDetail.writer,
       getPostDetail.postDetail.post,
-      getPostDetail.hashTags,
       getPostDetail.emoji,
     );
     return new PostDetailResponse(postDetail);
