@@ -48,7 +48,7 @@ export class FeedController {
     private readonly feedCommentService: FeedCommentService,
     private readonly imageService: ImageService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: '피드 작성' })
   @Post('')
@@ -113,16 +113,16 @@ export class FeedController {
 
   @ApiOperation({ summary: '피드 이모지 삭제' })
   @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
-  @ApiParam({ name: 'emojiId', required: true, description: '피드 이모지 id' })
+  @ApiParam({ name: 'emojiCode', required: true, description: '피드 이모지 코드' })
   @ApiUnauthorizedResponse({ status: 401, description: '해당 이모지를 추가한 유저가 아닐 경우' })
   @ApiGoneResponse({ status: 410, description: '피드가 삭제되었을 경우' })
-  @Delete(':feedId/emoji/:emojiId')
+  @Delete(':feedId/emoji/:emojiCode')
   async deletePostEmoji(
     @Req() req,
     @Param('feedId', ParseIntPipe) feedId: number,
-    @Param('emojiId', ParseIntPipe) emojiId: number,
+    @Param('emojiCode') emojiCode: string,
   ): Promise<void> {
-    return this.feedService.deleteFeedEmoji(feedId, req.user.id, emojiId);
+    return this.feedService.deleteFeedEmoji(feedId, req.user.id, emojiCode);
   }
 
   @ApiOperation({ summary: '피드 댓글 목록' })
