@@ -6,6 +6,7 @@ import { GetOthersProfileDto } from 'src/dto/get-others-profile';
 import { GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
 import { profileInfoRequestDto } from 'src/dto/request/profile-info.request';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
+import { GetProfileHashTagListInfo } from 'src/dto/response/profile/get-profile-post.dto';
 import { FeedImage } from 'src/entity/feed_image.entity';
 import { Member } from 'src/entity/member.entity';
 import { FollowQueryRepository } from 'src/repository/follow.query-repository';
@@ -111,4 +112,23 @@ export class ProfileService {
 
     return { feedList, totalCount };
   }
+}
+
+export class ProfilePostWriterDto {
+  id: number;
+  nickname: string;
+  generation: number;
+  profileImageUrl: string;
+}
+
+export class ProfilePostListDto {
+  id: number;
+  category: string;
+  title: string;
+  content: string;
+  viewCount: number;
+  commentCount: number;
+  emojiCount: number;
+  createdAt: Date;
+  hashTags: GetProfileHashTagListInfo[];
 }

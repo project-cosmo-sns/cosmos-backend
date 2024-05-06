@@ -8,6 +8,10 @@ import { GetPostTuple } from './post.query-repository';
 import { Post } from 'src/entity/post.entity';
 import { Feed } from 'src/entity/feed.entity';
 import { GetFeedTuple } from './feed.query-repository';
+import { HashTag } from 'src/entity/hash_tag.entity';
+import { PostHashTag } from 'src/entity/post_hash_tag.entity';
+import { PostEmoji } from 'src/entity/post_emoji.entity';
+import { EmojiType } from 'src/entity/common/Enums';
 
 @Injectable()
 export class ProfileQueryRepository {
@@ -122,6 +126,49 @@ export class ProfileQueryRepository {
       .andWhere('member.deletedAt IS NULL')
       .andWhere('feed.member_id = :memberId', { memberId });
   }
+
+  async getPostListHashTag(postId: number): Promise<GetProfilePostListHashTagTuple[]> {
+    const postListHashTag = await this.dataSource
+      .createQueryBuilder()
+      .from(HashTag, 'hash_tag')
+      .innerJoin(PostHashTag, 'post_hash_tag', 'post_hash_tag.hash_tag_id = hash_tag.id')
+      .where('post_hash_tag.post_id = :postId', { postId })
+      .select(['hash_tag.tagName as tagName', 'hash_tag.color as color'])
+      .getRawMany();
+    return plainToInstance(GetProfilePostListHashTagTuple, postListHashTag);
+  }
+
+  async getPostListEmoji(postId: number, memberId: number): Promise<GetProfilePostListEmojiTuple[]> {
+    const emojiListInfo = await this.dataSource
+      .createQueryBuilder()
+      .from(PostEmoji, 'post_emoji')
+      .select('post_emoji.emoji as emojiCode')
+      .addSelect('COUNT(*) as emojiCount')
+      .addSelect(
+        'CASE WHEN SUM(CASE WHEN post_emoji.member_id = :memberId THEN 1 ELSE 0 END) > 0 THEN true ELSE false END as isClicked',
+      )
+      .where('post_emoji.post_id = :postId')
+      .groupBy('post_emoji.emoji')
+      .setParameters({ memberId, postId })
+      .getRawMany();
+
+    return plainToInstance(GetProfilePostListEmojiTuple, emojiListInfo);
+  }
+}
+
+export class GetProfilePostTuple {
+  memberId!: number;
+  nickname!: string;
+  generation!: number;
+  profileImageUrl!: string;
+  createdAt!: Date;
+  postId!: number;
+  category!: string;
+  title!: string;
+  content!: string;
+  emojiCount!: number;
+  commentCount!: number;
+  viewCount!: number;
 }
 
 export class GetOthersProfileTuple {
@@ -153,4 +200,16 @@ export class FollowerCountTuple {
 
 export class FollowingCountTuple {
   followingCount!: number;
+}
+
+export class GetProfilePostListHashTagTuple {
+  tagName: string;
+  color: string;
+}
+
+export class GetProfilePostListEmojiTuple {
+  emojiCode!: EmojiType;
+  emojiCount!: number;
+  @Transform(({ value }) => value === '1')
+  isClicked!: boolean;
 }
