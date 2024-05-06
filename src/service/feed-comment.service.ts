@@ -120,7 +120,7 @@ export class FeedCommentService {
   async likeFeedComment(feedId: number, commentId: number, memberId: number): Promise<void> {
     await this.feedDomainService.getFeedIsNotDeleted(feedId);
 
-    const comment = await this.feedCommentQueryRepository.getIsNotDeletedFeedComment(feedId);
+    const comment = await this.feedCommentQueryRepository.getIsNotDeletedFeedComment(commentId);
 
     if (!comment) {
       throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
