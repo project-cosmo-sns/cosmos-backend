@@ -66,6 +66,7 @@ export class FeedService {
 
   async getFeedList(
     paginationRequest: PaginationRequest,
+    memberId: number,
   ): Promise<{ feedList: GetFeedResponseDto[]; totalCount: number }> {
     const getFeedListTuple = await this.feedQueryRepository.getFeedList(paginationRequest);
     const totalCount = await this.feedQueryRepository.getFeedListCount();
@@ -80,7 +81,7 @@ export class FeedService {
         };
 
         const feedImages = await this.feedImageRepository.findBy({ feedId: item.feedId });
-
+        const feedEmojis = await this.feedQueryRepository.getFeedEmoji(item.feedId, memberId);
         const feed = {
           id: item.feedId,
           content: item.feedContent,
@@ -89,6 +90,11 @@ export class FeedService {
           emojiCount: item.feedEmojiCount,
           createdAt: item.feedCreatedAt,
           imageUrls: feedImages.map((feedImage) => feedImage.imageUrl),
+          emojis: feedEmojis.map((emoji) => ({
+            emojiCode: emoji.emojiCode,
+            emojiCount: emoji.emojiCount,
+            isClicked: emoji.isClicked
+          }))
         };
 
         return GetFeedResponseDto.from({ writer, feed });

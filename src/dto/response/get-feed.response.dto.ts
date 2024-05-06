@@ -1,5 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { EmojiType } from 'src/entity/common/Enums';
 import { FeedDto, FeedWriterDto } from 'src/service/feed.service';
+
+export class FeedEmoji {
+  @ApiProperty()
+  emojiCode!: EmojiType;
+  @ApiProperty()
+  emojiCount!: number;
+  @ApiProperty()
+  isClicked!: boolean;
+  constructor(emojiCode: EmojiType, emojiCount: number, isClicked: boolean) {
+    this.emojiCode = emojiCode;
+    this.emojiCount = emojiCount;
+    this.isClicked = isClicked;
+  }
+}
 
 export class GetFeedResponseDto {
   @ApiProperty({
@@ -20,6 +35,7 @@ export class GetFeedResponseDto {
       emojiCount: { type: 'number' },
       createdAt: { type: 'string' },
       imageUrls: { type: 'array', items: { type: 'string' } },
+      emojis: { type: [FeedEmoji] }
     },
   })
   feed: FeedDto;
