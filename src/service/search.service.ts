@@ -11,15 +11,16 @@ export class SearchService {
   constructor(
     private readonly searchQueryRepository: SearchQueryRepository,
     private readonly followQueryRepository: FollowQueryRepository,
-  ) {}
+  ) { }
 
   async searchPostByHashTag(
     requestDto: GetSearchPostByHashTagRequestDto,
+    memberId: number,
   ): Promise<{ postList: GetSearchPostByHashTagResponseDto[]; totalCount: number }> {
     const postListTuple = await this.searchQueryRepository.searchPostByHashTag(requestDto);
     const totalCount = await this.searchQueryRepository.searchPostByHashTagTotalCount(requestDto.keyword);
 
-    const postList = postListTuple.map((item) => {
+    const postList = await Promise.all(postListTuple.map(async (item) => {
       const writer = {
         id: item.writerId,
         nickname: item.writerNickname,
@@ -27,6 +28,8 @@ export class SearchService {
         profileImageUrl: item.writerProfileImageUrl,
       };
 
+      const hashTagInfo = await this.searchQueryRepository.getSearchedPostHashTag(item.postId);
+      const postListEmojiInfo = await this.searchQueryRepository.getSearchPostEmoji(item.postId, memberId);
       const post = {
         id: item.postId,
         title: item.postTitle,
@@ -35,11 +38,13 @@ export class SearchService {
         commentCount: item.postCommentCount,
         emojiCount: item.postEmojiCount,
         createdAt: item.postCreatedAt,
+        hashTags: hashTagInfo,
+        emojis: postListEmojiInfo,
       };
 
       return GetSearchPostByHashTagResponseDto.from({ writer, post });
-    });
-
+    }),
+    );
     return { postList, totalCount };
   }
 

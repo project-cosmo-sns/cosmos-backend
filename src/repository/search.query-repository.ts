@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { plainToInstance } from 'class-transformer';
+import { Transform, plainToInstance } from 'class-transformer';
 import { GetSearchMemberByNameRequestDto } from 'src/dto/request/get-search-member-by-name.request.dto';
 import { GetSearchPostByHashTagRequestDto } from 'src/dto/request/get-search-post-by-hash-tag.request.dto';
+import { EmojiType } from 'src/entity/common/Enums';
 import { HashTag } from 'src/entity/hash_tag.entity';
 import { Member } from 'src/entity/member.entity';
 import { Post } from 'src/entity/post.entity';
+import { PostEmoji } from 'src/entity/post_emoji.entity';
 import { PostHashTag } from 'src/entity/post_hash_tag.entity';
 import { DataSource } from 'typeorm';
 
 @Injectable()
 export class SearchQueryRepository {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
+  constructor(@InjectDataSource() private readonly dataSource: DataSource) { }
 
   async searchPostByHashTag(requestDto: GetSearchPostByHashTagRequestDto): Promise<GetSearchPostByHashTagTuple[]> {
     const postList = await this.searchPostByHashTagBaseQuery(requestDto.keyword)
@@ -47,7 +49,9 @@ export class SearchQueryRepository {
       .innerJoin(PostHashTag, 'postHashTag', 'postHashTag.hashTagId = hashTag.id')
       .innerJoin(Post, 'post', 'post.id = postHashTag.postId')
       .innerJoin(Member, 'member', 'member.id = post.memberId')
-      .where('hashTag.tagName LIKE :keyword', { keyword: `%${keyword}%` });
+      .where('hashTag.tagName LIKE :keyword', { keyword: `%${keyword}%` })
+      .andWhere('post.deletedAt IS NULL')
+      .andWhere('member.deletedAt IS NULL');
   }
 
   async searchMemberByName(
@@ -73,6 +77,34 @@ export class SearchQueryRepository {
 
   async searchMemberByNameTotalCount(keyword: string, memberId: number) {
     return await this.searchMemberByNameBaseQuery(keyword, memberId).getCount();
+  }
+
+  async getSearchedPostHashTag(postId: number): Promise<GetSearchedPostHashTagTuple[]> {
+    const searchedPostHashTag = await this.dataSource
+      .createQueryBuilder()
+      .from(HashTag, 'hash_tag')
+      .innerJoin(PostHashTag, 'post_hash_tag', 'post_hash_tag.hash_tag_id = hash_tag.id')
+      .where('post_hash_tag.post_id = :postId', { postId })
+      .select(['hash_tag.tagName as tagName', 'hash_tag.color as color'])
+      .getRawMany();
+    return plainToInstance(GetSearchedPostHashTagTuple, searchedPostHashTag);
+  }
+
+  async getSearchPostEmoji(postId: number, memberId: number): Promise<GetSearchedPostEmojiTuple[]> {
+    const emojiListInfo = await this.dataSource
+      .createQueryBuilder()
+      .from(PostEmoji, 'post_emoji')
+      .select('post_emoji.emoji as emojiCode')
+      .addSelect('COUNT(*) as emojiCount')
+      .addSelect(
+        'CASE WHEN SUM(CASE WHEN post_emoji.member_id = :memberId THEN 1 ELSE 0 END) > 0 THEN true ELSE false END as isClicked',
+      )
+      .where('post_emoji.post_id = :postId')
+      .groupBy('post_emoji.emoji')
+      .setParameters({ memberId, postId })
+      .getRawMany();
+
+    return plainToInstance(GetSearchedPostEmojiTuple, emojiListInfo);
   }
 
   private searchMemberByNameBaseQuery(keyword: string, memberId: number) {
@@ -110,4 +142,17 @@ export class GetSearchMemberByNameTuple {
   profileImageUrl: string;
   introduce: string;
   isFollowing: boolean;
+}
+
+
+export class GetSearchedPostHashTagTuple {
+  tagName: string;
+  color: string;
+}
+
+export class GetSearchedPostEmojiTuple {
+  emojiCode!: EmojiType;
+  emojiCount!: number;
+  @Transform(({ value }) => value === '1')
+  isClicked!: boolean;
 }

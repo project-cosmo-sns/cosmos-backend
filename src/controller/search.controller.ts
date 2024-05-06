@@ -13,15 +13,16 @@ import { SearchService } from 'src/service/search.service';
 @Controller('search')
 @UseGuards(RolesGuard)
 export class SearchController {
-  constructor(private readonly searchService: SearchService) {}
+  constructor(private readonly searchService: SearchService) { }
 
   @ApiOperation({ summary: '포스트 해시태그 검색' })
   @ApiPaginatedResponse(GetSearchPostByHashTagResponseDto)
   @Get('/post/hash-tag')
   async searchPostByHashTag(
+    @Req() req,
     @Query() requestDto: GetSearchPostByHashTagRequestDto,
   ): Promise<PaginationResponse<GetSearchPostByHashTagResponseDto>> {
-    const { postList, totalCount } = await this.searchService.searchPostByHashTag(requestDto);
+    const { postList, totalCount } = await this.searchService.searchPostByHashTag(requestDto, req.user.id);
 
     return PaginationResponse.of({
       data: postList,
