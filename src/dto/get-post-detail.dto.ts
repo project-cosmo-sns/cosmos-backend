@@ -4,8 +4,8 @@ import { PostDetailDto, PostWriterDto } from 'src/service/post.service';
 
 export class GetPostDetailDto {
   postDetail!: GetPostDetail;
-  emoji!: GetEmojiInfo[];
-  constructor(postDetail: GetPostDetail, emoji: GetEmojiInfo[]) {
+  emoji!: GetEmojiDetailInfo[];
+  constructor(postDetail: GetPostDetail, emoji: GetEmojiDetailInfo[]) {
     this.postDetail = postDetail;
     this.emoji = emoji;
   }
@@ -81,7 +81,7 @@ export class GetHashTagInfo {
   }
 }
 
-export class GetEmojiInfo {
+export class GetEmojiDetailInfo {
   emojiCode: EmojiType;
   emojiCount: number;
   isClicked: boolean;

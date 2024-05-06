@@ -4,14 +4,14 @@ import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { Follow } from 'src/entity/follow.entity';
 import { Member } from 'src/entity/member.entity';
 import { DataSource } from 'typeorm';
-import { GetPostListTuple } from './post.query-repository';
+import { GetPostTuple } from './post.query-repository';
 import { Post } from 'src/entity/post.entity';
 import { Feed } from 'src/entity/feed.entity';
 import { GetFeedTuple } from './feed.query-repository';
 
 @Injectable()
 export class ProfileQueryRepository {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(private readonly dataSource: DataSource) { }
 
   async getOthersProfileInfo(memberId: number, myMemberId: number): Promise<GetOthersProfileTuple> {
     const othersProfile = await this.dataSource
@@ -52,7 +52,7 @@ export class ProfileQueryRepository {
     return plainToInstance(GetMyProfileTuple, myProfile);
   }
 
-  async getPostList(memberId: number, paginationRequest: PaginationRequest): Promise<GetPostListTuple[]> {
+  async getPostList(memberId: number, paginationRequest: PaginationRequest): Promise<GetPostTuple[]> {
     const postListQuery = await this.getPostListBaseQuery(memberId)
       .select([
         'member.id as memberId',
@@ -70,7 +70,7 @@ export class ProfileQueryRepository {
       .offset(paginationRequest.getSkip())
       .orderBy('post.created_at', paginationRequest.order)
       .getRawMany();
-    return plainToInstance(GetPostListTuple, postListQuery);
+    return plainToInstance(GetPostTuple, postListQuery);
   }
 
   async getAllPostListTotalCount(memberId: number): Promise<number> {
