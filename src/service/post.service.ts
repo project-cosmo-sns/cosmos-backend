@@ -9,7 +9,7 @@ import { PostHashTag } from 'src/entity/post_hash_tag.entity';
 import { Repository } from 'typeorm';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
-import { GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
+import { GetHashTagListInfo, GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
 import { GetHashTagInfo, GetPostDetail, GetPostDetailDto } from 'src/dto/get-post-detail.dto';
 import { ListSortBy, NotificationType } from 'src/entity/common/Enums';
 import { PostView } from 'src/entity/post_view.entity';
@@ -71,9 +71,10 @@ export class PostService {
 
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
-        const post = GetPostList.from(postList);
-        const hashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postList.postId);
-        return new GetPostListDto(post, hashTagInfo);
+        const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
+        const post = GetPostList.from(postList, hashTagInfo);
+
+        return new GetPostListDto(post);
       }),
     );
 
@@ -96,9 +97,8 @@ export class PostService {
 
     const postDetailHashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postId);
     const postDetailEmojiInfo = await this.postQueryRepository.getPostDetailEmoji(postId, memberId);
-    console.log(postDetailHashTagInfo);
     const postDetail = GetPostDetail.from(postDetailInfo, postDetailHashTagInfo);
-   
+
     return new GetPostDetailDto(postDetail, postDetailEmojiInfo);
   }
 
@@ -387,6 +387,7 @@ export class PostListDto {
   commentCount: number;
   emojiCount: number;
   createdAt: Date;
+  hashTags: GetHashTagListInfo[];
 }
 
 export class PostDetailDto {

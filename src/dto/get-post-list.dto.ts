@@ -1,14 +1,11 @@
-import { GetPostListTuple } from 'src/repository/post.query-repository';
+import { GetPostListHashTagTuple, GetPostListTuple } from 'src/repository/post.query-repository';
 import { PostListDto, PostWriterDto } from 'src/service/post.service';
-import { GetHashTagInfo } from './get-post-detail.dto';
 
 export class GetPostListDto {
   postList!: GetPostList;
-  hashTag!: GetHashTagInfo[];
 
-  constructor(postList: GetPostList, hashTag: GetHashTagInfo[]) {
+  constructor(postList: GetPostList) {
     this.postList = postList;
-    this.hashTag = hashTag;
   }
 }
 
@@ -30,6 +27,7 @@ export class GetPostList {
     emojiCount: number,
     commentCount: number,
     viewCount: number,
+    hashTags: GetHashTagListInfo[]
   ) {
     this.writer = {
       id: memberId,
@@ -46,10 +44,12 @@ export class GetPostList {
       commentCount,
       viewCount,
       createdAt,
+      hashTags,
     };
   }
 
-  static from(tuple: GetPostListTuple) {
+  static from(tuple: GetPostListTuple, hashTagTuple: GetPostListHashTagTuple[]) {
+    const hashTags: GetHashTagListInfo[] = hashTagTuple.map(tag => new GetHashTagListInfo(tag.tagName, tag.color));
     return new GetPostList(
       tuple.memberId,
       tuple.nickname,
@@ -63,6 +63,16 @@ export class GetPostList {
       tuple.emojiCount,
       tuple.commentCount,
       tuple.viewCount,
+      hashTags
     );
+  }
+}
+
+export class GetHashTagListInfo {
+  tagName?: string;
+  color?: string;
+  constructor(tagName: string, color: string) {
+    this.tagName = tagName;
+    this.color = color;
   }
 }

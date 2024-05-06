@@ -16,7 +16,7 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class PostQueryRepository {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
+  constructor(@InjectDataSource() private readonly dataSource: DataSource) { }
 
   async getPostList(
     memberId: number,
@@ -104,6 +104,17 @@ export class PostQueryRepository {
       .setParameters({ memberId })
       .getRawOne();
     return plainToInstance(GetPostDetailTuple, postDetail);
+  }
+
+  async getPostListHashTag(postId: number): Promise<GetPostListHashTagTuple[]> {
+    const postListHashTag = await this.dataSource
+      .createQueryBuilder()
+      .from(HashTag, 'hash_tag')
+      .innerJoin(PostHashTag, 'post_hash_tag', 'post_hash_tag.hash_tag_id = hash_tag.id')
+      .where('post_hash_tag.post_id = :postId', { postId })
+      .select(['hash_tag.tagName as tagName', 'hash_tag.color as color'])
+      .getRawMany();
+    return plainToInstance(GetPostListHashTagTuple, postListHashTag);
   }
 
   async getPostDetailHashTag(postId: number): Promise<GetPostDetailHashTagTuple[]> {
@@ -223,6 +234,11 @@ export class GetPostDetailTuple {
   memberDeletedAt!: Date;
   @Transform(({ value }) => value === '1')
   isMine: boolean;
+}
+
+export class GetPostListHashTagTuple {
+  tagName: string;
+  color: string;
 }
 
 export class GetPostDetailHashTagTuple {
