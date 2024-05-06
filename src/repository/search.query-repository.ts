@@ -49,7 +49,9 @@ export class SearchQueryRepository {
       .innerJoin(PostHashTag, 'postHashTag', 'postHashTag.hashTagId = hashTag.id')
       .innerJoin(Post, 'post', 'post.id = postHashTag.postId')
       .innerJoin(Member, 'member', 'member.id = post.memberId')
-      .where('hashTag.tagName LIKE :keyword', { keyword: `%${keyword}%` });
+      .where('hashTag.tagName LIKE :keyword', { keyword: `%${keyword}%` })
+      .andWhere('post.deletedAt IS NULL')
+      .andWhere('member.deletedAt IS NULL');
   }
 
   async searchMemberByName(
