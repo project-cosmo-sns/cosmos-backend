@@ -72,9 +72,10 @@ export class PostService {
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
         const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
+        const postListEmojiInfo = await this.postQueryRepository.getPostListEmoji(postList.postId, postList.memberId);
         const post = GetPostList.from(postList, hashTagInfo);
 
-        return new GetPostListDto(post);
+        return new GetPostListDto(post, postListEmojiInfo);
       }),
     );
 

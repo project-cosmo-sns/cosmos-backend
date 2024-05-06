@@ -1,11 +1,13 @@
+import { EmojiType } from 'src/entity/common/Enums';
 import { GetPostListHashTagTuple, GetPostListTuple } from 'src/repository/post.query-repository';
 import { PostListDto, PostWriterDto } from 'src/service/post.service';
 
 export class GetPostListDto {
   postList!: GetPostList;
-
-  constructor(postList: GetPostList) {
+  emoji!: GetEmojiListInfo[];
+  constructor(postList: GetPostList, emoji: GetEmojiListInfo[]) {
     this.postList = postList;
+    this.emoji = emoji;
   }
 }
 
@@ -74,5 +76,17 @@ export class GetHashTagListInfo {
   constructor(tagName: string, color: string) {
     this.tagName = tagName;
     this.color = color;
+  }
+}
+
+export class GetEmojiListInfo {
+  emojiCode: EmojiType;
+  emojiCount: number;
+  isClicked: boolean;
+
+  constructor(emojiCode: EmojiType, emojiCount: number, isClicked: boolean) {
+    this.emojiCode = emojiCode;
+    this.emojiCount = emojiCount;
+    this.isClicked = isClicked;
   }
 }

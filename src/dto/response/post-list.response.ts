@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PostListDto, PostWriterDto } from 'src/service/post.service';
 import { GetPostListDto } from '../get-post-list.dto';
+import { EmojiListResponse } from './emoji-list.response';
 
 export class PostListHashTag {
   @ApiProperty()
@@ -38,9 +39,13 @@ export class PostListInfo {
   })
   post: PostListDto;
 
-  constructor(writer: PostWriterDto, post: PostListDto) {
+  @ApiProperty({ type: [EmojiListResponse] })
+  emoji!: EmojiListResponse[];
+
+  constructor(writer: PostWriterDto, post: PostListDto, emoji: EmojiListResponse[]) {
     this.writer = writer;
     this.post = post;
+    this.emoji = emoji;
   }
 }
 
@@ -57,6 +62,7 @@ export class PostListResponse {
     const postList = new PostListInfo(
       getPostList.postList.writer,
       getPostList.postList.post,
+      getPostList.emoji
     );
     return new PostListResponse(postList)
   }
