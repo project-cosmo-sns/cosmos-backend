@@ -6,6 +6,7 @@ import { GetOthersProfileDto } from 'src/dto/get-others-profile';
 import { GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
 import { profileInfoRequestDto } from 'src/dto/request/profile-info.request';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
+import { GetProfileHashTagListInfo } from 'src/dto/response/profile/get-profile-post.dto';
 import { FeedImage } from 'src/entity/feed_image.entity';
 import { Member } from 'src/entity/member.entity';
 import { FollowQueryRepository } from 'src/repository/follow.query-repository';
@@ -23,7 +24,7 @@ export class ProfileService {
     private readonly profileQueryRepository: ProfileQueryRepository,
     private readonly postQueryRepository: PostQueryRepository,
     private readonly followQueryRepository: FollowQueryRepository,
-  ) {}
+  ) { }
 
   async getOthersProfileInfo(memberId: number, myMemberId: number): Promise<GetOthersProfileDto> {
     const isDeletedUser = await this.memberQueryRepository.getMemberIsNotDeletedById(memberId);
@@ -66,9 +67,11 @@ export class ProfileService {
 
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
-        const post = GetPostList.from(postList);
-        const hashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postList.postId);
-        return new GetPostListDto(post, hashTagInfo);
+        const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
+        const postListEmojiInfo = await this.postQueryRepository.getPostListEmoji(postList.postId, postList.memberId);
+        const post = GetPostList.from(postList, hashTagInfo);
+
+        return new GetPostListDto(post, postListEmojiInfo);
       }),
     );
 
@@ -109,4 +112,23 @@ export class ProfileService {
 
     return { feedList, totalCount };
   }
+}
+
+export class ProfilePostWriterDto {
+  id: number;
+  nickname: string;
+  generation: number;
+  profileImageUrl: string;
+}
+
+export class ProfilePostListDto {
+  id: number;
+  category: string;
+  title: string;
+  content: string;
+  viewCount: number;
+  commentCount: number;
+  emojiCount: number;
+  createdAt: Date;
+  hashTags: GetProfileHashTagListInfo[];
 }

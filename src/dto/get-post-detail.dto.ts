@@ -1,14 +1,12 @@
 import { EmojiType } from 'src/entity/common/Enums';
-import { GetPostDetailTuple } from 'src/repository/post.query-repository';
+import { GetPostDetailHashTagTuple, GetPostDetailTuple } from 'src/repository/post.query-repository';
 import { PostDetailDto, PostWriterDto } from 'src/service/post.service';
 
 export class GetPostDetailDto {
   postDetail!: GetPostDetail;
-  hashTags!: GetHashTagInfo[];
-  emoji!: GetEmojiInfo[];
-  constructor(postDetail: GetPostDetail, hashTags: GetHashTagInfo[], emoji: GetEmojiInfo[]) {
+  emoji!: GetEmojiDetailInfo[];
+  constructor(postDetail: GetPostDetail, emoji: GetEmojiDetailInfo[]) {
     this.postDetail = postDetail;
-    this.hashTags = hashTags;
     this.emoji = emoji;
   }
 }
@@ -31,6 +29,7 @@ export class GetPostDetail {
     commentCount: number,
     viewCount: number,
     isMine: boolean,
+    hashTags: GetHashTagInfo[],
   ) {
     this.writer = {
       id: memberId,
@@ -48,10 +47,12 @@ export class GetPostDetail {
       viewCount,
       createdAt,
       isMine,
+      hashTags,
     };
   }
 
-  static from(tuple: GetPostDetailTuple) {
+  static from(tuple: GetPostDetailTuple, hashTagTuple: GetPostDetailHashTagTuple[]) {
+    const hashTags: GetHashTagInfo[] = hashTagTuple.map(tag => new GetHashTagInfo(tag.tagName, tag.color));
     return new GetPostDetail(
       tuple.memberId,
       tuple.nickname,
@@ -66,6 +67,7 @@ export class GetPostDetail {
       tuple.commentCount,
       tuple.viewCount,
       tuple.isMine,
+      hashTags
     );
   }
 }
@@ -79,7 +81,7 @@ export class GetHashTagInfo {
   }
 }
 
-export class GetEmojiInfo {
+export class GetEmojiDetailInfo {
   emojiCode: EmojiType;
   emojiCount: number;
   isClicked: boolean;

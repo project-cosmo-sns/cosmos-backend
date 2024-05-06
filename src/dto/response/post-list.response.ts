@@ -1,7 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PostListDto, PostWriterDto } from 'src/service/post.service';
-import { PostDetailHashTag } from './post-detail.response';
 import { GetPostListDto } from '../get-post-list.dto';
+import { EmojiListResponse } from './emoji-list.response';
+
+export class PostListHashTag {
+  @ApiProperty()
+  tagName?: string;
+  @ApiProperty()
+  color?: string;
+  constructor(tagName: string, color: string) {
+    this.tagName = tagName;
+    this.color = color;
+  }
+}
 
 export class PostListInfo {
   @ApiProperty({
@@ -23,33 +34,36 @@ export class PostListInfo {
       commentCount: { type: 'number' },
       emojiCount: { type: 'number' },
       createdAt: { type: 'string' },
+      hashTags: { type: [PostListHashTag] }
     },
   })
   post: PostListDto;
 
-  constructor(writer: PostWriterDto, post: PostListDto) {
+  @ApiProperty({ type: [EmojiListResponse] })
+  emoji!: EmojiListResponse[];
+
+  constructor(writer: PostWriterDto, post: PostListDto, emoji: EmojiListResponse[]) {
     this.writer = writer;
     this.post = post;
+    this.emoji = emoji;
   }
 }
 
 export class PostListResponse {
   @ApiProperty({ type: PostListInfo })
   postListInfo!: PostListInfo;
-  @ApiProperty({ type: [PostDetailHashTag] })
-  postListHashTag!: PostDetailHashTag[];
 
 
-  constructor(postListInfo: PostListInfo, postListHashTag: PostDetailHashTag[]) {
+  constructor(postListInfo: PostListInfo) {
     this.postListInfo = postListInfo;
-    this.postListHashTag = postListHashTag;
   }
 
   static from(getPostList: GetPostListDto) {
     const postList = new PostListInfo(
       getPostList.postList.writer,
       getPostList.postList.post,
+      getPostList.emoji
     );
-    return new PostListResponse(postList, getPostList.hashTag)
+    return new PostListResponse(postList)
   }
 }

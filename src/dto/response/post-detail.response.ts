@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { GetPostDetailDto } from '../get-post-detail.dto';
 import { PostDetailDto, PostWriterDto } from 'src/service/post.service';
-import { EmojiListResponse } from './emoji-list.response';
+import { EmojiDetailResponse } from './emoji-detail.response';
 
 export class PostDetailHashTag {
   @ApiProperty()
@@ -35,19 +35,17 @@ export class PostDetail {
       emojiCount: { type: 'number' },
       createdAt: { type: 'string' },
       isMine: { type: 'boolean' },
+      hashTags: { type: [PostDetailHashTag] }
     },
   })
   post: PostDetailDto;
-  @ApiProperty({ type: [PostDetailHashTag] })
-  hashTags!: PostDetailHashTag[];
 
-  @ApiProperty({ type: [EmojiListResponse] })
-  emoji!: EmojiListResponse[];
+  @ApiProperty({ type: [EmojiDetailResponse] })
+  emoji!: EmojiDetailResponse[];
 
-  constructor(writer: PostWriterDto, post: PostDetailDto, hashTags: PostDetailHashTag[], emoji: EmojiListResponse[]) {
+  constructor(writer: PostWriterDto, post: PostDetailDto, emoji: EmojiDetailResponse[]) {
     this.writer = writer;
     this.post = post;
-    this.hashTags = hashTags;
     this.emoji = emoji;
   }
 }
@@ -64,7 +62,6 @@ export class PostDetailResponse {
     const postDetail = new PostDetail(
       getPostDetail.postDetail.writer,
       getPostDetail.postDetail.post,
-      getPostDetail.hashTags,
       getPostDetail.emoji,
     );
     return new PostDetailResponse(postDetail);

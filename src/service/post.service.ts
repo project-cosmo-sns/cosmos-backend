@@ -9,8 +9,8 @@ import { PostHashTag } from 'src/entity/post_hash_tag.entity';
 import { Repository } from 'typeorm';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
-import { GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
-import { GetPostDetail, GetPostDetailDto } from 'src/dto/get-post-detail.dto';
+import { GetHashTagListInfo, GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
+import { GetHashTagInfo, GetPostDetail, GetPostDetailDto } from 'src/dto/get-post-detail.dto';
 import { ListSortBy, NotificationType } from 'src/entity/common/Enums';
 import { PostView } from 'src/entity/post_view.entity';
 import { PostComment } from 'src/entity/post_comment.entity';
@@ -38,7 +38,7 @@ export class PostService {
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
     private readonly postQueryRepository: PostQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
-  ) {}
+  ) { }
 
   async createPost(memberId: number, dto: CreatePostInfoDto): Promise<CreatePostResponse> {
     const member = await this.memberRepository.findOneBy({ id: memberId });
@@ -71,9 +71,11 @@ export class PostService {
 
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
-        const post = GetPostList.from(postList);
-        const hashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postList.postId);
-        return new GetPostListDto(post, hashTagInfo);
+        const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
+        const postListEmojiInfo = await this.postQueryRepository.getPostListEmoji(postList.postId, postList.memberId);
+        const post = GetPostList.from(postList, hashTagInfo);
+
+        return new GetPostListDto(post, postListEmojiInfo);
       }),
     );
 
@@ -96,9 +98,9 @@ export class PostService {
 
     const postDetailHashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postId);
     const postDetailEmojiInfo = await this.postQueryRepository.getPostDetailEmoji(postId, memberId);
+    const postDetail = GetPostDetail.from(postDetailInfo, postDetailHashTagInfo);
 
-    const postDetail = GetPostDetail.from(postDetailInfo);
-    return new GetPostDetailDto(postDetail, postDetailHashTagInfo, postDetailEmojiInfo);
+    return new GetPostDetailDto(postDetail, postDetailEmojiInfo);
   }
 
   async modifyPost(postId: number, memberId: number, dto: CreatePostInfoDto): Promise<void> {
@@ -386,6 +388,7 @@ export class PostListDto {
   commentCount: number;
   emojiCount: number;
   createdAt: Date;
+  hashTags: GetHashTagListInfo[];
 }
 
 export class PostDetailDto {
@@ -398,6 +401,31 @@ export class PostDetailDto {
   emojiCount: number;
   createdAt: Date;
   isMine: boolean;
+  hashTags: GetHashTagInfo[];
+
+  constructor(
+    id: number,
+    category: string,
+    title: string,
+    content: string,
+    viewCount: number,
+    commentCount: number,
+    emojiCount: number,
+    createdAt: Date,
+    isMine: boolean,
+    hashTags: GetHashTagInfo[],
+  ) {
+    this.id = id;
+    this.category = category;
+    this.title = title;
+    this.content = content;
+    this.viewCount = viewCount;
+    this.commentCount = commentCount;
+    this.emojiCount = emojiCount;
+    this.createdAt = createdAt;
+    this.isMine = isMine;
+    this.hashTags = hashTags;
+  }
 }
 
 export class PostCommentWriterDto {

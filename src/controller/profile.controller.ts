@@ -23,7 +23,7 @@ export class ProfileController {
     private readonly profileService: ProfileService,
     private readonly imageService: ImageService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: '나의 프로필 조회' })
   @ApiResponse({ type: MyProfileInfoResponse })

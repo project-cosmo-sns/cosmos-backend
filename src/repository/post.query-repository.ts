@@ -16,14 +16,14 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class PostQueryRepository {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
+  constructor(@InjectDataSource() private readonly dataSource: DataSource) { }
 
   async getPostList(
     memberId: number,
     paginationRequest: PaginationRequest,
     sortPostList: ListSortBy,
     generation?: number,
-  ): Promise<GetPostListTuple[]> {
+  ): Promise<GetPostTuple[]> {
     let query = this.getPostListBaseQuery(memberId, paginationRequest, sortPostList, generation)
       .select([
         'member.id as memberId',
@@ -44,7 +44,7 @@ export class PostQueryRepository {
       .orderBy('post.created_at', paginationRequest.order);
 
     const postList = await query.getRawMany();
-    return plainToInstance(GetPostListTuple, postList);
+    return plainToInstance(GetPostTuple, postList);
   }
 
   async getAllPostListTotalCount(
@@ -104,6 +104,17 @@ export class PostQueryRepository {
       .setParameters({ memberId })
       .getRawOne();
     return plainToInstance(GetPostDetailTuple, postDetail);
+  }
+
+  async getPostListHashTag(postId: number): Promise<GetPostListHashTagTuple[]> {
+    const postListHashTag = await this.dataSource
+      .createQueryBuilder()
+      .from(HashTag, 'hash_tag')
+      .innerJoin(PostHashTag, 'post_hash_tag', 'post_hash_tag.hash_tag_id = hash_tag.id')
+      .where('post_hash_tag.post_id = :postId', { postId })
+      .select(['hash_tag.tagName as tagName', 'hash_tag.color as color'])
+      .getRawMany();
+    return plainToInstance(GetPostListHashTagTuple, postListHashTag);
   }
 
   async getPostDetailHashTag(postId: number): Promise<GetPostDetailHashTagTuple[]> {
@@ -174,6 +185,23 @@ export class PostQueryRepository {
     return plainToInstance(GetHashTagSearchTuple, searchResult);
   }
 
+  async getPostListEmoji(postId: number, memberId: number): Promise<GetPostListEmojiTuple[]> {
+    const emojiListInfo = await this.dataSource
+      .createQueryBuilder()
+      .from(PostEmoji, 'post_emoji')
+      .select('post_emoji.emoji as emojiCode')
+      .addSelect('COUNT(*) as emojiCount')
+      .addSelect(
+        'CASE WHEN SUM(CASE WHEN post_emoji.member_id = :memberId THEN 1 ELSE 0 END) > 0 THEN true ELSE false END as isClicked',
+      )
+      .where('post_emoji.post_id = :postId')
+      .groupBy('post_emoji.emoji')
+      .setParameters({ memberId, postId })
+      .getRawMany();
+
+    return plainToInstance(GetPostListEmojiTuple, emojiListInfo);
+  }
+
   async getPostDetailEmoji(postId: number, memberId: number): Promise<GetPostDetailEmojiTuple[]> {
     const emojiInfo = await this.dataSource
       .createQueryBuilder()
@@ -192,7 +220,7 @@ export class PostQueryRepository {
   }
 }
 
-export class GetPostListTuple {
+export class GetPostTuple {
   memberId!: number;
   nickname!: string;
   generation!: number;
@@ -207,22 +235,15 @@ export class GetPostListTuple {
   viewCount!: number;
 }
 
-export class GetPostDetailTuple {
-  memberId!: number;
-  nickname!: string;
-  generation!: number;
-  profileImageUrl!: string;
-  createdAt!: Date;
-  postId!: number;
-  category!: string;
-  title!: string;
-  content!: string;
-  emojiCount!: number;
-  commentCount!: number;
-  viewCount!: number;
+export class GetPostDetailTuple extends GetPostTuple {
   memberDeletedAt!: Date;
   @Transform(({ value }) => value === '1')
   isMine: boolean;
+}
+
+export class GetPostListHashTagTuple {
+  tagName: string;
+  color: string;
 }
 
 export class GetPostDetailHashTagTuple {
@@ -247,6 +268,14 @@ export class GetHashTagSearchTuple {
   tagName!: string;
   color!: string;
 }
+
+export class GetPostListEmojiTuple {
+  emojiCode!: EmojiType;
+  emojiCount!: number;
+  @Transform(({ value }) => value === '1')
+  isClicked!: boolean;
+}
+
 
 export class GetPostDetailEmojiTuple {
   emojiCode!: EmojiType;

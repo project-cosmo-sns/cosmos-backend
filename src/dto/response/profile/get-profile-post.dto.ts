@@ -1,20 +1,20 @@
 import { EmojiType } from 'src/entity/common/Enums';
-import { GetPostListHashTagTuple, GetPostTuple } from 'src/repository/post.query-repository';
-import { PostListDto, PostWriterDto } from 'src/service/post.service';
+import { GetProfilePostListHashTagTuple, GetProfilePostTuple } from 'src/repository/profile.query-repository';
+import { ProfilePostListDto, ProfilePostWriterDto } from 'src/service/profile.service';
 
-export class GetPostListDto {
-  postList!: GetPostList;
-  emoji!: GetEmojiListInfo[];
-  constructor(postList: GetPostList, emoji: GetEmojiListInfo[]) {
+export class GetProfilePostDto {
+  postList!: GetProfilePostList;
+  emoji!: GetProfileEmojiListInfo[];
+  constructor(postList: GetProfilePostList, emoji: GetProfileEmojiListInfo[]) {
     this.postList = postList;
     this.emoji = emoji;
   }
 }
 
 
-export class GetPostList {
-  writer: PostWriterDto;
-  post: PostListDto;
+export class GetProfilePostList {
+  writer: ProfilePostWriterDto;
+  post: ProfilePostListDto;
 
   constructor(
     memberId: number,
@@ -29,7 +29,7 @@ export class GetPostList {
     emojiCount: number,
     commentCount: number,
     viewCount: number,
-    hashTags: GetHashTagListInfo[]
+    hashTags: GetProfileHashTagListInfo[]
   ) {
     this.writer = {
       id: memberId,
@@ -50,9 +50,9 @@ export class GetPostList {
     };
   }
 
-  static from(tuple: GetPostTuple, hashTagTuple: GetPostListHashTagTuple[]) {
-    const hashTags: GetHashTagListInfo[] = hashTagTuple.map(tag => new GetHashTagListInfo(tag.tagName, tag.color));
-    return new GetPostList(
+  static from(tuple: GetProfilePostTuple, hashTagTuple: GetProfilePostListHashTagTuple[]) {
+    const hashTags: GetProfileHashTagListInfo[] = hashTagTuple.map(tag => new GetProfileHashTagListInfo(tag.tagName, tag.color));
+    return new GetProfilePostList(
       tuple.memberId,
       tuple.nickname,
       tuple.generation,
@@ -70,7 +70,7 @@ export class GetPostList {
   }
 }
 
-export class GetHashTagListInfo {
+export class GetProfileHashTagListInfo {
   tagName?: string;
   color?: string;
   constructor(tagName: string, color: string) {
@@ -79,7 +79,7 @@ export class GetHashTagListInfo {
   }
 }
 
-export class GetEmojiListInfo {
+export class GetProfileEmojiListInfo {
   emojiCode: EmojiType;
   emojiCount: number;
   isClicked: boolean;
