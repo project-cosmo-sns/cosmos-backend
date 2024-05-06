@@ -9,7 +9,7 @@ import { PostHashTag } from 'src/entity/post_hash_tag.entity';
 import { Repository } from 'typeorm';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
-import { GetHashTagListInfo, GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
+import { GetEmojiListInfo, GetHashTagListInfo, GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
 import { GetHashTagInfo, GetPostDetail, GetPostDetailDto } from 'src/dto/get-post-detail.dto';
 import { ListSortBy, NotificationType } from 'src/entity/common/Enums';
 import { PostView } from 'src/entity/post_view.entity';
@@ -73,9 +73,9 @@ export class PostService {
       postListTuples.map(async (postList) => {
         const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
         const postListEmojiInfo = await this.postQueryRepository.getPostListEmoji(postList.postId, postList.memberId);
-        const post = GetPostList.from(postList, hashTagInfo);
+        const post = GetPostList.from(postList, hashTagInfo, postListEmojiInfo);
 
-        return new GetPostListDto(post, postListEmojiInfo);
+        return new GetPostListDto(post);
       }),
     );
 
@@ -389,6 +389,7 @@ export class PostListDto {
   emojiCount: number;
   createdAt: Date;
   hashTags: GetHashTagListInfo[];
+  emojis: GetEmojiListInfo[];
 }
 
 export class PostDetailDto {

@@ -1,13 +1,11 @@
 import { EmojiType } from 'src/entity/common/Enums';
-import { GetPostListHashTagTuple, GetPostTuple } from 'src/repository/post.query-repository';
+import { GetPostListEmojiTuple, GetPostListHashTagTuple, GetPostTuple } from 'src/repository/post.query-repository';
 import { PostListDto, PostWriterDto } from 'src/service/post.service';
 
 export class GetPostListDto {
   postList!: GetPostList;
-  emoji!: GetEmojiListInfo[];
-  constructor(postList: GetPostList, emoji: GetEmojiListInfo[]) {
+  constructor(postList: GetPostList) {
     this.postList = postList;
-    this.emoji = emoji;
   }
 }
 
@@ -29,7 +27,8 @@ export class GetPostList {
     emojiCount: number,
     commentCount: number,
     viewCount: number,
-    hashTags: GetHashTagListInfo[]
+    hashTags: GetHashTagListInfo[],
+    emojis: GetEmojiListInfo[],
   ) {
     this.writer = {
       id: memberId,
@@ -47,11 +46,13 @@ export class GetPostList {
       viewCount,
       createdAt,
       hashTags,
+      emojis
     };
   }
 
-  static from(tuple: GetPostTuple, hashTagTuple: GetPostListHashTagTuple[]) {
+  static from(tuple: GetPostTuple, hashTagTuple: GetPostListHashTagTuple[], emojiTuple: GetPostListEmojiTuple[]) {
     const hashTags: GetHashTagListInfo[] = hashTagTuple.map(tag => new GetHashTagListInfo(tag.tagName, tag.color));
+    const emojis: GetEmojiListInfo[] = emojiTuple.map(emoji => new GetEmojiListInfo(emoji.emojiCode, emoji.emojiCount, emoji.isClicked));
     return new GetPostList(
       tuple.memberId,
       tuple.nickname,
@@ -65,14 +66,15 @@ export class GetPostList {
       tuple.emojiCount,
       tuple.commentCount,
       tuple.viewCount,
-      hashTags
+      hashTags,
+      emojis
     );
   }
 }
 
 export class GetHashTagListInfo {
-  tagName?: string;
-  color?: string;
+  tagName!: string;
+  color!: string;
   constructor(tagName: string, color: string) {
     this.tagName = tagName;
     this.color = color;
@@ -80,9 +82,9 @@ export class GetHashTagListInfo {
 }
 
 export class GetEmojiListInfo {
-  emojiCode: EmojiType;
-  emojiCount: number;
-  isClicked: boolean;
+  emojiCode!: EmojiType;
+  emojiCount!: number;
+  isClicked!: boolean;
 
   constructor(emojiCode: EmojiType, emojiCount: number, isClicked: boolean) {
     this.emojiCode = emojiCode;
