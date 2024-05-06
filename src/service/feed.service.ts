@@ -18,7 +18,7 @@ export class FeedService {
     @InjectRepository(FeedEmoji) private readonly feedEmojiRepository: Repository<FeedEmoji>,
     private readonly feedQueryRepository: FeedQueryRepository,
     private readonly feedDomainService: FeedDomainService,
-  ) {}
+  ) { }
 
   async postFeed(memberId: number, content: string, imageUrls: string[]): Promise<void> {
     const feed = new Feed();
@@ -159,10 +159,10 @@ export class FeedService {
     });
   }
 
-  async deleteFeedEmoji(feedId: number, memberId: number, emojiId: number) {
+  async deleteFeedEmoji(feedId: number, memberId: number, emojiCode: string) {
     const feed = await this.feedDomainService.getFeedIsNotDeleted(feedId);
 
-    const emoji = await this.feedEmojiRepository.findOneBy({ id: emojiId });
+    const emoji = await this.feedEmojiRepository.findOneBy({ feedId, emoji: emojiCode });
 
     if (!emoji) {
       throw new NotFoundException('해당 이모지를 찾을 수 없습니다.');
