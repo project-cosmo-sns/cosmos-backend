@@ -50,7 +50,7 @@ export class PostController {
     private readonly postService: PostService,
     private readonly imageService: ImageService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: '포스트 작성' })
   @ApiResponse({ type: CreatePostResponse })
@@ -131,16 +131,16 @@ export class PostController {
 
   @ApiOperation({ summary: '포스트 이모지 삭제' })
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
-  @ApiParam({ name: 'emojiId', required: true, description: '포스트 이모지 id' })
+  @ApiParam({ name: 'emojiCode', required: true, description: '포스트 이모지 코드' })
   @ApiUnauthorizedResponse({ status: 401, description: '해당 이모지를 추가한 유저가 아닐 경우' })
   @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었을 경우' })
-  @Delete(':postId/emoji/:emojiId')
+  @Delete(':postId/emoji/:emojiCode')
   async deletePostEmoji(
     @Req() req,
     @Param('postId', ParseIntPipe) postId: number,
-    @Param('emojiId', ParseIntPipe) emojiId: number,
+    @Param('emojiCode') emojiCode: string,
   ): Promise<void> {
-    return this.postService.removePostEmoji(postId, req.user.id, emojiId);
+    return this.postService.removePostEmoji(postId, req.user.id, emojiCode);
   }
 
   @Roles('anyone')
