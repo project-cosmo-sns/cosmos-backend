@@ -1,13 +1,11 @@
 import { EmojiType } from 'src/entity/common/Enums';
-import { GetPostDetailHashTagTuple, GetPostDetailTuple } from 'src/repository/post.query-repository';
+import { GetPostDetailEmojiTuple, GetPostDetailHashTagTuple, GetPostDetailTuple } from 'src/repository/post.query-repository';
 import { PostDetailDto, PostWriterDto } from 'src/service/post.service';
 
 export class GetPostDetailDto {
   postDetail!: GetPostDetail;
-  emoji!: GetEmojiDetailInfo[];
-  constructor(postDetail: GetPostDetail, emoji: GetEmojiDetailInfo[]) {
+  constructor(postDetail: GetPostDetail) {
     this.postDetail = postDetail;
-    this.emoji = emoji;
   }
 }
 
@@ -29,7 +27,8 @@ export class GetPostDetail {
     commentCount: number,
     viewCount: number,
     isMine: boolean,
-    hashTags: GetHashTagInfo[],
+    hashTags: GetHashTagDetailInfo[],
+    emojis: GetEmojiDetailInfo[],
   ) {
     this.writer = {
       id: memberId,
@@ -48,11 +47,13 @@ export class GetPostDetail {
       createdAt,
       isMine,
       hashTags,
+      emojis
     };
   }
 
-  static from(tuple: GetPostDetailTuple, hashTagTuple: GetPostDetailHashTagTuple[]) {
-    const hashTags: GetHashTagInfo[] = hashTagTuple.map(tag => new GetHashTagInfo(tag.tagName, tag.color));
+  static from(tuple: GetPostDetailTuple, hashTagTuple: GetPostDetailHashTagTuple[], emojiTuple: GetPostDetailEmojiTuple[]) {
+    const hashTags: GetHashTagDetailInfo[] = hashTagTuple.map(tag => new GetHashTagDetailInfo(tag.tagName, tag.color));
+    const emojis: GetEmojiDetailInfo[] = emojiTuple.map(emoji => new GetEmojiDetailInfo(emoji.emojiCode, emoji.emojiCount, emoji.isClicked));
     return new GetPostDetail(
       tuple.memberId,
       tuple.nickname,
@@ -67,12 +68,13 @@ export class GetPostDetail {
       tuple.commentCount,
       tuple.viewCount,
       tuple.isMine,
-      hashTags
+      hashTags,
+      emojis
     );
   }
 }
 
-export class GetHashTagInfo {
+export class GetHashTagDetailInfo {
   tagName?: string;
   color?: string;
   constructor(tagName: string, color: string) {
