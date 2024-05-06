@@ -1,13 +1,11 @@
 import { EmojiType } from 'src/entity/common/Enums';
-import { GetProfilePostListHashTagTuple, GetProfilePostTuple } from 'src/repository/profile.query-repository';
+import { GetProfilePostListEmojiTuple, GetProfilePostListHashTagTuple, GetProfilePostTuple } from 'src/repository/profile.query-repository';
 import { ProfilePostListDto, ProfilePostWriterDto } from 'src/service/profile.service';
 
 export class GetProfilePostDto {
   postList!: GetProfilePostList;
-  emoji!: GetProfileEmojiListInfo[];
-  constructor(postList: GetProfilePostList, emoji: GetProfileEmojiListInfo[]) {
+  constructor(postList: GetProfilePostList) {
     this.postList = postList;
-    this.emoji = emoji;
   }
 }
 
@@ -29,7 +27,8 @@ export class GetProfilePostList {
     emojiCount: number,
     commentCount: number,
     viewCount: number,
-    hashTags: GetProfileHashTagListInfo[]
+    hashTags: GetProfileHashTagListInfo[],
+    emojis: GetProfileEmojiListInfo[]
   ) {
     this.writer = {
       id: memberId,
@@ -47,11 +46,13 @@ export class GetProfilePostList {
       viewCount,
       createdAt,
       hashTags,
+      emojis,
     };
   }
 
-  static from(tuple: GetProfilePostTuple, hashTagTuple: GetProfilePostListHashTagTuple[]) {
+  static from(tuple: GetProfilePostTuple, hashTagTuple: GetProfilePostListHashTagTuple[], emojiTuple: GetProfilePostListEmojiTuple[]) {
     const hashTags: GetProfileHashTagListInfo[] = hashTagTuple.map(tag => new GetProfileHashTagListInfo(tag.tagName, tag.color));
+    const emojis: GetProfileEmojiListInfo[] = emojiTuple.map(emoji => new GetProfileEmojiListInfo(emoji.emojiCode, emoji.emojiCount, emoji.isClicked));
     return new GetProfilePostList(
       tuple.memberId,
       tuple.nickname,
@@ -65,14 +66,15 @@ export class GetProfilePostList {
       tuple.emojiCount,
       tuple.commentCount,
       tuple.viewCount,
-      hashTags
+      hashTags,
+      emojis,
     );
   }
 }
 
 export class GetProfileHashTagListInfo {
-  tagName?: string;
-  color?: string;
+  tagName!: string;
+  color!: string;
   constructor(tagName: string, color: string) {
     this.tagName = tagName;
     this.color = color;
@@ -80,9 +82,9 @@ export class GetProfileHashTagListInfo {
 }
 
 export class GetProfileEmojiListInfo {
-  emojiCode: EmojiType;
-  emojiCount: number;
-  isClicked: boolean;
+  emojiCode!: EmojiType;
+  emojiCount!: number;
+  isClicked!: boolean;
 
   constructor(emojiCode: EmojiType, emojiCount: number, isClicked: boolean) {
     this.emojiCode = emojiCode;

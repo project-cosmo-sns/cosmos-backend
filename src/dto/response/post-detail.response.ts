@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { GetPostDetailDto } from '../get-post-detail.dto';
 import { PostDetailDto, PostWriterDto } from 'src/service/post.service';
-import { EmojiDetailResponse } from './emoji-detail.response';
 import { EmojiType } from 'src/entity/common/Enums';
 
 export class PostDetailHashTag {
