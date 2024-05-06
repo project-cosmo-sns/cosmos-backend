@@ -17,6 +17,8 @@ export class OthersProfileInfoResponse {
   @ApiProperty()
   followingCount!: number;
   @ApiProperty()
+  isAuthorized!: boolean;
+  @ApiProperty()
   isFollowed!: boolean;
 
   constructor(
@@ -27,6 +29,7 @@ export class OthersProfileInfoResponse {
     introduce: string,
     followerCount: number,
     followingCount: number,
+    isAuthorized: boolean,
     isFollowed: boolean
   ) {
     this.memberId = memberId;
@@ -36,6 +39,7 @@ export class OthersProfileInfoResponse {
     this.introduce = introduce;
     this.followerCount = followerCount;
     this.followingCount = followingCount;
+    this.isAuthorized = isAuthorized;
     this.isFollowed = isFollowed;
   }
 
@@ -48,6 +52,7 @@ export class OthersProfileInfoResponse {
       getOthersProfileDto.introduce,
       getOthersProfileDto.followerCount,
       getOthersProfileDto.followingCount,
+      getOthersProfileDto.isAuthorized,
       getOthersProfileDto.isFollowed
     )
   }

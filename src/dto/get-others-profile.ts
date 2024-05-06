@@ -8,7 +8,9 @@ export class GetOthersProfileDto {
   introduce!: string;
   followerCount!: number;
   followingCount!: number;
+  isAuthorized!: boolean;
   isFollowed!: boolean;
+
 
   constructor(
     memberId: number,
@@ -18,6 +20,7 @@ export class GetOthersProfileDto {
     introduce: string,
     followerCount: number,
     followingCount: number,
+    isAuthorized: boolean,
     isFollowed: boolean,
   ) {
     this.memberId = memberId;
@@ -27,6 +30,7 @@ export class GetOthersProfileDto {
     this.introduce = introduce;
     this.followerCount = followerCount;
     this.followingCount = followingCount;
+    this.isAuthorized = isAuthorized;
     this.isFollowed = isFollowed;
   }
 
@@ -39,6 +43,7 @@ export class GetOthersProfileDto {
       tuple.introduce,
       tuple.followerCount,
       tuple.followingCount,
+      tuple.isAuthorized,
       tuple.isFollowed
     );
   }
