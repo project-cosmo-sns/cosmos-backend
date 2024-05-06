@@ -1,16 +1,29 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { GetPostDetailDto } from '../get-post-detail.dto';
 import { PostDetailDto, PostWriterDto } from 'src/service/post.service';
-import { EmojiDetailResponse } from './emoji-detail.response';
+import { EmojiType } from 'src/entity/common/Enums';
 
 export class PostDetailHashTag {
   @ApiProperty()
-  tagName?: string;
+  tagName!: string;
   @ApiProperty()
-  color?: string;
+  color!: string;
   constructor(tagName: string, color: string) {
     this.tagName = tagName;
     this.color = color;
+  }
+}
+export class PostDetailEmoji {
+  @ApiProperty()
+  emojiCode!: EmojiType;
+  @ApiProperty()
+  emojiCount!: number;
+  @ApiProperty()
+  isClicked!: boolean;
+  constructor(emojiCode: EmojiType, emojiCount: number, isClicked: boolean) {
+    this.emojiCode = emojiCode;
+    this.emojiCount = emojiCount;
+    this.isClicked = isClicked;
   }
 }
 
@@ -35,18 +48,15 @@ export class PostDetail {
       emojiCount: { type: 'number' },
       createdAt: { type: 'string' },
       isMine: { type: 'boolean' },
-      hashTags: { type: [PostDetailHashTag] }
+      hashTags: { type: [PostDetailHashTag] },
+      emojis: { type: [PostDetailEmoji] }
     },
   })
   post: PostDetailDto;
 
-  @ApiProperty({ type: [EmojiDetailResponse] })
-  emoji!: EmojiDetailResponse[];
-
-  constructor(writer: PostWriterDto, post: PostDetailDto, emoji: EmojiDetailResponse[]) {
+  constructor(writer: PostWriterDto, post: PostDetailDto) {
     this.writer = writer;
     this.post = post;
-    this.emoji = emoji;
   }
 }
 
@@ -62,7 +72,6 @@ export class PostDetailResponse {
     const postDetail = new PostDetail(
       getPostDetail.postDetail.writer,
       getPostDetail.postDetail.post,
-      getPostDetail.emoji,
     );
     return new PostDetailResponse(postDetail);
   }

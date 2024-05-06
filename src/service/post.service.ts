@@ -9,8 +9,8 @@ import { PostHashTag } from 'src/entity/post_hash_tag.entity';
 import { Repository } from 'typeorm';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
-import { GetHashTagListInfo, GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
-import { GetHashTagInfo, GetPostDetail, GetPostDetailDto } from 'src/dto/get-post-detail.dto';
+import { GetEmojiListInfo, GetHashTagListInfo, GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
+import { GetEmojiDetailInfo, GetHashTagDetailInfo, GetPostDetail, GetPostDetailDto } from 'src/dto/get-post-detail.dto';
 import { ListSortBy, NotificationType } from 'src/entity/common/Enums';
 import { PostView } from 'src/entity/post_view.entity';
 import { PostComment } from 'src/entity/post_comment.entity';
@@ -73,9 +73,9 @@ export class PostService {
       postListTuples.map(async (postList) => {
         const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
         const postListEmojiInfo = await this.postQueryRepository.getPostListEmoji(postList.postId, postList.memberId);
-        const post = GetPostList.from(postList, hashTagInfo);
+        const post = GetPostList.from(postList, hashTagInfo, postListEmojiInfo);
 
-        return new GetPostListDto(post, postListEmojiInfo);
+        return new GetPostListDto(post);
       }),
     );
 
@@ -98,9 +98,9 @@ export class PostService {
 
     const postDetailHashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postId);
     const postDetailEmojiInfo = await this.postQueryRepository.getPostDetailEmoji(postId, memberId);
-    const postDetail = GetPostDetail.from(postDetailInfo, postDetailHashTagInfo);
+    const postDetail = GetPostDetail.from(postDetailInfo, postDetailHashTagInfo, postDetailEmojiInfo);
 
-    return new GetPostDetailDto(postDetail, postDetailEmojiInfo);
+    return new GetPostDetailDto(postDetail);
   }
 
   async modifyPost(postId: number, memberId: number, dto: CreatePostInfoDto): Promise<void> {
@@ -389,6 +389,7 @@ export class PostListDto {
   emojiCount: number;
   createdAt: Date;
   hashTags: GetHashTagListInfo[];
+  emojis: GetEmojiListInfo[];
 }
 
 export class PostDetailDto {
@@ -401,7 +402,8 @@ export class PostDetailDto {
   emojiCount: number;
   createdAt: Date;
   isMine: boolean;
-  hashTags: GetHashTagInfo[];
+  hashTags: GetHashTagDetailInfo[];
+  emojis: GetEmojiDetailInfo[];
 
   constructor(
     id: number,
@@ -413,7 +415,8 @@ export class PostDetailDto {
     emojiCount: number,
     createdAt: Date,
     isMine: boolean,
-    hashTags: GetHashTagInfo[],
+    hashTags: GetHashTagDetailInfo[],
+    emojis: GetEmojiDetailInfo[]
   ) {
     this.id = id;
     this.category = category;
@@ -425,6 +428,7 @@ export class PostDetailDto {
     this.createdAt = createdAt;
     this.isMine = isMine;
     this.hashTags = hashTags;
+    this.emojis = emojis;
   }
 }
 

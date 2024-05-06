@@ -3,10 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { GetMyProfileDto } from 'src/dto/get-my-profile';
 import { GetOthersProfileDto } from 'src/dto/get-others-profile';
-import { GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
-import { profileInfoRequestDto } from 'src/dto/request/profile-info.request';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
-import { GetProfileHashTagListInfo } from 'src/dto/response/profile/get-profile-post.dto';
+import { GetProfileEmojiListInfo, GetProfileHashTagListInfo, GetProfilePostDto, GetProfilePostList } from 'src/dto/response/profile/get-profile-post.dto';
 import { FeedImage } from 'src/entity/feed_image.entity';
 import { Member } from 'src/entity/member.entity';
 import { FollowQueryRepository } from 'src/repository/follow.query-repository';
@@ -69,9 +67,9 @@ export class ProfileService {
       postListTuples.map(async (postList) => {
         const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
         const postListEmojiInfo = await this.postQueryRepository.getPostListEmoji(postList.postId, postList.memberId);
-        const post = GetPostList.from(postList, hashTagInfo);
+        const post = GetProfilePostList.from(postList, hashTagInfo, postListEmojiInfo);
 
-        return new GetPostListDto(post, postListEmojiInfo);
+        return new GetProfilePostDto(post);
       }),
     );
 
@@ -131,4 +129,5 @@ export class ProfilePostListDto {
   emojiCount: number;
   createdAt: Date;
   hashTags: GetProfileHashTagListInfo[];
+  emojis: GetProfileEmojiListInfo[];
 }
