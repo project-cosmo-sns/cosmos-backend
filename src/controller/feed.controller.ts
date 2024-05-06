@@ -88,8 +88,12 @@ export class FeedController {
   @ApiOperation({ summary: '피드 목록' })
   @ApiPaginatedResponse(GetFeedResponseDto)
   @Get('/list')
-  async getFeedList(@Query() paginationRequest: PaginationRequest): Promise<PaginationResponse<GetFeedResponseDto>> {
-    const { feedList, totalCount } = await this.feedService.getFeedList(paginationRequest);
+  async getFeedList(
+    @Req() req,
+    @Query() paginationRequest: PaginationRequest
+  ): Promise<PaginationResponse<GetFeedResponseDto>> {
+    const userId = req.user?.id;
+    const { feedList, totalCount } = await this.feedService.getFeedList(paginationRequest, userId);
 
     return PaginationResponse.of({
       data: feedList,

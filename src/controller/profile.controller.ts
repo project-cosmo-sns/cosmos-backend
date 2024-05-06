@@ -63,7 +63,7 @@ export class ProfileController {
     @Req() req,
     @Query() paginationRequest: PaginationRequest,
   ): Promise<PaginationResponse<GetFeedResponseDto>> {
-    const { feedList, totalCount } = await this.profileService.getFeedList(req.user.id, paginationRequest);
+    const { feedList, totalCount } = await this.profileService.getMyFeedList(req.user.id, paginationRequest);
 
     return PaginationResponse.of({
       data: feedList,
@@ -95,8 +95,9 @@ export class ProfileController {
   async getOthersFeedList(
     @Param('memberId', ParseIntPipe) memberId: number,
     @Query() paginationRequest: PaginationRequest,
+    @Req() req,
   ): Promise<PaginationResponse<GetFeedResponseDto>> {
-    const { feedList, totalCount } = await this.profileService.getFeedList(memberId, paginationRequest);
+    const { feedList, totalCount } = await this.profileService.getOthersFeedList(memberId, paginationRequest, req.user.id);
 
     return PaginationResponse.of({
       data: feedList,

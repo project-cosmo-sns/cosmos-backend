@@ -4,6 +4,7 @@ import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { FeedDomainService } from 'src/domain-service/feed.domain-service';
 import { GetFeedDetailResponseDto } from 'src/dto/response/get-feed-detail.response.dto';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
+import { EmojiType } from 'src/entity/common/Enums';
 import { Feed } from 'src/entity/feed.entity';
 import { FeedEmoji } from 'src/entity/feed_emoji.entity';
 import { FeedImage } from 'src/entity/feed_image.entity';
@@ -65,6 +66,7 @@ export class FeedService {
 
   async getFeedList(
     paginationRequest: PaginationRequest,
+    memberId: number,
   ): Promise<{ feedList: GetFeedResponseDto[]; totalCount: number }> {
     const getFeedListTuple = await this.feedQueryRepository.getFeedList(paginationRequest);
     const totalCount = await this.feedQueryRepository.getFeedListCount();
@@ -79,7 +81,7 @@ export class FeedService {
         };
 
         const feedImages = await this.feedImageRepository.findBy({ feedId: item.feedId });
-
+        const feedEmojis = await this.feedQueryRepository.getFeedEmoji(item.feedId, memberId);
         const feed = {
           id: item.feedId,
           content: item.feedContent,
@@ -88,6 +90,11 @@ export class FeedService {
           emojiCount: item.feedEmojiCount,
           createdAt: item.feedCreatedAt,
           imageUrls: feedImages.map((feedImage) => feedImage.imageUrl),
+          emojis: feedEmojis.map((emoji) => ({
+            emojiCode: emoji.emojiCode,
+            emojiCount: emoji.emojiCount,
+            isClicked: emoji.isClicked
+          }))
         };
 
         return GetFeedResponseDto.from({ writer, feed });
@@ -105,7 +112,7 @@ export class FeedService {
     }
 
     const feedImages = await this.feedImageRepository.findBy({ feedId });
-
+    const feedEmojis = await this.feedQueryRepository.getFeedEmoji(feedId, memberId);
     return new GetFeedDetailResponseDto(
       {
         id: feed.writerId,
@@ -122,6 +129,11 @@ export class FeedService {
         createdAt: feed.feedCreatedAt,
         imageUrls: feedImages.map((feedImage) => feedImage.imageUrl),
         isMine: feed.isMine,
+        emojis: feedEmojis.map((emoji) => ({
+          emojiCode: emoji.emojiCode,
+          emojiCount: emoji.emojiCount,
+          isClicked: emoji.isClicked
+        }))
       },
     );
   }
@@ -194,8 +206,15 @@ export class FeedDto {
   emojiCount: number;
   createdAt: Date;
   imageUrls: string[];
+  emojis: GetFeedEmojiDto[];
 }
 
 export class FeedDetailDto extends FeedDto {
   isMine: boolean;
+}
+
+export class GetFeedEmojiDto {
+  emojiCode: EmojiType;
+  emojiCount: number;
+  isClicked: boolean;
 }

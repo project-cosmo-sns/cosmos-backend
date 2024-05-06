@@ -12,6 +12,7 @@ import { HashTag } from 'src/entity/hash_tag.entity';
 import { PostHashTag } from 'src/entity/post_hash_tag.entity';
 import { PostEmoji } from 'src/entity/post_emoji.entity';
 import { EmojiType } from 'src/entity/common/Enums';
+import { FeedEmoji } from 'src/entity/feed_emoji.entity';
 
 @Injectable()
 export class ProfileQueryRepository {
@@ -155,6 +156,23 @@ export class ProfileQueryRepository {
 
     return plainToInstance(GetProfilePostListEmojiTuple, emojiListInfo);
   }
+
+  async getProfileFeedEmoji(feedId: number, memberId: number): Promise<GetProfileFeedEmojiTuple[]> {
+    const profileEmojiInfo = await this.dataSource
+      .createQueryBuilder()
+      .from(FeedEmoji, 'feed_emoji')
+      .select('feed_emoji.emoji as emojiCode')
+      .addSelect('COUNT(*) as emojiCount')
+      .addSelect(
+        'CASE WHEN SUM(CASE WHEN feed_emoji.member_id = :memberId THEN 1 ELSE 0 END) > 0 THEN true ELSE false END as isClicked',
+      )
+      .where('feed_emoji.feed_id = :feedId')
+      .groupBy('feed_emoji.emoji')
+      .setParameters({ memberId, feedId })
+      .getRawMany();
+
+    return plainToInstance(GetProfileFeedEmojiTuple, profileEmojiInfo);
+  }
 }
 
 export class GetProfilePostTuple {
@@ -211,6 +229,13 @@ export class GetProfilePostListHashTagTuple {
 }
 
 export class GetProfilePostListEmojiTuple {
+  emojiCode!: EmojiType;
+  emojiCount!: number;
+  @Transform(({ value }) => value === '1')
+  isClicked!: boolean;
+}
+
+export class GetProfileFeedEmojiTuple {
   emojiCode!: EmojiType;
   emojiCount!: number;
   @Transform(({ value }) => value === '1')

@@ -2,13 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Transform, plainToInstance } from 'class-transformer';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
+import { EmojiType } from 'src/entity/common/Enums';
 import { Feed } from 'src/entity/feed.entity';
+import { FeedEmoji } from 'src/entity/feed_emoji.entity';
 import { Member } from 'src/entity/member.entity';
 import { DataSource } from 'typeorm';
 
 @Injectable()
 export class FeedQueryRepository {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
+  constructor(@InjectDataSource() private readonly dataSource: DataSource) { }
 
   async getFeedList(paginationRequest: PaginationRequest): Promise<GetFeedTuple[]> {
     const feedList = await this.getFeedBaseQuery()
@@ -78,6 +80,23 @@ export class FeedQueryRepository {
 
     return plainToInstance(Feed, feed);
   }
+
+  async getFeedEmoji(feedId: number, memberId: number): Promise<GetFeedEmojiTuple[]> {
+    const emojiInfo = await this.dataSource
+      .createQueryBuilder()
+      .from(FeedEmoji, 'feed_emoji')
+      .select('feed_emoji.emoji as emojiCode')
+      .addSelect('COUNT(*) as emojiCount')
+      .addSelect(
+        'CASE WHEN SUM(CASE WHEN feed_emoji.member_id = :memberId THEN 1 ELSE 0 END) > 0 THEN true ELSE false END as isClicked',
+      )
+      .where('feed_emoji.feed_id = :feedId')
+      .groupBy('feed_emoji.emoji')
+      .setParameters({ memberId, feedId })
+      .getRawMany();
+
+    return plainToInstance(GetFeedEmojiTuple, emojiInfo);
+  }
 }
 
 export class GetFeedTuple {
@@ -93,4 +112,11 @@ export class GetFeedTuple {
   feedCreatedAt: Date;
   @Transform(({ value }) => value === '1')
   isMine: boolean;
+}
+
+export class GetFeedEmojiTuple {
+  emojiCode!: EmojiType;
+  emojiCount!: number;
+  @Transform(({ value }) => value === '1')
+  isClicked!: boolean;
 }
