@@ -23,7 +23,7 @@ export class PostQueryRepository {
     paginationRequest: PaginationRequest,
     sortPostList: ListSortBy,
     generation?: number,
-  ): Promise<GetPostListTuple[]> {
+  ): Promise<GetPostTuple[]> {
     let query = this.getPostListBaseQuery(memberId, paginationRequest, sortPostList, generation)
       .select([
         'member.id as memberId',
@@ -44,7 +44,7 @@ export class PostQueryRepository {
       .orderBy('post.created_at', paginationRequest.order);
 
     const postList = await query.getRawMany();
-    return plainToInstance(GetPostListTuple, postList);
+    return plainToInstance(GetPostTuple, postList);
   }
 
   async getAllPostListTotalCount(
@@ -220,7 +220,7 @@ export class PostQueryRepository {
   }
 }
 
-export class GetPostListTuple {
+export class GetPostTuple {
   memberId!: number;
   nickname!: string;
   generation!: number;
@@ -235,19 +235,7 @@ export class GetPostListTuple {
   viewCount!: number;
 }
 
-export class GetPostDetailTuple {
-  memberId!: number;
-  nickname!: string;
-  generation!: number;
-  profileImageUrl!: string;
-  createdAt!: Date;
-  postId!: number;
-  category!: string;
-  title!: string;
-  content!: string;
-  emojiCount!: number;
-  commentCount!: number;
-  viewCount!: number;
+export class GetPostDetailTuple extends GetPostTuple {
   memberDeletedAt!: Date;
   @Transform(({ value }) => value === '1')
   isMine: boolean;

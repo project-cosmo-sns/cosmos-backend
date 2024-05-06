@@ -1,5 +1,5 @@
 import { EmojiType } from 'src/entity/common/Enums';
-import { GetPostListHashTagTuple, GetPostListTuple } from 'src/repository/post.query-repository';
+import { GetPostListHashTagTuple, GetPostTuple } from 'src/repository/post.query-repository';
 import { PostListDto, PostWriterDto } from 'src/service/post.service';
 
 export class GetPostListDto {
@@ -50,7 +50,7 @@ export class GetPostList {
     };
   }
 
-  static from(tuple: GetPostListTuple, hashTagTuple: GetPostListHashTagTuple[]) {
+  static from(tuple: GetPostTuple, hashTagTuple: GetPostListHashTagTuple[]) {
     const hashTags: GetHashTagListInfo[] = hashTagTuple.map(tag => new GetHashTagListInfo(tag.tagName, tag.color));
     return new GetPostList(
       tuple.memberId,
