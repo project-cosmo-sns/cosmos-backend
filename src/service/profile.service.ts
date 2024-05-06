@@ -76,7 +76,7 @@ export class ProfileService {
     return { postInfo, totalCount };
   }
 
-  async getFeedList(
+  async getMyFeedList(
     memberId: number,
     paginationRequest: PaginationRequest,
   ): Promise<{ feedList: GetFeedResponseDto[]; totalCount: number }> {
@@ -93,7 +93,7 @@ export class ProfileService {
         };
 
         const feedImages = await this.feedImageRepository.findBy({ feedId: item.feedId });
-
+        const feedEmojis = await this.profileQueryRepository.getProfileFeedEmoji(item.feedId, memberId);
         const feed = {
           id: item.feedId,
           content: item.feedContent,
@@ -102,6 +102,52 @@ export class ProfileService {
           emojiCount: item.feedEmojiCount,
           createdAt: item.feedCreatedAt,
           imageUrls: feedImages.map((feedImage) => feedImage.imageUrl),
+          emojis: feedEmojis.map((emoji) => ({
+            emojiCode: emoji.emojiCode,
+            emojiCount: emoji.emojiCount,
+            isClicked: emoji.isClicked
+          }))
+        };
+
+        return GetFeedResponseDto.from({ writer, feed });
+      }),
+    );
+
+    return { feedList, totalCount };
+  }
+
+  async getOthersFeedList(
+    memberId: number,
+    paginationRequest: PaginationRequest,
+    myId: number,
+  ): Promise<{ feedList: GetFeedResponseDto[]; totalCount: number }> {
+    const getFeedListTuple = await this.profileQueryRepository.getFeedList(memberId, paginationRequest);
+    const totalCount = await this.profileQueryRepository.getFeedListCount(memberId);
+
+    const feedList = await Promise.all(
+      getFeedListTuple.map(async (item) => {
+        const writer = {
+          id: item.writerId,
+          nickname: item.writerNickname,
+          generation: item.writerGeneration,
+          profileImageUrl: item.writerProfileImageUrl,
+        };
+
+        const feedImages = await this.feedImageRepository.findBy({ feedId: item.feedId });
+        const feedEmojis = await this.profileQueryRepository.getProfileFeedEmoji(item.feedId, myId);
+        const feed = {
+          id: item.feedId,
+          content: item.feedContent,
+          viewCount: item.feedViewCount,
+          commentCount: item.feedCommentCount,
+          emojiCount: item.feedEmojiCount,
+          createdAt: item.feedCreatedAt,
+          imageUrls: feedImages.map((feedImage) => feedImage.imageUrl),
+          emojis: feedEmojis.map((emoji) => ({
+            emojiCode: emoji.emojiCode,
+            emojiCount: emoji.emojiCount,
+            isClicked: emoji.isClicked
+          }))
         };
 
         return GetFeedResponseDto.from({ writer, feed });
