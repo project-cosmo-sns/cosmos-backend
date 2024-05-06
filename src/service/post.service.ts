@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
 import { GetPostList, GetPostListDto } from 'src/dto/get-post-list.dto';
-import { GetPostDetail, GetPostDetailDto } from 'src/dto/get-post-detail.dto';
+import { GetHashTagInfo, GetPostDetail, GetPostDetailDto } from 'src/dto/get-post-detail.dto';
 import { ListSortBy, NotificationType } from 'src/entity/common/Enums';
 import { PostView } from 'src/entity/post_view.entity';
 import { PostComment } from 'src/entity/post_comment.entity';
@@ -38,7 +38,7 @@ export class PostService {
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
     private readonly postQueryRepository: PostQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
-  ) {}
+  ) { }
 
   async createPost(memberId: number, dto: CreatePostInfoDto): Promise<CreatePostResponse> {
     const member = await this.memberRepository.findOneBy({ id: memberId });
@@ -96,9 +96,10 @@ export class PostService {
 
     const postDetailHashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postId);
     const postDetailEmojiInfo = await this.postQueryRepository.getPostDetailEmoji(postId, memberId);
-
-    const postDetail = GetPostDetail.from(postDetailInfo);
-    return new GetPostDetailDto(postDetail, postDetailHashTagInfo, postDetailEmojiInfo);
+    console.log(postDetailHashTagInfo);
+    const postDetail = GetPostDetail.from(postDetailInfo, postDetailHashTagInfo);
+   
+    return new GetPostDetailDto(postDetail, postDetailEmojiInfo);
   }
 
   async modifyPost(postId: number, memberId: number, dto: CreatePostInfoDto): Promise<void> {
@@ -398,6 +399,31 @@ export class PostDetailDto {
   emojiCount: number;
   createdAt: Date;
   isMine: boolean;
+  hashTags: GetHashTagInfo[];
+
+  constructor(
+    id: number,
+    category: string,
+    title: string,
+    content: string,
+    viewCount: number,
+    commentCount: number,
+    emojiCount: number,
+    createdAt: Date,
+    isMine: boolean,
+    hashTags: GetHashTagInfo[],
+  ) {
+    this.id = id;
+    this.category = category;
+    this.title = title;
+    this.content = content;
+    this.viewCount = viewCount;
+    this.commentCount = commentCount;
+    this.emojiCount = emojiCount;
+    this.createdAt = createdAt;
+    this.isMine = isMine;
+    this.hashTags = hashTags;
+  }
 }
 
 export class PostCommentWriterDto {
