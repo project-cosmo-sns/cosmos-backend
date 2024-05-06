@@ -37,6 +37,7 @@ export class PostQueryRepository {
         'post.emoji_count as emojiCount',
         'post.comment_count as commentCount',
         'post.view_count as viewCount',
+        'post.created_at as createdAt',
       ])
       .limit(paginationRequest.take)
       .offset(paginationRequest.getSkip())
