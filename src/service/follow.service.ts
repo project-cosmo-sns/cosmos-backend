@@ -1,5 +1,6 @@
 import { ConflictException, GoneException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { GetFollowerList } from 'src/dto/get-follower-list';
 import { GetFollowingList } from 'src/dto/get-following-list';
 import { NotificationType } from 'src/entity/common/Enums';
@@ -18,7 +19,7 @@ export class FollowService {
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
     private readonly followQueryRepository: FollowQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
-  ) {}
+  ) { }
 
   async followMember(followingMemberId: number, followerMemberId: number): Promise<void> {
     const followInfo = await this.followRepository.findOneBy({ followerMemberId, followingMemberId });
@@ -46,16 +47,18 @@ export class FollowService {
     await this.followRepository.remove(followInfo);
   }
 
-  async getFollowerLists(memberId: number) {
-    const followerListTuples = await this.followQueryRepository.getFollowerQuery(memberId);
+  async getFollowerLists(memberId: number, paginationRequest: PaginationRequest) {
+    const followerListTuples = await this.followQueryRepository.getFollowerQuery(memberId, paginationRequest);
+    const totalCount = await this.followQueryRepository.GetFollowerTotalCount(memberId);
     const followerList = followerListTuples.map((follower) => GetFollowerList.from(follower));
-    return followerList;
+    return { followerList, totalCount };
   }
 
-  async getFollowingLists(memberId: number) {
-    const followingListTuples = await this.followQueryRepository.getFollowingQuery(memberId);
+  async getFollowingLists(memberId: number, paginationRequest: PaginationRequest) {
+    const followingListTuples = await this.followQueryRepository.getFollowingQuery(memberId, paginationRequest);
+    const totalCount = await this.followQueryRepository.GetFollowingTotalCount(memberId);
     const followingList = followingListTuples.map((following) => GetFollowingList.from(following));
-    return followingList;
+    return { followingList, totalCount };
   }
 
   private async followNotification(followingMemberId, followerMemberId) {
