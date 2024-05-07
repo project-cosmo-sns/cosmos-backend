@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { plainToInstance } from 'class-transformer';
+import { Transform, plainToInstance } from 'class-transformer';
 import { Member } from 'src/entity/member.entity';
 import { DataSource } from 'typeorm';
 
@@ -31,4 +31,29 @@ export class MemberQueryRepository {
 
     return plainToInstance(Member, member);
   }
+
+  async getNotificationSettingByMemberId(memberId: number): Promise<GetNotificationSettingTuple> {
+    const notificationSetting = await this.dataSource
+      .createQueryBuilder()
+      .from(Member, 'member')
+      .where('member.id = :memberId', { memberId })
+      .andWhere('member.deletedAt IS NULL')
+      .select([
+        'member.isCommentNotification as isCommentNotification',
+        'member.isEmojiNotification as isEmojiNotification',
+        'member.isFollowNotification as isFollowNotification',
+      ])
+      .getRawOne();
+
+    return plainToInstance(GetNotificationSettingTuple, notificationSetting);
+  }
+}
+
+class GetNotificationSettingTuple {
+  @Transform(({ value }) => Boolean(value))
+  isCommentNotification: boolean;
+  @Transform(({ value }) => Boolean(value))
+  isEmojiNotification: boolean;
+  @Transform(({ value }) => Boolean(value))
+  isFollowNotification: boolean;
 }

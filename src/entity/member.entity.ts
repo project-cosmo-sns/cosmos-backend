@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { SocialProvider } from './common/SocialProvider';
+import { NotificationSettingType } from './common/Enums';
 
 @Entity({
   name: 'member',
@@ -56,5 +57,33 @@ export class Member {
   setDelete(deletedAt: Date) {
     this.externalId = null;
     this.deletedAt = deletedAt;
+  }
+
+  setAcceptNotificationSetting(notificationSettingType: NotificationSettingType) {
+    switch (notificationSettingType) {
+      case NotificationSettingType.COMMENT:
+        this.isCommentNotification = true;
+        break;
+      case NotificationSettingType.EMOJI:
+        this.isEmojiNotification = true;
+        break;
+      case NotificationSettingType.FOLLOW:
+        this.isFollowNotification = true;
+        break;
+    }
+  }
+
+  setRejectNotificationSetting(notificationSettingType: NotificationSettingType) {
+    switch (notificationSettingType) {
+      case NotificationSettingType.COMMENT:
+        this.isCommentNotification = false;
+        break;
+      case NotificationSettingType.EMOJI:
+        this.isEmojiNotification = false;
+        break;
+      case NotificationSettingType.FOLLOW:
+        this.isFollowNotification = false;
+        break;
+    }
   }
 }

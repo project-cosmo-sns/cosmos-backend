@@ -1,8 +1,12 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
+import { GetNotificationSettingMineResponseDto } from 'src/dto/response/get-notification-setting-mine.response.dto';
 import { GetNotificationResponseDto } from 'src/dto/response/get-notification.response.dto';
+import { NotificationSettingType } from 'src/entity/common/Enums';
+import { Member } from 'src/entity/member.entity';
 import { Notification } from 'src/entity/notification.entity';
+import { MemberQueryRepository } from 'src/repository/member.query-repository';
 import { NotificationQueryRepository } from 'src/repository/notification.query-repository';
 import { Repository } from 'typeorm';
 
@@ -10,7 +14,9 @@ import { Repository } from 'typeorm';
 export class NotificationService {
   constructor(
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
+    @InjectRepository(Member) private readonly memberRepository: Repository<Member>,
     private readonly notificationQueryRepository: NotificationQueryRepository,
+    private readonly memberQueryRepository: MemberQueryRepository,
   ) {}
 
   async getNotificationList(
@@ -56,6 +62,40 @@ export class NotificationService {
     notification.isConfirmed = true;
 
     await this.notificationRepository.save(notification);
+  }
+
+  async getNotificationSettingMine(memberId: number): Promise<GetNotificationSettingMineResponseDto> {
+    const notificationSetting = await this.memberQueryRepository.getNotificationSettingByMemberId(memberId);
+
+    if (!notificationSetting) {
+      throw new NotFoundException('해당 회원을 찾을 수 없습니다.');
+    }
+
+    return GetNotificationSettingMineResponseDto.from(notificationSetting);
+  }
+
+  async acceptNotificationSetting(memberId: number, notificationSettingType: NotificationSettingType): Promise<void> {
+    const member = await this.memberQueryRepository.getMemberIsNotDeletedById(memberId);
+
+    if (!member) {
+      throw new NotFoundException('해당 회원을 찾을 수 없습니다.');
+    }
+
+    member.setAcceptNotificationSetting(notificationSettingType);
+
+    await this.memberRepository.save(member);
+  }
+
+  async rejectNotificationSetting(memberId: number, notificationSettingType: NotificationSettingType): Promise<void> {
+    const member = await this.memberQueryRepository.getMemberIsNotDeletedById(memberId);
+
+    if (!member) {
+      throw new NotFoundException('해당 회원을 찾을 수 없습니다.');
+    }
+
+    member.setRejectNotificationSetting(notificationSettingType);
+
+    await this.memberRepository.save(member);
   }
 }
 

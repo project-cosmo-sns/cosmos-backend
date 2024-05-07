@@ -19,5 +19,11 @@ export enum EmojiType {
   LAUGH = 'LAUGH',
   SAD = 'SAD',
   CHECK = 'CHECK',
-  ME = 'ME'
+  ME = 'ME',
+}
+
+export enum NotificationSettingType {
+  COMMENT = 'COMMENT',
+  EMOJI = 'EMOJI',
+  FOLLOW = 'FOLLOW',
 }
