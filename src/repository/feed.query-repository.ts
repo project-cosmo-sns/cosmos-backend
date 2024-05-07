@@ -80,23 +80,6 @@ export class FeedQueryRepository {
 
     return plainToInstance(Feed, feed);
   }
-
-  async getFeedEmoji(feedId: number, memberId: number): Promise<GetFeedEmojiTuple[]> {
-    const emojiInfo = await this.dataSource
-      .createQueryBuilder()
-      .from(FeedEmoji, 'feed_emoji')
-      .select('feed_emoji.emoji as emojiCode')
-      .addSelect('COUNT(*) as emojiCount')
-      .addSelect(
-        'CASE WHEN SUM(CASE WHEN feed_emoji.member_id = :memberId THEN 1 ELSE 0 END) > 0 THEN true ELSE false END as isClicked',
-      )
-      .where('feed_emoji.feed_id = :feedId')
-      .groupBy('feed_emoji.emoji')
-      .setParameters({ memberId, feedId })
-      .getRawMany();
-
-    return plainToInstance(GetFeedEmojiTuple, emojiInfo);
-  }
 }
 
 export class GetFeedTuple {
@@ -112,11 +95,4 @@ export class GetFeedTuple {
   feedCreatedAt: Date;
   @Transform(({ value }) => value === '1')
   isMine: boolean;
-}
-
-export class GetFeedEmojiTuple {
-  emojiCode!: EmojiType;
-  emojiCount!: number;
-  @Transform(({ value }) => value === '1')
-  isClicked!: boolean;
 }

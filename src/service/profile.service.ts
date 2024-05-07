@@ -7,8 +7,10 @@ import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
 import { GetProfileEmojiListInfo, GetProfileHashTagListInfo, GetProfilePostDto, GetProfilePostList } from 'src/dto/response/profile/get-profile-post.dto';
 import { FeedImage } from 'src/entity/feed_image.entity';
 import { Member } from 'src/entity/member.entity';
+import { FeedEmojiQueryRepository } from 'src/repository/feed-emoji.query-repository';
 import { FollowQueryRepository } from 'src/repository/follow.query-repository';
 import { MemberQueryRepository } from 'src/repository/member.query-repository';
+import { PostEmojiQueryRepository } from 'src/repository/post-emoji.query-repository';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
 import { ProfileQueryRepository } from 'src/repository/profile.query-repository';
 import { Repository } from 'typeorm';
@@ -22,6 +24,8 @@ export class ProfileService {
     private readonly profileQueryRepository: ProfileQueryRepository,
     private readonly postQueryRepository: PostQueryRepository,
     private readonly followQueryRepository: FollowQueryRepository,
+    private readonly postEmojiQueryRepository: PostEmojiQueryRepository,
+    private readonly feedEmojiQueryRepository: FeedEmojiQueryRepository,
   ) { }
 
   async getOthersProfileInfo(memberId: number, myMemberId: number): Promise<GetOthersProfileDto> {
@@ -66,7 +70,7 @@ export class ProfileService {
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
         const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
-        const postListEmojiInfo = await this.postQueryRepository.getPostListEmoji(postList.postId, memberId);
+        const postListEmojiInfo = await this.postEmojiQueryRepository.getPostEmoji(postList.postId, memberId);
         const post = GetProfilePostList.from(postList, hashTagInfo, postListEmojiInfo);
 
         return new GetProfilePostDto(post);
@@ -83,7 +87,7 @@ export class ProfileService {
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
         const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
-        const postListEmojiInfo = await this.postQueryRepository.getPostListEmoji(postList.postId, myId);
+        const postListEmojiInfo = await this.postEmojiQueryRepository.getPostEmoji(postList.postId, myId);
         const post = GetProfilePostList.from(postList, hashTagInfo, postListEmojiInfo);
 
         return new GetProfilePostDto(post);
@@ -110,7 +114,7 @@ export class ProfileService {
         };
 
         const feedImages = await this.feedImageRepository.findBy({ feedId: item.feedId });
-        const feedEmojis = await this.profileQueryRepository.getProfileFeedEmoji(item.feedId, memberId);
+        const feedEmojis = await this.feedEmojiQueryRepository.getFeedEmoji(item.feedId, memberId);
         const feed = {
           id: item.feedId,
           content: item.feedContent,
@@ -151,7 +155,7 @@ export class ProfileService {
         };
 
         const feedImages = await this.feedImageRepository.findBy({ feedId: item.feedId });
-        const feedEmojis = await this.profileQueryRepository.getProfileFeedEmoji(item.feedId, myId);
+        const feedEmojis = await this.feedEmojiQueryRepository.getFeedEmoji(item.feedId, myId);
         const feed = {
           id: item.feedId,
           content: item.feedContent,

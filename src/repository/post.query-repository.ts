@@ -184,40 +184,6 @@ export class PostQueryRepository {
 
     return plainToInstance(GetHashTagSearchTuple, searchResult);
   }
-
-  async getPostListEmoji(postId: number, memberId: number): Promise<GetPostListEmojiTuple[]> {
-    const emojiListInfo = await this.dataSource
-      .createQueryBuilder()
-      .from(PostEmoji, 'post_emoji')
-      .select('post_emoji.emoji as emojiCode')
-      .addSelect('COUNT(*) as emojiCount')
-      .addSelect(
-        'CASE WHEN SUM(CASE WHEN post_emoji.member_id = :memberId THEN 1 ELSE 0 END) > 0 THEN true ELSE false END as isClicked',
-      )
-      .where('post_emoji.post_id = :postId')
-      .groupBy('post_emoji.emoji')
-      .setParameters({ memberId, postId })
-      .getRawMany();
-
-    return plainToInstance(GetPostListEmojiTuple, emojiListInfo);
-  }
-
-  async getPostDetailEmoji(postId: number, memberId: number): Promise<GetPostDetailEmojiTuple[]> {
-    const emojiInfo = await this.dataSource
-      .createQueryBuilder()
-      .from(PostEmoji, 'post_emoji')
-      .select('post_emoji.emoji as emojiCode')
-      .addSelect('COUNT(*) as emojiCount')
-      .addSelect(
-        'CASE WHEN SUM(CASE WHEN post_emoji.member_id = :memberId THEN 1 ELSE 0 END) > 0 THEN true ELSE false END as isClicked',
-      )
-      .where('post_emoji.post_id = :postId')
-      .groupBy('post_emoji.emoji')
-      .setParameters({ memberId, postId })
-      .getRawMany();
-
-    return plainToInstance(GetPostDetailEmojiTuple, emojiInfo);
-  }
 }
 
 export class GetPostTuple {
@@ -269,17 +235,3 @@ export class GetHashTagSearchTuple {
   color!: string;
 }
 
-export class GetPostListEmojiTuple {
-  emojiCode!: EmojiType;
-  emojiCount!: number;
-  @Transform(({ value }) => value === '1')
-  isClicked!: boolean;
-}
-
-
-export class GetPostDetailEmojiTuple {
-  emojiCode!: EmojiType;
-  emojiCount!: number;
-  @Transform(({ value }) => value === '1')
-  isClicked!: boolean;
-}

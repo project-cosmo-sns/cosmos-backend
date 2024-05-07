@@ -1,5 +1,6 @@
 import { EmojiType } from 'src/entity/common/Enums';
-import { GetPostDetailEmojiTuple, GetPostDetailHashTagTuple, GetPostDetailTuple } from 'src/repository/post.query-repository';
+import { GetPostEmojiTuple } from 'src/repository/post-emoji.query-repository';
+import { GetPostDetailHashTagTuple, GetPostDetailTuple } from 'src/repository/post.query-repository';
 import { PostDetailDto, PostWriterDto } from 'src/service/post.service';
 
 export class GetPostDetailDto {
@@ -51,7 +52,7 @@ export class GetPostDetail {
     };
   }
 
-  static from(tuple: GetPostDetailTuple, hashTagTuple: GetPostDetailHashTagTuple[], emojiTuple: GetPostDetailEmojiTuple[]) {
+  static from(tuple: GetPostDetailTuple, hashTagTuple: GetPostDetailHashTagTuple[], emojiTuple: GetPostEmojiTuple[]) {
     const hashTags: GetHashTagDetailInfo[] = hashTagTuple.map(tag => new GetHashTagDetailInfo(tag.tagName, tag.color));
     const emojis: GetEmojiDetailInfo[] = emojiTuple.map(emoji => new GetEmojiDetailInfo(emoji.emojiCode, emoji.emojiCount, emoji.isClicked));
     return new GetPostDetail(

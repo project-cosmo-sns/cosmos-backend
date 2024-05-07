@@ -23,6 +23,7 @@ import { PostEmoji } from 'src/entity/post_emoji.entity';
 import { MemberQueryRepository } from 'src/repository/member.query-repository';
 import { Notification } from 'src/entity/notification.entity';
 import { CreatePostResponse } from 'src/dto/response/create-post.response';
+import { PostEmojiQueryRepository } from 'src/repository/post-emoji.query-repository';
 
 @Injectable()
 export class PostService {
@@ -38,6 +39,7 @@ export class PostService {
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
     private readonly postQueryRepository: PostQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
+    private readonly postEmojiQueryRepository: PostEmojiQueryRepository,
   ) { }
 
   async createPost(memberId: number, dto: CreatePostInfoDto): Promise<CreatePostResponse> {
@@ -72,7 +74,7 @@ export class PostService {
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
         const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
-        const postListEmojiInfo = await this.postQueryRepository.getPostListEmoji(postList.postId, memberId);
+        const postListEmojiInfo = await this.postEmojiQueryRepository.getPostEmoji(postList.postId, memberId);
         const post = GetPostList.from(postList, hashTagInfo, postListEmojiInfo);
 
         return new GetPostListDto(post);
@@ -97,7 +99,7 @@ export class PostService {
     }
 
     const postDetailHashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postId);
-    const postDetailEmojiInfo = await this.postQueryRepository.getPostDetailEmoji(postId, memberId);
+    const postDetailEmojiInfo = await this.postEmojiQueryRepository.getPostEmoji(postId, memberId);
     const postDetail = GetPostDetail.from(postDetailInfo, postDetailHashTagInfo, postDetailEmojiInfo);
 
     return new GetPostDetailDto(postDetail);
