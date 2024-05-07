@@ -79,7 +79,7 @@ export class ProfileController {
     @Req() req,
     @Query() paginationRequest: PaginationRequest,
   ): Promise<PaginationResponse<ProfilePostResponse>> {
-    const { postInfo, totalCount } = await this.profileService.getPostList(req.user.id, paginationRequest);
+    const { postInfo, totalCount } = await this.profileService.getMyPostList(req.user.id, paginationRequest);
     const postData = postInfo.map((info) => ProfilePostResponse.from(info));
     return PaginationResponse.of({
       data: postData,
@@ -113,8 +113,9 @@ export class ProfileController {
   async othersProifilePost(
     @Param('memberId', ParseIntPipe) memberId: number,
     @Query() paginationRequest: PaginationRequest,
+    @Req() req,
   ): Promise<PaginationResponse<ProfilePostResponse>> {
-    const { postInfo, totalCount } = await this.profileService.getPostList(memberId, paginationRequest);
+    const { postInfo, totalCount } = await this.profileService.getOthersPostList(memberId, paginationRequest, req.user.id);
     const postData = postInfo.map((info) => ProfilePostResponse.from(info));
     return PaginationResponse.of({
       data: postData,

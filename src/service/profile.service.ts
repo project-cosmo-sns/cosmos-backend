@@ -59,14 +59,31 @@ export class ProfileService {
     await this.memberRepository.save(memberInfo);
   }
 
-  async getPostList(memberId: number, paginationRequest: PaginationRequest) {
+  async getMyPostList(memberId: number, paginationRequest: PaginationRequest) {
     const postListTuples = await this.profileQueryRepository.getPostList(memberId, paginationRequest);
     const totalCount = await this.profileQueryRepository.getAllPostListTotalCount(memberId);
 
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
         const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
-        const postListEmojiInfo = await this.postQueryRepository.getPostListEmoji(postList.postId, postList.memberId);
+        const postListEmojiInfo = await this.postQueryRepository.getPostListEmoji(postList.postId, memberId);
+        const post = GetProfilePostList.from(postList, hashTagInfo, postListEmojiInfo);
+
+        return new GetProfilePostDto(post);
+      }),
+    );
+
+    return { postInfo, totalCount };
+  }
+
+  async getOthersPostList(memberId: number, paginationRequest: PaginationRequest, myId: number) {
+    const postListTuples = await this.profileQueryRepository.getPostList(memberId, paginationRequest);
+    const totalCount = await this.profileQueryRepository.getAllPostListTotalCount(memberId);
+
+    const postInfo = await Promise.all(
+      postListTuples.map(async (postList) => {
+        const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
+        const postListEmojiInfo = await this.postQueryRepository.getPostListEmoji(postList.postId, myId);
         const post = GetProfilePostList.from(postList, hashTagInfo, postListEmojiInfo);
 
         return new GetProfilePostDto(post);
