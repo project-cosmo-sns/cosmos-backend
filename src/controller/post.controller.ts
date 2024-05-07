@@ -286,7 +286,7 @@ export class PostController {
   @ApiOperation({ summary: '포스트 이미지 url 불러오기' })
   @Get('/image/create')
   async createUploadURL(): Promise<ImageResponse> {
-    const bucket = this.configService.get('AWS_S3_UPLOAD_BUCKET_FEED');
+    const bucket = this.configService.get('AWS_S3_UPLOAD_BUCKET_POST');
 
     const uploadUrl = await this.imageService.createUploadURL(bucket);
     return new ImageResponse(uploadUrl);
