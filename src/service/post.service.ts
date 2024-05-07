@@ -25,6 +25,7 @@ import { Notification } from 'src/entity/notification.entity';
 import { CreatePostResponse } from 'src/dto/response/create-post.response';
 import { PostEmojiQueryRepository } from 'src/repository/post-emoji.query-repository';
 import { PostHashTagQueryRepository } from 'src/repository/post-hash-tag.query-repository';
+import { PostCommentQueryRepository } from 'src/repository/post-comment.query-repository';
 
 @Injectable()
 export class PostService {
@@ -39,6 +40,7 @@ export class PostService {
     @InjectRepository(PostEmoji) private readonly postEmojiRepository: Repository<PostEmoji>,
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
     private readonly postQueryRepository: PostQueryRepository,
+    private readonly postCommentQueryRepository: PostCommentQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
     private readonly postHashTagQueryRepository: PostHashTagQueryRepository,
     private readonly postEmojiQueryRepository: PostEmojiQueryRepository,
@@ -196,8 +198,8 @@ export class PostService {
   }
 
   async getPostCommentList(postId: number, memberId: number, paginationRequest: PaginationRequest) {
-    const postCommentList = await this.postQueryRepository.getPostCommentList(postId, memberId, paginationRequest);
-    const totalCount = await this.postQueryRepository.getPostCommentListCount(postId);
+    const postCommentList = await this.postCommentQueryRepository.getPostCommentList(postId, memberId, paginationRequest);
+    const totalCount = await this.postCommentQueryRepository.getPostCommentListCount(postId);
 
     const postCommentInfo = postCommentList.map((commentList) => GetPostCommentList.from(commentList));
     return { postCommentInfo, totalCount };

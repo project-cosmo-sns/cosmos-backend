@@ -56,6 +56,7 @@ import { MemberController } from './controller/member.controller';
 import { FeedEmojiQueryRepository } from './repository/feed-emoji.query-repository';
 import { PostEmojiQueryRepository } from './repository/post-emoji.query-repository';
 import { PostHashTagQueryRepository } from './repository/post-hash-tag.query-repository';
+import { PostCommentQueryRepository } from './repository/post-comment.query-repository';
 
 @Module({
   imports: [
@@ -119,6 +120,7 @@ import { PostHashTagQueryRepository } from './repository/post-hash-tag.query-rep
     FeedQueryRepository,
     FeedCommentQueryRepository,
     PostQueryRepository,
+    PostCommentQueryRepository,
     FollowQueryRepository,
     NotificationQueryRepository,
     SearchQueryRepository,
