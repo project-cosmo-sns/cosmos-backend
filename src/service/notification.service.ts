@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
+import { GetNotificationSettingMineResponseDto } from 'src/dto/response/get-notification-setting-mine.response.dto';
 import { GetNotificationResponseDto } from 'src/dto/response/get-notification.response.dto';
 import { NotificationSettingType } from 'src/entity/common/Enums';
 import { Member } from 'src/entity/member.entity';
@@ -61,6 +62,16 @@ export class NotificationService {
     notification.isConfirmed = true;
 
     await this.notificationRepository.save(notification);
+  }
+
+  async getNotificationSettingMine(memberId: number): Promise<GetNotificationSettingMineResponseDto> {
+    const notificationSetting = await this.memberQueryRepository.getNotificationSettingByMemberId(memberId);
+
+    if (!notificationSetting) {
+      throw new NotFoundException('해당 회원을 찾을 수 없습니다.');
+    }
+
+    return GetNotificationSettingMineResponseDto.from(notificationSetting);
   }
 
   async acceptNotificationSetting(memberId: number, notificationSettingType: NotificationSettingType): Promise<void> {

@@ -3,6 +3,7 @@ import { ApiNotFoundResponse, ApiOperation, ApiParam, ApiTags, ApiUnauthorizedRe
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
+import { GetNotificationSettingMineResponseDto } from 'src/dto/response/get-notification-setting-mine.response.dto';
 import { GetNotificationResponseDto } from 'src/dto/response/get-notification.response.dto';
 import { NotificationSettingType } from 'src/entity/common/Enums';
 import { RolesGuard } from 'src/guard/roles.guard';
@@ -39,6 +40,12 @@ export class NotificationController {
   @Post('/:notificationId/confirm')
   async confirmNotification(@Req() req, @Param('notificationId', ParseIntPipe) notificationId: number): Promise<void> {
     await this.notificationService.confirmNotification(req.user.id, notificationId);
+  }
+
+  @ApiOperation({ summary: '알림 설정 받아오기' })
+  @Get('/setting/mine')
+  async getNotificationSetting(@Req() req): Promise<GetNotificationSettingMineResponseDto> {
+    return await this.notificationService.getNotificationSettingMine(req.user.id);
   }
 
   @ApiOperation({ summary: '알림 설정 수락' })
