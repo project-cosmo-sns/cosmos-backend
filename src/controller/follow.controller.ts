@@ -101,4 +101,16 @@ export class FollowController {
       totalCount,
     })
   }
+
+  @ApiOperation({ summary: '팔로워 삭제' })
+  @ApiNotFoundResponse({ status: 404, description: '팔로우 되어있지 않을 경우' })
+  @ApiParam({ name: 'memberId', required: true, description: '나를 팔로우 하고 있는 유저 중 취소할 유저' })
+  @Delete('/:memberId/remove')
+  async deleteFollower(
+    @Req() req,
+    @Param('memberId', ParseIntPipe) memberId: number
+  ): Promise<void> {
+    return this.followService.removeFollower(req.user.id, memberId);
+  }
+
 }
