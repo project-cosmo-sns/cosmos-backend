@@ -21,7 +21,6 @@ export class FeedCommentQueryRepository {
         FeedCommentHeart,
         'feedCommentHeart',
         'feedComment.id = feedCommentHeart.commentId AND feedCommentHeart.memberId = :memberId',
-        { memberId },
       )
       .select([
         'member.id as writerId',
@@ -33,10 +32,12 @@ export class FeedCommentQueryRepository {
         'feedComment.heartCount as heartCount',
         'CASE WHEN ISNULL(feedCommentHeart.id) THEN false ELSE true END as isHearted',
         'feedComment.createdAt as createdAt',
+        'CASE WHEN feedComment.member_id = :memberId THEN 1 ELSE 0 END as isMine',
       ])
       .limit(paginationRequest.take)
       .offset(paginationRequest.getSkip())
       .orderBy('feedComment.createdAt', paginationRequest.order)
+      .setParameters({ memberId })
       .getRawMany();
 
     return plainToInstance(GetFeedCommentTuple, commentList);
@@ -80,4 +81,6 @@ export class GetFeedCommentTuple {
   @Transform(({ value }) => Boolean(value))
   isHearted: boolean;
   createdAt: Date;
+  @Transform(({ value }) => Boolean(value))
+  isMine: boolean;
 }

@@ -9,7 +9,7 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class PostCommentQueryRepository {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) { }
+  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
 
   async getPostCommentList(
     postId: number,
@@ -21,7 +21,6 @@ export class PostCommentQueryRepository {
         PostCommentHeart,
         'post_comment_heart',
         'post_comment_heart.comment_id = post_comment.id AND post_comment_heart.member_id = :memberId',
-        { memberId },
       )
       .select([
         'member.id as memberId',
@@ -33,10 +32,12 @@ export class PostCommentQueryRepository {
         'post_comment.heart_count as heartCount',
         'post_comment.created_at as createdAt',
         'CASE WHEN post_comment_heart.id IS NOT NULL THEN true ELSE false END as isHearted',
+        'CASE WHEN post_comment.member_id = :memberId THEN 1 ELSE 0 END as isMine',
       ])
       .limit(paginationRequest.take)
       .offset(paginationRequest.getSkip())
       .orderBy('post_comment.createdAt', paginationRequest.order)
+      .setParameters({ memberId })
       .getRawMany();
 
     return plainToInstance(GetPostCommentTuple, postCommentList);
@@ -68,4 +69,6 @@ export class GetPostCommentTuple {
   createdAt: Date;
   @Transform(({ value }) => Boolean(value))
   isHearted: boolean;
+  @Transform(({ value }) => Boolean(value))
+  isMine: boolean;
 }
