@@ -107,7 +107,7 @@ export class FeedCommentService {
       throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
     }
 
-    if (comment.memberId !== memberId) {
+    if (feed.memberId !== memberId && comment.memberId !== memberId) {
       throw new UnauthorizedException('접근 권한이 없습니다.');
     }
 
