@@ -93,6 +93,7 @@ export class PostQueryRepository {
         'post.comment_count as commentCount',
         'post.view_count as viewCount',
         'member.deleted_at as memberDeletedAt',
+        'post.created_at as createdAt',
         'CASE WHEN post.member_id = :memberId THEN 1 ELSE 0 END as isMine',
       ])
       .setParameters({ memberId })
