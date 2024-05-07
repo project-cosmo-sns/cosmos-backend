@@ -57,6 +57,7 @@ import { FeedEmojiQueryRepository } from './repository/feed-emoji.query-reposito
 import { PostEmojiQueryRepository } from './repository/post-emoji.query-repository';
 import { PostHashTagQueryRepository } from './repository/post-hash-tag.query-repository';
 import { PostCommentQueryRepository } from './repository/post-comment.query-repository';
+import { PostDomainService } from './domain-service/post.domain-service';
 
 @Module({
   imports: [
@@ -114,6 +115,7 @@ import { PostCommentQueryRepository } from './repository/post-comment.query-repo
 
     // DomainService
     FeedDomainService,
+    PostDomainService,
 
     // QueryRepository
     MemberQueryRepository,

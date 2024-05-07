@@ -99,6 +99,18 @@ export class PostQueryRepository {
       .getRawOne();
     return plainToInstance(GetPostDetailTuple, postDetail);
   }
+
+  async getIsNotDeletedPost(postId: number): Promise<Post | undefined> {
+    const post = this.dataSource
+      .createQueryBuilder()
+      .from(Post, 'post')
+      .where('post.id = :postId', { postId })
+      .andWhere('post.deletedAt IS NULL')
+      .select('post')
+      .getOne();
+
+    return plainToInstance(Post, post);
+  }
 }
 
 export class GetPostTuple {
