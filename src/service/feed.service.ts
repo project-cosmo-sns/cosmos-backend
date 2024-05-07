@@ -176,7 +176,7 @@ export class FeedService {
   async deleteFeedEmoji(feedId: number, memberId: number, emojiCode: string) {
     const feed = await this.feedDomainService.getFeedIsNotDeleted(feedId);
 
-    const emoji = await this.feedEmojiRepository.findOneBy({ feedId, emoji: emojiCode });
+    const emoji = await this.feedEmojiRepository.findOneBy({ feedId, memberId, emoji: emojiCode });
 
     if (!emoji) {
       throw new NotFoundException('해당 이모지를 찾을 수 없습니다.');

@@ -147,7 +147,7 @@ export class PostService {
   async removePostEmoji(postId: number, memberId: number, emojiCode: string) {
     const postInfo = await this.postDomainService.getPostIsNotDeleted(postId);
 
-    const emojiInfo = await this.postEmojiRepository.findOneBy({ postId, emoji: emojiCode });
+    const emojiInfo = await this.postEmojiRepository.findOneBy({ postId, memberId, emoji: emojiCode });
     if (!emojiInfo) {
       throw new NotFoundException('해당 이모지를 찾을 수 없습니다.');
     }
