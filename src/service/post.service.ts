@@ -395,4 +395,5 @@ export class PostCommentDto {
   heartCount: number;
   isHearted: boolean;
   createdAt: Date;
+  isMine: boolean;
 }

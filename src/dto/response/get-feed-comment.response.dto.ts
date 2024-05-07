@@ -19,6 +19,7 @@ export class GetFeedCommentResponseDto {
       heartCount: { type: 'number' },
       isHearted: { type: 'boolean' },
       createdAt: { type: 'string' },
+      isMine: { type: 'boolean' },
     },
   })
   comment: FeedCommentDto;

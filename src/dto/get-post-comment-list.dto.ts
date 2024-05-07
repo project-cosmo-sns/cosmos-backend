@@ -1,7 +1,6 @@
 import { GetPostCommentTuple } from 'src/repository/post-comment.query-repository';
 import { PostCommentDto, PostCommentWriterDto } from 'src/service/post.service';
 
-
 export class GetPostCommentList {
   writer: PostCommentWriterDto;
   comment: PostCommentDto;
@@ -16,6 +15,7 @@ export class GetPostCommentList {
     heartCount: number,
     createdAt: Date,
     isHearted: boolean,
+    isMine: boolean,
   ) {
     this.writer = {
       id: memberId,
@@ -29,7 +29,8 @@ export class GetPostCommentList {
       heartCount,
       createdAt,
       isHearted,
-    }
+      isMine,
+    };
   }
 
   static from(tuple: GetPostCommentTuple) {
@@ -42,7 +43,8 @@ export class GetPostCommentList {
       tuple.content,
       tuple.heartCount,
       tuple.createdAt,
-      tuple.isHearted
-    )
+      tuple.isHearted,
+      tuple.isMine,
+    );
   }
 }

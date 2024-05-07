@@ -53,6 +53,7 @@ export class FeedCommentService {
         heartCount: item.heartCount,
         isHearted: item.isHearted,
         createdAt: item.createdAt,
+        isMine: item.isMine,
       };
 
       return GetFeedCommentResponseDto.from({ writer, comment });
@@ -194,4 +195,5 @@ export class FeedCommentDto {
   heartCount: number;
   isHearted: boolean;
   createdAt: Date;
+  isMine: boolean;
 }

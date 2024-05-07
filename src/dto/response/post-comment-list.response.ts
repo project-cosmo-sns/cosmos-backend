@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PostCommentDto, PostCommentWriterDto} from 'src/service/post.service';
+import { PostCommentDto, PostCommentWriterDto } from 'src/service/post.service';
 
 export class PostCommentListResponse {
   @ApiProperty({
@@ -18,6 +18,7 @@ export class PostCommentListResponse {
       heartCount: { type: 'number' },
       isHearted: { type: 'boolean' },
       createdAt: { type: 'string' },
+      isMine: { type: 'boolean' },
     },
   })
   comment: PostCommentDto;
