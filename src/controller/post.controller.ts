@@ -118,7 +118,7 @@ export class PostController {
 
   @ApiOperation({ summary: '포스트 이모지 추가' })
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
-  @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었을 경우' })
+  @ApiNotFoundResponse({ status: 404, description: '해당 postId값을 가진 포스트가 없거나 삭제된 경우' })
   @ApiBody({ description: '이모지 정보', schema: { type: 'object', properties: { emoji: { type: 'string' } } } })
   @Post(':postId/emoji')
   async createPostEmoji(
@@ -133,7 +133,7 @@ export class PostController {
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
   @ApiParam({ name: 'emojiCode', required: true, description: '포스트 이모지 코드' })
   @ApiUnauthorizedResponse({ status: 401, description: '해당 이모지를 추가한 유저가 아닐 경우' })
-  @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었을 경우' })
+  @ApiNotFoundResponse({ status: 404, description: '해당 postId값을 가진 포스트가 없거나 삭제된 경우' })
   @Delete(':postId/emoji/:emojiCode')
   async deletePostEmoji(
     @Req() req,
@@ -190,7 +190,7 @@ export class PostController {
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
   @ApiParam({ name: 'commentId', required: true, description: '포스트 댓글 id' })
   @ApiUnauthorizedResponse({ status: 401, description: '해당 댓글을 작성한 사람이 아닐 경우' })
-  @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었거나, 댓글이 삭제된 경우' })
+  @ApiNotFoundResponse({ status: 404, description: '해당 postId값을 가진 포스트가 없거나 삭제된 경우' })
   @ApiBody({ description: '댓글 내용', schema: { type: 'object', properties: { content: { type: 'string' } } } })
   @Patch(':postId/comment/:commentId/modify')
   async modifyPostComment(
@@ -214,7 +214,7 @@ export class PostController {
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
   @ApiParam({ name: 'commentId', required: true, description: '포스트 댓글 id' })
   @ApiUnauthorizedResponse({ status: 401, description: '해당 댓글을 작성한 사람이 아닐 경우' })
-  @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었거나, 댓글이 삭제된 경우' })
+  @ApiNotFoundResponse({ status: 404, description: '해당 postId값을 가진 포스트가 없거나 삭제된 경우' })
   @Delete(':postId/comment/:commentId')
   async removePostComment(
     @Param('postId', ParseIntPipe) postId: number,
@@ -235,7 +235,7 @@ export class PostController {
   @ApiOperation({ summary: '포스트 댓글 좋아요' })
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
   @ApiParam({ name: 'commentId', required: true, description: '포스트 댓글 id' })
-  @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었거나, 댓글이 삭제된 경우' })
+  @ApiNotFoundResponse({ status: 404, description: '해당 postId값을 가진 포스트가 없거나 삭제된 경우' })
   @Post(':postId/comment/:commentId/like')
   async likePostComment(
     @Param('postId', ParseIntPipe) postId: number,
@@ -257,7 +257,7 @@ export class PostController {
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
   @ApiParam({ name: 'commentId', required: true, description: '포스트 댓글 id' })
   @ApiUnauthorizedResponse({ status: 401, description: '해당 댓글 좋아요를 누른 사람이 아닐 경우' })
-  @ApiGoneResponse({ status: 410, description: '포스트가 삭제되었거나, 댓글이 삭제된 경우' })
+  @ApiNotFoundResponse({ status: 404, description: '해당 postId값을 가진 포스트가 없거나 삭제된 경우' })
   @Delete(':postId/comment/:commentId/like')
   async removePostCommentHeart(
     @Param('postId', ParseIntPipe) postId: number,
