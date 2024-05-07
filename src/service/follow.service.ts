@@ -61,6 +61,14 @@ export class FollowService {
     return { followingList, totalCount };
   }
 
+  async removeFollower(myId: number, memberId: number): Promise<void> {
+    const followerInfo = await this.followRepository.findOneBy({ followingMemberId: memberId, followerMemberId: myId });
+    if (!followerInfo) {
+      throw new NotFoundException('팔로우 되어있지 않습니다.');
+    }
+    await this.followRepository.remove(followerInfo);
+  }
+
   private async followNotification(followingMemberId, followerMemberId) {
     try {
       const followerMember = await this.memberQueryRepository.getMemberIsNotDeletedById(followerMemberId);
