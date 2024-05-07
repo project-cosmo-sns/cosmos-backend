@@ -1,5 +1,7 @@
 import { EmojiType } from 'src/entity/common/Enums';
-import { GetProfilePostListEmojiTuple, GetProfilePostListHashTagTuple, GetProfilePostTuple } from 'src/repository/profile.query-repository';
+import { GetPostEmojiTuple } from 'src/repository/post-emoji.query-repository';
+import { GetPostHashTagTuple } from 'src/repository/post-hash-tag.query-repository';
+import { GetProfilePostTuple } from 'src/repository/profile.query-repository';
 import { ProfilePostListDto, ProfilePostWriterDto } from 'src/service/profile.service';
 
 export class GetProfilePostDto {
@@ -50,7 +52,7 @@ export class GetProfilePostList {
     };
   }
 
-  static from(tuple: GetProfilePostTuple, hashTagTuple: GetProfilePostListHashTagTuple[], emojiTuple: GetProfilePostListEmojiTuple[]) {
+  static from(tuple: GetProfilePostTuple, hashTagTuple: GetPostHashTagTuple[], emojiTuple: GetPostEmojiTuple[]) {
     const hashTags: GetProfileHashTagListInfo[] = hashTagTuple.map(tag => new GetProfileHashTagListInfo(tag.tagName, tag.color));
     const emojis: GetProfileEmojiListInfo[] = emojiTuple.map(emoji => new GetProfileEmojiListInfo(emoji.emojiCode, emoji.emojiCount, emoji.isClicked));
     return new GetProfilePostList(

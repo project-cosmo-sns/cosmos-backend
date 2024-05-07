@@ -23,6 +23,10 @@ import { PostEmoji } from 'src/entity/post_emoji.entity';
 import { MemberQueryRepository } from 'src/repository/member.query-repository';
 import { Notification } from 'src/entity/notification.entity';
 import { CreatePostResponse } from 'src/dto/response/create-post.response';
+import { PostEmojiQueryRepository } from 'src/repository/post-emoji.query-repository';
+import { PostHashTagQueryRepository } from 'src/repository/post-hash-tag.query-repository';
+import { PostCommentQueryRepository } from 'src/repository/post-comment.query-repository';
+import { PostDomainService } from 'src/domain-service/post.domain-service';
 
 @Injectable()
 export class PostService {
@@ -37,7 +41,12 @@ export class PostService {
     @InjectRepository(PostEmoji) private readonly postEmojiRepository: Repository<PostEmoji>,
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
     private readonly postQueryRepository: PostQueryRepository,
+    private readonly postCommentQueryRepository: PostCommentQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
+    private readonly postHashTagQueryRepository: PostHashTagQueryRepository,
+    private readonly postEmojiQueryRepository: PostEmojiQueryRepository,
+    private readonly postDomainService: PostDomainService,
+
   ) { }
 
   async createPost(memberId: number, dto: CreatePostInfoDto): Promise<CreatePostResponse> {
@@ -71,8 +80,8 @@ export class PostService {
 
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
-        const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
-        const postListEmojiInfo = await this.postQueryRepository.getPostListEmoji(postList.postId, memberId);
+        const hashTagInfo = await this.postHashTagQueryRepository.getPostHashTag(postList.postId);
+        const postListEmojiInfo = await this.postEmojiQueryRepository.getPostEmoji(postList.postId, memberId);
         const post = GetPostList.from(postList, hashTagInfo, postListEmojiInfo);
 
         return new GetPostListDto(post);
@@ -83,31 +92,23 @@ export class PostService {
   }
 
   async getPostDetail(postId: number, memberId: number): Promise<GetPostDetailDto> {
-    const isDeletedPost = await this.postRepository.findOneBy({ id: postId });
-    if (!isDeletedPost) {
-      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
-    }
-    if (isDeletedPost.deletedAt !== null) {
-      throw new GoneException('해당 포스트는 삭제되었습니다.');
-    }
+    await this.postDomainService.getPostIsNotDeleted(postId);
     const postDetailInfo = await this.postQueryRepository.getPostDetail(postId, memberId);
 
     if (postDetailInfo.memberDeletedAt !== null) {
       throw new GoneException('해당 글 작성자가 존재하지 않습니다.');
     }
 
-    const postDetailHashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postId);
-    const postDetailEmojiInfo = await this.postQueryRepository.getPostDetailEmoji(postId, memberId);
+    const postDetailHashTagInfo = await this.postHashTagQueryRepository.getPostHashTag(postId);
+    const postDetailEmojiInfo = await this.postEmojiQueryRepository.getPostEmoji(postId, memberId);
     const postDetail = GetPostDetail.from(postDetailInfo, postDetailHashTagInfo, postDetailEmojiInfo);
 
     return new GetPostDetailDto(postDetail);
   }
 
   async modifyPost(postId: number, memberId: number, dto: CreatePostInfoDto): Promise<void> {
-    const postInfo = await this.postRepository.findOneBy({ id: postId });
-    if (!postInfo || postInfo.deletedAt !== null) {
-      throw new NotFoundException('해당 포스트가 없거나 삭제되었습니다.');
-    }
+    const postInfo = await this.postDomainService.getPostIsNotDeleted(postId);
+
     if (postInfo.memberId !== memberId) {
       throw new UnauthorizedException('권한이 없습니다.');
     }
@@ -121,10 +122,7 @@ export class PostService {
   }
 
   async deletePost(postId: number, memberId: number): Promise<void> {
-    const postInfo = await this.postRepository.findOneBy({ id: postId });
-    if (!postInfo) {
-      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
-    }
+    const postInfo = await this.postDomainService.getPostIsNotDeleted(postId);
     if (postInfo.memberId !== memberId) {
       throw new UnauthorizedException('권한이 없습니다.');
     }
@@ -134,13 +132,7 @@ export class PostService {
   }
 
   async createPostEmoji(postId: number, memberId: number, emoji: string) {
-    const postInfo = await this.postRepository.findOneBy({ id: postId });
-    if (!postInfo) {
-      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
-    }
-    if (postInfo.deletedAt !== null) {
-      throw new GoneException('해당 포스트는 삭제되었습니다.');
-    }
+    const postInfo = await this.postDomainService.getPostIsNotDeleted(postId);
 
     postInfo.plusEmojiCount(postInfo.emojiCount);
     await this.postRepository.save(postInfo);
@@ -153,13 +145,7 @@ export class PostService {
   }
 
   async removePostEmoji(postId: number, memberId: number, emojiCode: string) {
-    const postInfo = await this.postRepository.findOneBy({ id: postId });
-    if (!postInfo) {
-      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
-    }
-    if (postInfo.deletedAt !== null) {
-      throw new GoneException('해당 포스트는 삭제되었습니다.');
-    }
+    const postInfo = await this.postDomainService.getPostIsNotDeleted(postId);
 
     const emojiInfo = await this.postEmojiRepository.findOneBy({ postId, emoji: emojiCode });
     if (!emojiInfo) {
@@ -176,13 +162,7 @@ export class PostService {
   }
 
   async increasePostViewCount(postId: number, memberId: number): Promise<void> {
-    const postInfo = await this.postRepository.findOneBy({ id: postId });
-    if (!postInfo) {
-      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
-    }
-    if (postInfo.deletedAt) {
-      throw new GoneException('해당 포스트는 삭제되었습니다.');
-    }
+    const postInfo = await this.postDomainService.getPostIsNotDeleted(postId);
     if (memberId) {
       await this.postViewRepository.save({ postId, memberId });
     }
@@ -191,40 +171,28 @@ export class PostService {
   }
 
   async getPostCommentList(postId: number, memberId: number, paginationRequest: PaginationRequest) {
-    const postCommentList = await this.postQueryRepository.getPostCommentList(postId, memberId, paginationRequest);
-    const totalCount = await this.postQueryRepository.getPostCommentListCount(postId);
+    const postCommentList = await this.postCommentQueryRepository.getPostCommentList(postId, memberId, paginationRequest);
+    const totalCount = await this.postCommentQueryRepository.getPostCommentListCount(postId);
 
     const postCommentInfo = postCommentList.map((commentList) => GetPostCommentList.from(commentList));
     return { postCommentInfo, totalCount };
   }
 
   async writePostComment(postId: number, memberId: number, content: string): Promise<void> {
-    const post = await this.postRepository.findOneBy({ id: postId });
-    if (!post) {
-      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
-    }
-    if (post.deletedAt !== null) {
-      throw new GoneException('해당 포스트는 삭제되었습니다.');
-    }
-    post.plusCommentCount(post.commentCount);
-    await this.postRepository.save(post);
+    const postInfo = await this.postDomainService.getPostIsNotDeleted(postId);
+    postInfo.plusCommentCount(postInfo.commentCount);
+    await this.postRepository.save(postInfo);
     const comment = await this.postCommentRepository.save({
       postId: postId,
       memberId: memberId,
       content: content,
     });
 
-    this.newPostCommentNotification(post.memberId, memberId, postId, comment.id);
+    this.newPostCommentNotification(postInfo.memberId, memberId, postId, comment.id);
   }
 
   async patchPostComment(postId: number, commentId: number, memberId: number, content: string): Promise<void> {
-    const post = await this.postRepository.findOneBy({ id: postId });
-    if (!post) {
-      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
-    }
-    if (post.deletedAt !== null) {
-      throw new GoneException('해당 포스트는 삭제되었습니다.');
-    }
+    await this.postDomainService.getPostIsNotDeleted(postId);
 
     const commentInfo = await this.postCommentRepository.findOneBy({ id: commentId, postId });
     if (!commentInfo) {
@@ -242,13 +210,7 @@ export class PostService {
   }
 
   async deletePostComment(postId: number, commentId: number, memberId: number): Promise<void> {
-    const post = await this.postRepository.findOneBy({ id: postId });
-    if (!post) {
-      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
-    }
-    if (post.deletedAt !== null) {
-      throw new GoneException('해당 포스트는 삭제되었습니다.');
-    }
+    const postInfo = await this.postDomainService.getPostIsNotDeleted(postId);
     const commentInfo = await this.postCommentRepository.findOneBy({ id: commentId, postId });
     if (!commentInfo) {
       throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
@@ -260,21 +222,15 @@ export class PostService {
       throw new GoneException('해당 댓글은 삭제되었습니다.');
     }
 
-    post.minusCommentCount(post.commentCount);
-    await this.postRepository.save(post);
+    postInfo.minusCommentCount(postInfo.commentCount);
+    await this.postRepository.save(postInfo);
 
     commentInfo.deleteCommentInfo(new Date());
     await this.postCommentRepository.save(commentInfo);
   }
 
   async heartPostComment(postId: number, commentId: number, memberId: number): Promise<void> {
-    const post = await this.postRepository.findOneBy({ id: postId });
-    if (!post) {
-      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
-    }
-    if (post.deletedAt !== null) {
-      throw new GoneException('해당 포스트는 삭제되었습니다.');
-    }
+    await this.postDomainService.getPostIsNotDeleted(postId);
     const commentInfo = await this.postCommentRepository.findOneBy({ id: commentId, postId });
     if (!commentInfo) {
       throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
@@ -289,13 +245,7 @@ export class PostService {
   }
 
   async deletePostCommentHeart(postId: number, commentId: number, memberId: number) {
-    const post = await this.postRepository.findOneBy({ id: postId });
-    if (!post) {
-      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
-    }
-    if (post.deletedAt !== null) {
-      throw new GoneException('해당 포스트는 삭제되었습니다.');
-    }
+    await this.postDomainService.getPostIsNotDeleted(postId);
     const commentInfo = await this.postCommentRepository.findOneBy({ id: commentId, postId });
     if (!commentInfo) {
       throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
@@ -313,7 +263,7 @@ export class PostService {
   }
 
   async getHashTagSearchInfo(hashTagResult: HashTagSearchRequest) {
-    const hashTagSearchTuples = await this.postQueryRepository.getHashTagSearchList(hashTagResult);
+    const hashTagSearchTuples = await this.postHashTagQueryRepository.getHashTagSearchList(hashTagResult);
     const hashTagSearchInfo = hashTagSearchTuples.map((hashTagSearch) => GetHashTagSearch.from(hashTagSearch));
     return hashTagSearchInfo;
   }

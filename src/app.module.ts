@@ -53,6 +53,11 @@ import { ProfileQueryRepository } from './repository/profile.query-repository';
 import { FeedDomainService } from './domain-service/feed.domain-service';
 import { FeedImage } from './entity/feed_image.entity';
 import { MemberController } from './controller/member.controller';
+import { FeedEmojiQueryRepository } from './repository/feed-emoji.query-repository';
+import { PostEmojiQueryRepository } from './repository/post-emoji.query-repository';
+import { PostHashTagQueryRepository } from './repository/post-hash-tag.query-repository';
+import { PostCommentQueryRepository } from './repository/post-comment.query-repository';
+import { PostDomainService } from './domain-service/post.domain-service';
 
 @Module({
   imports: [
@@ -110,16 +115,21 @@ import { MemberController } from './controller/member.controller';
 
     // DomainService
     FeedDomainService,
+    PostDomainService,
 
     // QueryRepository
     MemberQueryRepository,
     FeedQueryRepository,
     FeedCommentQueryRepository,
     PostQueryRepository,
+    PostCommentQueryRepository,
     FollowQueryRepository,
     NotificationQueryRepository,
     SearchQueryRepository,
     ProfileQueryRepository,
+    PostHashTagQueryRepository,
+    FeedEmojiQueryRepository,
+    PostEmojiQueryRepository,
 
     // Strategy
     GithubStrategy,
@@ -132,4 +142,4 @@ import { MemberController } from './controller/member.controller';
     Logger,
   ],
 })
-export class AppModule {}
+export class AppModule { }

@@ -8,6 +8,7 @@ import { EmojiType } from 'src/entity/common/Enums';
 import { Feed } from 'src/entity/feed.entity';
 import { FeedEmoji } from 'src/entity/feed_emoji.entity';
 import { FeedImage } from 'src/entity/feed_image.entity';
+import { FeedEmojiQueryRepository } from 'src/repository/feed-emoji.query-repository';
 import { FeedQueryRepository } from 'src/repository/feed.query-repository';
 import { Repository } from 'typeorm';
 
@@ -18,6 +19,7 @@ export class FeedService {
     @InjectRepository(FeedImage) private readonly feedImageRepository: Repository<FeedImage>,
     @InjectRepository(FeedEmoji) private readonly feedEmojiRepository: Repository<FeedEmoji>,
     private readonly feedQueryRepository: FeedQueryRepository,
+    private readonly feedEmojiQueryRepository: FeedEmojiQueryRepository,
     private readonly feedDomainService: FeedDomainService,
   ) { }
 
@@ -81,7 +83,7 @@ export class FeedService {
         };
 
         const feedImages = await this.feedImageRepository.findBy({ feedId: item.feedId });
-        const feedEmojis = await this.feedQueryRepository.getFeedEmoji(item.feedId, memberId);
+        const feedEmojis = await this.feedEmojiQueryRepository.getFeedEmoji(item.feedId, memberId);
         const feed = {
           id: item.feedId,
           content: item.feedContent,
@@ -112,7 +114,7 @@ export class FeedService {
     }
 
     const feedImages = await this.feedImageRepository.findBy({ feedId });
-    const feedEmojis = await this.feedQueryRepository.getFeedEmoji(feedId, memberId);
+    const feedEmojis = await this.feedEmojiQueryRepository.getFeedEmoji(feedId, memberId);
     return new GetFeedDetailResponseDto(
       {
         id: feed.writerId,

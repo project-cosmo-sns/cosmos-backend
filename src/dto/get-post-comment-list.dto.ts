@@ -1,4 +1,4 @@
-import { GetPostCommentTuple } from "src/repository/post.query-repository";
+import { GetPostCommentTuple } from 'src/repository/post-comment.query-repository';
 import { PostCommentDto, PostCommentWriterDto } from 'src/service/post.service';
 
 
