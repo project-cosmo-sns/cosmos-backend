@@ -2,16 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Transform, plainToInstance } from 'class-transformer';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
-import { HashTagSearchRequest } from 'src/dto/request/hash-tag-search.request';
-import { EmojiType, ListSortBy } from 'src/entity/common/Enums';
+import { ListSortBy } from 'src/entity/common/Enums';
 import { Follow } from 'src/entity/follow.entity';
-import { HashTag } from 'src/entity/hash_tag.entity';
 import { Member } from 'src/entity/member.entity';
 import { Post } from 'src/entity/post.entity';
 import { PostComment } from 'src/entity/post_comment.entity';
 import { PostCommentHeart } from 'src/entity/post_comment_heart.entity';
-import { PostEmoji } from 'src/entity/post_emoji.entity';
-import { PostHashTag } from 'src/entity/post_hash_tag.entity';
 import { DataSource } from 'typeorm';
 
 @Injectable()

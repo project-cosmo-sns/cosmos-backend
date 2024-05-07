@@ -8,11 +8,6 @@ import { GetPostTuple } from './post.query-repository';
 import { Post } from 'src/entity/post.entity';
 import { Feed } from 'src/entity/feed.entity';
 import { GetFeedTuple } from './feed.query-repository';
-import { HashTag } from 'src/entity/hash_tag.entity';
-import { PostHashTag } from 'src/entity/post_hash_tag.entity';
-import { PostEmoji } from 'src/entity/post_emoji.entity';
-import { EmojiType } from 'src/entity/common/Enums';
-import { FeedEmoji } from 'src/entity/feed_emoji.entity';
 
 @Injectable()
 export class ProfileQueryRepository {

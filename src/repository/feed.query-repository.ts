@@ -2,9 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Transform, plainToInstance } from 'class-transformer';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
-import { EmojiType } from 'src/entity/common/Enums';
 import { Feed } from 'src/entity/feed.entity';
-import { FeedEmoji } from 'src/entity/feed_emoji.entity';
 import { Member } from 'src/entity/member.entity';
 import { DataSource } from 'typeorm';
 
