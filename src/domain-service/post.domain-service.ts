@@ -14,14 +14,4 @@ async getPostIsNotDeleted(postId:number){
   }
   return postInfo;
 }
-
-  // async getFeedIsNotDeleted(feedId: number) {
-  //   const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
-
-  //   if (!feed) {
-  //     throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
-  //   }
-
-  //   return feed;
-  // }
 }
