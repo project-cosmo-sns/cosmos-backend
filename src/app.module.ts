@@ -55,6 +55,7 @@ import { FeedImage } from './entity/feed_image.entity';
 import { MemberController } from './controller/member.controller';
 import { FeedEmojiQueryRepository } from './repository/feed-emoji.query-repository';
 import { PostEmojiQueryRepository } from './repository/post-emoji.query-repository';
+import { PostHashTagQueryRepository } from './repository/post-hash-tag.query-repository';
 
 @Module({
   imports: [
@@ -122,6 +123,7 @@ import { PostEmojiQueryRepository } from './repository/post-emoji.query-reposito
     NotificationQueryRepository,
     SearchQueryRepository,
     ProfileQueryRepository,
+    PostHashTagQueryRepository,
     FeedEmojiQueryRepository,
     PostEmojiQueryRepository,
 

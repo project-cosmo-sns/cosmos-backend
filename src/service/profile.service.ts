@@ -11,6 +11,7 @@ import { FeedEmojiQueryRepository } from 'src/repository/feed-emoji.query-reposi
 import { FollowQueryRepository } from 'src/repository/follow.query-repository';
 import { MemberQueryRepository } from 'src/repository/member.query-repository';
 import { PostEmojiQueryRepository } from 'src/repository/post-emoji.query-repository';
+import { PostHashTagQueryRepository } from 'src/repository/post-hash-tag.query-repository';
 import { PostQueryRepository } from 'src/repository/post.query-repository';
 import { ProfileQueryRepository } from 'src/repository/profile.query-repository';
 import { Repository } from 'typeorm';
@@ -24,6 +25,7 @@ export class ProfileService {
     private readonly profileQueryRepository: ProfileQueryRepository,
     private readonly postQueryRepository: PostQueryRepository,
     private readonly followQueryRepository: FollowQueryRepository,
+    private readonly postHashTagQueryRepository: PostHashTagQueryRepository,
     private readonly postEmojiQueryRepository: PostEmojiQueryRepository,
     private readonly feedEmojiQueryRepository: FeedEmojiQueryRepository,
   ) { }
@@ -69,7 +71,7 @@ export class ProfileService {
 
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
-        const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
+        const hashTagInfo = await this.postHashTagQueryRepository.getPostHashTag(postList.postId);
         const postListEmojiInfo = await this.postEmojiQueryRepository.getPostEmoji(postList.postId, memberId);
         const post = GetProfilePostList.from(postList, hashTagInfo, postListEmojiInfo);
 
@@ -86,7 +88,7 @@ export class ProfileService {
 
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
-        const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
+        const hashTagInfo = await this.postHashTagQueryRepository.getPostHashTag(postList.postId);
         const postListEmojiInfo = await this.postEmojiQueryRepository.getPostEmoji(postList.postId, myId);
         const post = GetProfilePostList.from(postList, hashTagInfo, postListEmojiInfo);
 

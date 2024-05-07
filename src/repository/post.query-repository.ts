@@ -106,28 +106,6 @@ export class PostQueryRepository {
     return plainToInstance(GetPostDetailTuple, postDetail);
   }
 
-  async getPostListHashTag(postId: number): Promise<GetPostListHashTagTuple[]> {
-    const postListHashTag = await this.dataSource
-      .createQueryBuilder()
-      .from(HashTag, 'hash_tag')
-      .innerJoin(PostHashTag, 'post_hash_tag', 'post_hash_tag.hash_tag_id = hash_tag.id')
-      .where('post_hash_tag.post_id = :postId', { postId })
-      .select(['hash_tag.tagName as tagName', 'hash_tag.color as color'])
-      .getRawMany();
-    return plainToInstance(GetPostListHashTagTuple, postListHashTag);
-  }
-
-  async getPostDetailHashTag(postId: number): Promise<GetPostDetailHashTagTuple[]> {
-    const postDetailHashTag = await this.dataSource
-      .createQueryBuilder()
-      .from(HashTag, 'hash_tag')
-      .innerJoin(PostHashTag, 'post_hash_tag', 'post_hash_tag.hash_tag_id = hash_tag.id')
-      .where('post_hash_tag.post_id = :postId', { postId })
-      .select(['hash_tag.tagName as tagName', 'hash_tag.color as color'])
-      .getRawMany();
-    return plainToInstance(GetPostDetailHashTagTuple, postDetailHashTag);
-  }
-
   async getPostCommentList(
     postId: number,
     memberId: number,
@@ -172,18 +150,6 @@ export class PostQueryRepository {
       .andWhere('member.deletedAt IS NULL')
       .andWhere('post_comment.post_id = :postId', { postId });
   }
-
-  async getHashTagSearchList(search: HashTagSearchRequest): Promise<GetHashTagSearchTuple[]> {
-    const searchResult = await this.dataSource
-      .createQueryBuilder()
-      .from(HashTag, 'hash_Tag')
-      .select(['tag_name as tagName', 'color as color'])
-      .where(`tag_name LIKE '%${search.searchWord}%'`)
-      .limit(10)
-      .getRawMany();
-
-    return plainToInstance(GetHashTagSearchTuple, searchResult);
-  }
 }
 
 export class GetPostTuple {
@@ -207,16 +173,6 @@ export class GetPostDetailTuple extends GetPostTuple {
   isMine: boolean;
 }
 
-export class GetPostListHashTagTuple {
-  tagName: string;
-  color: string;
-}
-
-export class GetPostDetailHashTagTuple {
-  tagName: string;
-  color: string;
-}
-
 export class GetPostCommentTuple {
   memberId: number;
   nickname: string;
@@ -228,10 +184,5 @@ export class GetPostCommentTuple {
   createdAt: Date;
   @Transform(({ value }) => Boolean(value))
   isHearted: boolean;
-}
-
-export class GetHashTagSearchTuple {
-  tagName!: string;
-  color!: string;
 }
 

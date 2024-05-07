@@ -1,4 +1,4 @@
-import { GetHashTagSearchTuple } from "src/repository/post.query-repository";
+import { GetHashTagSearchTuple } from 'src/repository/post-hash-tag.query-repository';
 
 export class GetHashTagSearch {
   tagName!: string;

@@ -128,17 +128,6 @@ export class ProfileQueryRepository {
       .andWhere('member.deletedAt IS NULL')
       .andWhere('feed.member_id = :memberId', { memberId });
   }
-
-  async getPostListHashTag(postId: number): Promise<GetProfilePostListHashTagTuple[]> {
-    const postListHashTag = await this.dataSource
-      .createQueryBuilder()
-      .from(HashTag, 'hash_tag')
-      .innerJoin(PostHashTag, 'post_hash_tag', 'post_hash_tag.hash_tag_id = hash_tag.id')
-      .where('post_hash_tag.post_id = :postId', { postId })
-      .select(['hash_tag.tagName as tagName', 'hash_tag.color as color'])
-      .getRawMany();
-    return plainToInstance(GetProfilePostListHashTagTuple, postListHashTag);
-  }
 }
 
 export class GetProfilePostTuple {
@@ -187,11 +176,6 @@ export class FollowerCountTuple {
 
 export class FollowingCountTuple {
   followingCount!: number;
-}
-
-export class GetProfilePostListHashTagTuple {
-  tagName: string;
-  color: string;
 }
 
 

@@ -24,6 +24,7 @@ import { MemberQueryRepository } from 'src/repository/member.query-repository';
 import { Notification } from 'src/entity/notification.entity';
 import { CreatePostResponse } from 'src/dto/response/create-post.response';
 import { PostEmojiQueryRepository } from 'src/repository/post-emoji.query-repository';
+import { PostHashTagQueryRepository } from 'src/repository/post-hash-tag.query-repository';
 
 @Injectable()
 export class PostService {
@@ -39,7 +40,9 @@ export class PostService {
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
     private readonly postQueryRepository: PostQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
+    private readonly postHashTagQueryRepository: PostHashTagQueryRepository,
     private readonly postEmojiQueryRepository: PostEmojiQueryRepository,
+
   ) { }
 
   async createPost(memberId: number, dto: CreatePostInfoDto): Promise<CreatePostResponse> {
@@ -73,7 +76,7 @@ export class PostService {
 
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
-        const hashTagInfo = await this.postQueryRepository.getPostListHashTag(postList.postId);
+        const hashTagInfo = await this.postHashTagQueryRepository.getPostHashTag(postList.postId);
         const postListEmojiInfo = await this.postEmojiQueryRepository.getPostEmoji(postList.postId, memberId);
         const post = GetPostList.from(postList, hashTagInfo, postListEmojiInfo);
 
@@ -98,7 +101,7 @@ export class PostService {
       throw new GoneException('해당 글 작성자가 존재하지 않습니다.');
     }
 
-    const postDetailHashTagInfo = await this.postQueryRepository.getPostDetailHashTag(postId);
+    const postDetailHashTagInfo = await this.postHashTagQueryRepository.getPostHashTag(postId);
     const postDetailEmojiInfo = await this.postEmojiQueryRepository.getPostEmoji(postId, memberId);
     const postDetail = GetPostDetail.from(postDetailInfo, postDetailHashTagInfo, postDetailEmojiInfo);
 
@@ -315,7 +318,7 @@ export class PostService {
   }
 
   async getHashTagSearchInfo(hashTagResult: HashTagSearchRequest) {
-    const hashTagSearchTuples = await this.postQueryRepository.getHashTagSearchList(hashTagResult);
+    const hashTagSearchTuples = await this.postHashTagQueryRepository.getHashTagSearchList(hashTagResult);
     const hashTagSearchInfo = hashTagSearchTuples.map((hashTagSearch) => GetHashTagSearch.from(hashTagSearch));
     return hashTagSearchInfo;
   }
