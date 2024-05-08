@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Transform, plainToInstance } from 'class-transformer';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
-import { ListSortBy } from 'src/entity/common/Enums';
+import { SortPostList } from 'src/dto/request/sort-post-list.request';
+import { CategoryType, ListSortBy } from 'src/entity/common/Enums';
 import { Follow } from 'src/entity/follow.entity';
 import { Member } from 'src/entity/member.entity';
 import { Post } from 'src/entity/post.entity';
@@ -16,9 +17,16 @@ export class PostQueryRepository {
     memberId: number,
     paginationRequest: PaginationRequest,
     sortPostList: ListSortBy,
+    postCategory: CategoryType,
     generation?: number,
   ): Promise<GetPostTuple[]> {
-    let query = this.getPostListBaseQuery(memberId, paginationRequest, sortPostList, generation)
+    let query = this.getPostListBaseQuery(
+      memberId,
+      paginationRequest,
+      sortPostList,
+      postCategory,
+      generation
+    )
       .select([
         'member.id as memberId',
         'member.nickname as nickname',
@@ -45,15 +53,24 @@ export class PostQueryRepository {
     memberId: number,
     paginationRequest: PaginationRequest,
     sortPostList: ListSortBy,
+    postCategory: CategoryType,
     generation?: number,
   ) {
-    return await this.getPostListBaseQuery(memberId, paginationRequest, sortPostList, generation).getCount();
+    return await this.getPostListBaseQuery(
+      memberId,
+      paginationRequest,
+      sortPostList,
+      postCategory,
+      generation
+    )
+      .getCount();
   }
 
   private getPostListBaseQuery(
     memberId: number,
     paginationRequest: PaginationRequest,
     sortPostList: ListSortBy,
+    postCategory: CategoryType,
     generation?: number,
   ) {
     let query = this.dataSource
@@ -62,6 +79,22 @@ export class PostQueryRepository {
       .innerJoin(Member, 'member', 'post.member_id = member.id')
       .where('post.deleted_at IS NULL')
       .andWhere('member.deleted_at IS NULL');
+
+    if (postCategory === CategoryType.NOTICE) {
+      query = query.andWhere("post.category = '공지사항'")
+    }
+    else if (postCategory === CategoryType.EVENT) {
+      query = query.andWhere("post.category = '이벤트'")
+    }
+    else if (postCategory === CategoryType.SPECIAL_LECTURE) {
+      query = query.andWhere("post.category = '특강'")
+    }
+    else if (postCategory === CategoryType.INFORMATION_SHARING) {
+      query = query.andWhere("post.category = '정보공유'")
+    }
+    else if (postCategory === CategoryType.TODAYS_QUESTION) {
+      query = query.andWhere("post.category = '오늘의 질문'")
+    }
 
     if (sortPostList === ListSortBy.BY_FOLLOW) {
       query = query
