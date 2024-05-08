@@ -10,7 +10,7 @@ export class SortPostList extends PaginationRequest {
   @IsOptional()
   sortBy!: ListSortBy;
 
-  @ApiProperty({ description: '선택할 카테고리' })
+  @ApiPropertyOptional({ description: '선택할 카테고리', enum: CategoryType })
   @Type(() => String)
   @IsEnum(CategoryType)
   @IsOptional()
