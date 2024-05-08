@@ -65,17 +65,29 @@ export class PostService {
     return new CreatePostResponse(post.id);
   }
 
-  async getPostList(memberId: number, userGeneration: number, sortPostList: SortPostList) {
+  async getPostList(
+    memberId: number,
+    userGeneration: number,
+    sortPostList: SortPostList,
+  ) {
     const sortBy = sortPostList.sortBy;
     if (typeof memberId === 'undefined' && (sortBy === ListSortBy.BY_FOLLOW || sortBy === ListSortBy.BY_GENERATION)) {
       throw new UnauthorizedException('로그인이 필요합니다.');
     }
-    const postListTuples = await this.postQueryRepository.getPostList(memberId, sortPostList, sortBy, userGeneration);
+    const sortCategory = sortPostList.category;
+    const postListTuples = await this.postQueryRepository.getPostList(
+      memberId,
+      sortPostList,
+      sortBy,
+      sortCategory,
+      userGeneration
+    );
     const totalCount = await this.postQueryRepository.getAllPostListTotalCount(
       memberId,
       sortPostList,
       sortBy,
-      userGeneration,
+      sortCategory,
+      userGeneration
     );
 
     const postInfo = await Promise.all(

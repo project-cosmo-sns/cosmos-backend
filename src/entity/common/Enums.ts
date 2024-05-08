@@ -27,3 +27,11 @@ export enum NotificationSettingType {
   EMOJI = 'EMOJI',
   FOLLOW = 'FOLLOW',
 }
+
+export enum CategoryType {
+  NOTICE = 'NOTICE',
+  EVENT = 'EVENT',
+  SPECIAL_LECTURE = 'SPECIAL_LECTURE',
+  INFORMATION_SHARING = 'INFORMATION_SHARING',
+  TODAYS_QUESTION = 'TODAYS_QUESTION',
+}
