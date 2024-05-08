@@ -145,6 +145,22 @@ export class PostQueryRepository {
 
     return plainToInstance(Post, post);
   }
+
+  async getRandomQuestion(): Promise<RandomQuestionTuple> {
+    const question = this.dataSource
+      .createQueryBuilder()
+      .from(Post, 'post')
+      .where("post.category ='오늘의 질문'")
+      .select([
+        'post.id as postId',
+        'post.title as question'
+      ])
+      .orderBy('RAND()')
+      .limit(1)
+      .getRawOne();
+
+    return plainToInstance(RandomQuestionTuple, question);
+  }
 }
 
 export class GetPostTuple {
@@ -166,4 +182,9 @@ export class GetPostDetailTuple extends GetPostTuple {
   memberDeletedAt!: Date;
   @Transform(({ value }) => value === '1')
   isMine: boolean;
+}
+
+export class RandomQuestionTuple {
+  postId!: number;
+  question!: string;
 }

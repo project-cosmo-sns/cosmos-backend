@@ -38,6 +38,7 @@ import { ImageResponse } from 'src/dto/response/image.response';
 import { PostCommentListResponse } from 'src/dto/response/post-comment-list.response';
 import { PostDetailResponse } from 'src/dto/response/post-detail.response';
 import { PostListResponse } from 'src/dto/response/post-list.response';
+import { TodayQuestionResponse } from 'src/dto/response/today-question.response';
 import { RolesGuard } from 'src/guard/roles.guard';
 import { ImageService } from 'src/service/image.service';
 import { PostService } from 'src/service/post.service';
@@ -290,5 +291,12 @@ export class PostController {
 
     const uploadUrl = await this.imageService.createUploadURL(bucket);
     return new ImageResponse(uploadUrl);
+  }
+
+  @ApiOperation({ summary: '오늘의 질문 불러오기' })
+  @Get('today-question')
+  async getTodayQuestion(): Promise<TodayQuestionResponse> {
+    const todayQuestion = await this.postService.getTodayQuestion();
+    return new TodayQuestionResponse(todayQuestion.postId, todayQuestion.question);
   }
 }
