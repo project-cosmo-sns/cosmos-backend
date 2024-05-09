@@ -5,7 +5,7 @@ import { MemberQueryRepository } from 'src/repository/member.query-repository';
 export class MemberDomainService {
   constructor(private readonly memberQueryRepository: MemberQueryRepository) {}
 
-  async getMemberIsNotDeletedById({ memberId }) {
+  async getMemberIsNotDeletedById(memberId: number) {
     const member = await this.memberQueryRepository.getMemberIsNotDeletedById(memberId);
 
     if (!member) {
