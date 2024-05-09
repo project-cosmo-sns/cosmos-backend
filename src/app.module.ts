@@ -58,6 +58,9 @@ import { PostEmojiQueryRepository } from './repository/post-emoji.query-reposito
 import { PostHashTagQueryRepository } from './repository/post-hash-tag.query-repository';
 import { PostCommentQueryRepository } from './repository/post-comment.query-repository';
 import { PostDomainService } from './domain-service/post.domain-service';
+import { Authorization } from './entity/authorization.entity';
+import { AuthorizationController } from './controller/authorization.controller';
+import { AuthorizationService } from './service/authorization.service';
 
 @Module({
   imports: [
@@ -83,6 +86,7 @@ import { PostDomainService } from './domain-service/post.domain-service';
       PostView,
       PostEmoji,
       Notification,
+      Authorization
     ]),
     PassportModule.register({
       session: true,
@@ -98,6 +102,7 @@ import { PostDomainService } from './domain-service/post.domain-service';
     SearchController,
     ProfileController,
     MemberController,
+    AuthorizationController,
   ],
   providers: [
     // Service
@@ -112,6 +117,7 @@ import { PostDomainService } from './domain-service/post.domain-service';
     NotificationService,
     SearchService,
     ProfileService,
+    AuthorizationService,
 
     // DomainService
     FeedDomainService,
