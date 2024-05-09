@@ -294,6 +294,7 @@ export class PostController {
   }
 
   @ApiOperation({ summary: '오늘의 질문 불러오기' })
+  @ApiResponse({ type: TodayQuestionResponse })
   @Get('today-question')
   async getTodayQuestion(): Promise<TodayQuestionResponse> {
     const todayQuestion = await this.postService.getTodayQuestion();
