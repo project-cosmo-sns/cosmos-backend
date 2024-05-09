@@ -1,4 +1,10 @@
-import { GoneException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  GoneException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashTagDto } from 'src/dto/hash-tag-dto';
 import { CreatePostInfoDto } from 'src/dto/request/create-post-dto';
@@ -47,8 +53,7 @@ export class PostService {
     private readonly postHashTagQueryRepository: PostHashTagQueryRepository,
     private readonly postEmojiQueryRepository: PostEmojiQueryRepository,
     private readonly postDomainService: PostDomainService,
-
-  ) { }
+  ) {}
 
   async createPost(memberId: number, dto: CreatePostInfoDto): Promise<CreatePostResponse> {
     const member = await this.memberRepository.findOneBy({ id: memberId });
@@ -66,11 +71,7 @@ export class PostService {
     return new CreatePostResponse(post.id);
   }
 
-  async getPostList(
-    memberId: number,
-    userGeneration: number,
-    sortPostList: SortPostList,
-  ) {
+  async getPostList(memberId: number, userGeneration: number, sortPostList: SortPostList) {
     const sortBy = sortPostList.sortBy;
     if (typeof memberId === 'undefined' && (sortBy === ListSortBy.BY_FOLLOW || sortBy === ListSortBy.BY_GENERATION)) {
       throw new UnauthorizedException('로그인이 필요합니다.');
@@ -81,14 +82,14 @@ export class PostService {
       sortPostList,
       sortBy,
       sortCategory,
-      userGeneration
+      userGeneration,
     );
     const totalCount = await this.postQueryRepository.getAllPostListTotalCount(
       memberId,
       sortPostList,
       sortBy,
       sortCategory,
-      userGeneration
+      userGeneration,
     );
 
     const postInfo = await Promise.all(
@@ -176,15 +177,23 @@ export class PostService {
 
   async increasePostViewCount(postId: number, memberId: number): Promise<void> {
     const postInfo = await this.postDomainService.getPostIsNotDeleted(postId);
-    if (memberId) {
-      await this.postViewRepository.save({ postId, memberId });
+
+    if (memberId === postInfo.memberId) {
+      return;
     }
+
+    await this.postViewRepository.save({ postId, memberId });
+
     postInfo.plusPostViewCount(postInfo.viewCount);
     await this.postRepository.save(postInfo);
   }
 
   async getPostCommentList(postId: number, memberId: number, paginationRequest: PaginationRequest) {
-    const postCommentList = await this.postCommentQueryRepository.getPostCommentList(postId, memberId, paginationRequest);
+    const postCommentList = await this.postCommentQueryRepository.getPostCommentList(
+      postId,
+      memberId,
+      paginationRequest,
+    );
     const totalCount = await this.postCommentQueryRepository.getPostCommentListCount(postId);
 
     const postCommentInfo = postCommentList.map((commentList) => GetPostCommentList.from(commentList));
@@ -387,7 +396,7 @@ export class PostDetailDto {
     createdAt: Date,
     isMine: boolean,
     hashTags: GetHashTagDetailInfo[],
-    emojis: GetEmojiDetailInfo[]
+    emojis: GetEmojiDetailInfo[],
   ) {
     this.id = id;
     this.category = category;

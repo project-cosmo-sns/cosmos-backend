@@ -51,7 +51,7 @@ export class PostController {
     private readonly postService: PostService,
     private readonly imageService: ImageService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   @ApiOperation({ summary: '포스트 작성' })
   @ApiResponse({ type: CreatePostResponse })
@@ -89,10 +89,7 @@ export class PostController {
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
   @ApiResponse({ type: PostDetailResponse })
   @Get(':postId/detail')
-  async getPostDetail(
-    @Req() req,
-    @Param('postId', ParseIntPipe) postId: number
-  ): Promise<PostDetailResponse> {
+  async getPostDetail(@Req() req, @Param('postId', ParseIntPipe) postId: number): Promise<PostDetailResponse> {
     const postDetail = await this.postService.getPostDetail(postId, req.user.id);
     return PostDetailResponse.from(postDetail);
   }
@@ -144,12 +141,11 @@ export class PostController {
     return this.postService.removePostEmoji(postId, req.user.id, emojiCode);
   }
 
-  @Roles('anyone')
   @ApiOperation({ summary: '포스트 조회수 증가' })
   @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
   @Post(':postId/view-count/increase')
   async increasePostViewCount(@Req() req, @Param('postId', ParseIntPipe) postId: number): Promise<void> {
-    const userId = req.user?.id;
+    const userId = req.user.id;
     return this.postService.increasePostViewCount(postId, userId);
   }
 
