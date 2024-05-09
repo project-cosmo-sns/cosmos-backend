@@ -2,9 +2,11 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { FeedDomainService } from 'src/domain-service/feed.domain-service';
+import { MemberDomainService } from 'src/domain-service/member.domain-service';
+import { NotificationDomainService } from 'src/domain-service/notification.domain-service';
 import { GetFeedDetailResponseDto } from 'src/dto/response/get-feed-detail.response.dto';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
-import { EmojiType } from 'src/entity/common/Enums';
+import { EmojiType, NotificationType } from 'src/entity/common/Enums';
 import { Feed } from 'src/entity/feed.entity';
 import { FeedEmoji } from 'src/entity/feed_emoji.entity';
 import { FeedImage } from 'src/entity/feed_image.entity';
@@ -21,7 +23,9 @@ export class FeedService {
     private readonly feedQueryRepository: FeedQueryRepository,
     private readonly feedEmojiQueryRepository: FeedEmojiQueryRepository,
     private readonly feedDomainService: FeedDomainService,
-  ) { }
+    private readonly memberDomainService: MemberDomainService,
+    private readonly notificationDomainService: NotificationDomainService,
+  ) {}
 
   async postFeed(memberId: number, content: string, imageUrls: string[]): Promise<void> {
     const feed = new Feed();
@@ -95,8 +99,8 @@ export class FeedService {
           emojis: feedEmojis.map((emoji) => ({
             emojiCode: emoji.emojiCode,
             emojiCount: emoji.emojiCount,
-            isClicked: emoji.isClicked
-          }))
+            isClicked: emoji.isClicked,
+          })),
         };
 
         return GetFeedResponseDto.from({ writer, feed });
@@ -134,8 +138,8 @@ export class FeedService {
         emojis: feedEmojis.map((emoji) => ({
           emojiCode: emoji.emojiCode,
           emojiCount: emoji.emojiCount,
-          isClicked: emoji.isClicked
-        }))
+          isClicked: emoji.isClicked,
+        })),
       },
     );
   }
@@ -157,11 +161,7 @@ export class FeedService {
   }
 
   async postFeedEmoji(feedId: number, memberId: number, emoji: string) {
-    const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
-
-    if (!feed) {
-      throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
-    }
+    const feed = await this.feedDomainService.getFeedIsNotDeleted(feedId);
 
     feed.plusEmojiCount(feed.emojiCount);
     await this.feedRepository.save(feed);
@@ -170,6 +170,22 @@ export class FeedService {
       feedId,
       memberId,
       emoji,
+    });
+
+    await this.feedEmojiNotification(feed.memberId, memberId, feedId);
+  }
+
+  private async feedEmojiNotification(receivedMemberId, sendMemberId, feedId) {
+    const sendMember = await this.memberDomainService.getMemberIsNotDeletedById(sendMemberId);
+
+    await this.notificationDomainService.saveNotification({
+      receivedMemberId,
+      sendMemberId,
+      notificationType: JSON.stringify({
+        type: NotificationType.CREATE_FEED_EMOJI,
+        feedId,
+      }),
+      content: `${sendMember.nickname}님이 회원님의 피드에 이모지를 남겼습니다.`,
     });
   }
 
