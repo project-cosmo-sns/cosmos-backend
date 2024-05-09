@@ -4,10 +4,10 @@ export class TodayQuestionResponse {
   @ApiProperty()
   postId!: number;
   @ApiProperty()
-  question!: string;
+  title!: string;
 
-  constructor(postId: number, question: string) {
+  constructor(postId: number, title: string) {
     this.postId = postId;
-    this.question = question;
+    this.title = title;
   }
 }

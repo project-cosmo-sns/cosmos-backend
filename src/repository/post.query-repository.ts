@@ -153,7 +153,7 @@ export class PostQueryRepository {
       .where("post.category ='오늘의 질문'")
       .select([
         'post.id as postId',
-        'post.title as question'
+        'post.title as title'
       ])
       .orderBy('RAND()')
       .limit(1)
@@ -186,5 +186,5 @@ export class GetPostDetailTuple extends GetPostTuple {
 
 export class RandomQuestionTuple {
   postId!: number;
-  question!: string;
+  title!: string;
 }

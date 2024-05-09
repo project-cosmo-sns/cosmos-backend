@@ -297,6 +297,6 @@ export class PostController {
   @Get('today-question')
   async getTodayQuestion(): Promise<TodayQuestionResponse> {
     const todayQuestion = await this.postService.getTodayQuestion();
-    return new TodayQuestionResponse(todayQuestion.postId, todayQuestion.question);
+    return new TodayQuestionResponse(todayQuestion.postId, todayQuestion.title);
   }
 }
