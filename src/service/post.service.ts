@@ -1,4 +1,10 @@
-import { GoneException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  GoneException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashTagDto } from 'src/dto/hash-tag-dto';
 import { CreatePostInfoDto } from 'src/dto/request/create-post-dto';
@@ -172,9 +178,11 @@ export class PostService {
   async increasePostViewCount(postId: number, memberId: number): Promise<void> {
     const postInfo = await this.postDomainService.getPostIsNotDeleted(postId);
 
-    if (memberId) {
-      await this.postViewRepository.save({ postId, memberId });
+    if (postId === postInfo.id) {
+      return;
     }
+
+    await this.postViewRepository.save({ postId, memberId });
 
     postInfo.plusPostViewCount(postInfo.viewCount);
     await this.postRepository.save(postInfo);
