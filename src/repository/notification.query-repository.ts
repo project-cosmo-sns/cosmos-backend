@@ -36,7 +36,7 @@ export class NotificationQueryRepository {
     return this.dataSource
       .createQueryBuilder()
       .from(Notification, 'notification')
-      .innerJoin(Member, 'member', 'notification.memberId = member.id')
+      .innerJoin(Member, 'member', 'notification.sendMemberId = member.id')
       .where('notification.memberId = :memberId', { memberId });
   }
 }
