@@ -178,7 +178,7 @@ export class PostService {
   async increasePostViewCount(postId: number, memberId: number): Promise<void> {
     const postInfo = await this.postDomainService.getPostIsNotDeleted(postId);
 
-    if (postId === postInfo.id) {
+    if (memberId === postInfo.memberId) {
       return;
     }
 
