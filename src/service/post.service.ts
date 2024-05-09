@@ -27,6 +27,7 @@ import { PostEmojiQueryRepository } from 'src/repository/post-emoji.query-reposi
 import { PostHashTagQueryRepository } from 'src/repository/post-hash-tag.query-repository';
 import { PostCommentQueryRepository } from 'src/repository/post-comment.query-repository';
 import { PostDomainService } from 'src/domain-service/post.domain-service';
+import { TodayQuestionResponse } from 'src/dto/response/today-question.response';
 
 @Injectable()
 export class PostService {
@@ -278,6 +279,14 @@ export class PostService {
     const hashTagSearchTuples = await this.postHashTagQueryRepository.getHashTagSearchList(hashTagResult);
     const hashTagSearchInfo = hashTagSearchTuples.map((hashTagSearch) => GetHashTagSearch.from(hashTagSearch));
     return hashTagSearchInfo;
+  }
+
+  async getTodayQuestion(): Promise<TodayQuestionResponse> {
+    const randomQuestion = await this.postQueryRepository.getRandomQuestion();
+    if (!randomQuestion) {
+      return new TodayQuestionResponse(0, '');
+    }
+    return randomQuestion;
   }
 
   private async saveHashTags(postId: number, hashTags: HashTagDto[]): Promise<void> {
