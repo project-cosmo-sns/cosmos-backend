@@ -15,11 +15,11 @@ export class AuthorizationController {
     private readonly authorizationService: AuthorizationService,
     private readonly configService: ConfigService,
     private readonly imageService: ImageService,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: '인증 보내기' })
   @Post('')
-  async postAuthorizationINfo(@Req() req, @Body() authorizationRequest: AuthorizationRequest): Promise<void> {
+  async postAuthorizationInfo(@Req() req, @Body() authorizationRequest: AuthorizationRequest): Promise<void> {
     return this.authorizationService.postAuthorizationInfo(req.user.id, authorizationRequest);
   }
 
