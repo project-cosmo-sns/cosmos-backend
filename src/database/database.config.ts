@@ -19,6 +19,7 @@ export class TypeORMConfigService implements TypeOrmOptionsFactory {
       migrations: ['src/database/migrations/*.ts'],
       synchronize: false,
       logging: true,
+      timezone: '+09:00',
     };
   }
 }
