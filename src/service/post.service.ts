@@ -34,6 +34,8 @@ import { PostHashTagQueryRepository } from 'src/repository/post-hash-tag.query-r
 import { PostCommentQueryRepository } from 'src/repository/post-comment.query-repository';
 import { PostDomainService } from 'src/domain-service/post.domain-service';
 import { TodayQuestionResponse } from 'src/dto/response/today-question.response';
+import { NotificationDomainService } from 'src/domain-service/notification.domain-service';
+import { MemberDomainService } from 'src/domain-service/member.domain-service';
 
 @Injectable()
 export class PostService {
@@ -53,6 +55,8 @@ export class PostService {
     private readonly postHashTagQueryRepository: PostHashTagQueryRepository,
     private readonly postEmojiQueryRepository: PostEmojiQueryRepository,
     private readonly postDomainService: PostDomainService,
+    private readonly memberDomainService: MemberDomainService,
+    private readonly notificationDomainService: NotificationDomainService,
   ) {}
 
   async createPost(memberId: number, dto: CreatePostInfoDto): Promise<CreatePostResponse> {
@@ -156,6 +160,8 @@ export class PostService {
       memberId,
       emoji,
     });
+
+    await this.postEmojiNotification(postInfo.memberId, memberId, postId);
   }
 
   async removePostEmoji(postId: number, memberId: number, emojiCode: string) {
@@ -323,32 +329,32 @@ export class PostService {
   }
 
   private async newPostCommentNotification(receivedMemberId, sendMemberId, postId, commentId) {
-    if (receivedMemberId === sendMemberId) {
-      return;
-    }
+    const sendMember = await this.memberDomainService.getMemberIsNotDeletedById(sendMemberId);
 
-    try {
-      const sendMember = await this.memberQueryRepository.getMemberIsNotDeletedById(sendMemberId);
-
-      if (!sendMember) {
-        throw new NotFoundException('해당 회원을 찾을 수 없습니다.');
-      }
-
-      const notification = new Notification();
-
-      notification.memberId = receivedMemberId;
-      notification.sendMemberId = sendMemberId;
-      notification.notificationType = JSON.stringify({
-        type: NotificationType.CREATE_POST_COMMENT,
+    await this.notificationDomainService.saveNotification({
+      receivedMemberId,
+      sendMemberId,
+      notificationType: JSON.stringify({
+        type: NotificationType.CREATE_FEED_COMMENT,
         postId,
         commentId,
-      });
-      notification.content = `${sendMember.nickname}님이 회원님의 포스트에 댓글을 남겼습니다.`;
+      }),
+      content: `${sendMember.nickname}님이 회원님의 포스트에 댓글을 남겼습니다.`,
+    });
+  }
 
-      await this.notificationRepository.save(notification);
-    } catch (e) {
-      console.error(e);
-    }
+  private async postEmojiNotification(receivedMemberId, sendMemberId, postId) {
+    const sendMember = await this.memberDomainService.getMemberIsNotDeletedById(sendMemberId);
+
+    await this.notificationDomainService.saveNotification({
+      receivedMemberId,
+      sendMemberId,
+      notificationType: JSON.stringify({
+        type: NotificationType.CREATE_POST_EMOJI,
+        postId,
+      }),
+      content: `${sendMember.nickname}님이 회원님의 포스트에 이모지를 남겼습니다.`,
+    });
   }
 }
 

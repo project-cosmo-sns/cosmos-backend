@@ -61,6 +61,8 @@ import { PostDomainService } from './domain-service/post.domain-service';
 import { Authorization } from './entity/authorization.entity';
 import { AuthorizationController } from './controller/authorization.controller';
 import { AuthorizationService } from './service/authorization.service';
+import { NotificationDomainService } from './domain-service/notification.domain-service';
+import { MemberDomainService } from './domain-service/member.domain-service';
 
 @Module({
   imports: [
@@ -86,7 +88,7 @@ import { AuthorizationService } from './service/authorization.service';
       PostView,
       PostEmoji,
       Notification,
-      Authorization
+      Authorization,
     ]),
     PassportModule.register({
       session: true,
@@ -122,6 +124,8 @@ import { AuthorizationService } from './service/authorization.service';
     // DomainService
     FeedDomainService,
     PostDomainService,
+    MemberDomainService,
+    NotificationDomainService,
 
     // QueryRepository
     MemberQueryRepository,
@@ -148,4 +152,4 @@ import { AuthorizationService } from './service/authorization.service';
     Logger,
   ],
 })
-export class AppModule { }
+export class AppModule {}

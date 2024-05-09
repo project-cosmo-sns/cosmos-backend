@@ -1,6 +1,8 @@
 import { ConflictException, GoneException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
+import { MemberDomainService } from 'src/domain-service/member.domain-service';
+import { NotificationDomainService } from 'src/domain-service/notification.domain-service';
 import { GetFollowerList } from 'src/dto/get-follower-list';
 import { GetFollowingList } from 'src/dto/get-following-list';
 import { NotificationType } from 'src/entity/common/Enums';
@@ -19,7 +21,9 @@ export class FollowService {
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
     private readonly followQueryRepository: FollowQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
-  ) { }
+    private readonly memberDomainService: MemberDomainService,
+    private readonly notificationDomainService: NotificationDomainService,
+  ) {}
 
   async followMember(followingMemberId: number, followerMemberId: number): Promise<void> {
     const followInfo = await this.followRepository.findOneBy({ followerMemberId, followingMemberId });
@@ -32,7 +36,7 @@ export class FollowService {
     }
     await this.followRepository.save({ followerMemberId, followingMemberId });
 
-    // this.followNotification(followingMemberId, followerMemberId);
+    this.followNotification(followingMemberId, followerMemberId);
   }
 
   async unFollowMember(followingMemberId: number, followerMemberId: number): Promise<void> {
@@ -70,26 +74,16 @@ export class FollowService {
   }
 
   private async followNotification(followingMemberId, followerMemberId) {
-    try {
-      const followerMember = await this.memberQueryRepository.getMemberIsNotDeletedById(followerMemberId);
+    const followingMember = await this.memberDomainService.getMemberIsNotDeletedById(followingMemberId);
 
-      if (!followerMember) {
-        throw new NotFoundException('해당 회원을 찾을 수 없습니다.');
-      }
-
-      const notification = new Notification();
-
-      notification.memberId = followingMemberId;
-      notification.sendMemberId = followerMemberId;
-      notification.notificationType = JSON.stringify({
+    await this.notificationDomainService.saveNotification({
+      receivedMemberId: followerMemberId,
+      sendMemberId: followingMemberId,
+      notificationType: JSON.stringify({
         type: NotificationType.FOLLOW,
         followerMemberId,
-      });
-      notification.content = `${followerMember.nickname}님이 회원님을 팔로우했습니다.`;
-
-      await this.notificationRepository.save(notification);
-    } catch (e) {
-      console.error(e);
-    }
+      }),
+      content: `${followingMember.nickname}님이 회원님을 팔로우했습니다.`,
+    });
   }
 }

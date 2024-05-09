@@ -3,6 +3,8 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { FeedDomainService } from 'src/domain-service/feed.domain-service';
+import { MemberDomainService } from 'src/domain-service/member.domain-service';
+import { NotificationDomainService } from 'src/domain-service/notification.domain-service';
 import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
 import { NotificationType } from 'src/entity/common/Enums';
 import { Feed } from 'src/entity/feed.entity';
@@ -24,6 +26,8 @@ export class FeedCommentService {
     private readonly feedQueryRepository: FeedQueryRepository,
     private readonly feedCommentQueryRepository: FeedCommentQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
+    private readonly memberDomainService: MemberDomainService,
+    private readonly notificationDomainService: NotificationDomainService,
   ) {}
 
   async getFeedCommentList(
@@ -153,32 +157,18 @@ export class FeedCommentService {
   }
 
   private async newFeedCommentNotification(receivedMemberId, sendMemberId, feedId, commentId) {
-    if (receivedMemberId === sendMemberId) {
-      return;
-    }
+    const sendMember = await this.memberDomainService.getMemberIsNotDeletedById(sendMemberId);
 
-    try {
-      const sendMember = await this.memberQueryRepository.getMemberIsNotDeletedById(sendMemberId);
-
-      if (!sendMember) {
-        throw new NotFoundException('해당 회원을 찾을 수 없습니다.');
-      }
-
-      const notification = new Notification();
-
-      notification.memberId = receivedMemberId;
-      notification.sendMemberId = sendMemberId;
-      notification.notificationType = JSON.stringify({
+    await this.notificationDomainService.saveNotification({
+      receivedMemberId,
+      sendMemberId,
+      notificationType: JSON.stringify({
         type: NotificationType.CREATE_FEED_COMMENT,
         feedId,
         commentId,
-      });
-      notification.content = `${sendMember.nickname}님이 회원님의 피드에 댓글을 남겼습니다.`;
-
-      await this.notificationRepository.save(notification);
-    } catch (e) {
-      console.error(e);
-    }
+      }),
+      content: `${sendMember.nickname}님이 회원님의 피드에 댓글을 남겼습니다.`,
+    });
   }
 }
 

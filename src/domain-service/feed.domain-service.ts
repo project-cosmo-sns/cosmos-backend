@@ -9,7 +9,7 @@ export class FeedDomainService {
     const feed = await this.feedQueryRepository.getIsNotDeletedFeed(feedId);
 
     if (!feed) {
-      throw new NotFoundException('해당 포스트를 찾을 수 없습니다.');
+      throw new NotFoundException('해당 피드를 찾을 수 없습니다.');
     }
 
     return feed;
