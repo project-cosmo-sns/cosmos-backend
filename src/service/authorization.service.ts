@@ -64,4 +64,19 @@ export class AuthorizationService {
     await this.authorizationRepository.remove(authorizedMemberInfo);
 
   }
+
+  async declineAuthorization(adminId: number, memberId: number) {
+    await this.memberDomainService.getMemberIsAdmin(adminId);
+
+    const memberInfo = await this.memberDomainService.getMemberIsNotDeletedById(memberId);
+    if (memberInfo.isAuthorized) {
+      throw new NotFoundException('이미 인증된 사용자입니다.');
+    }
+    const authorizedMemberInfo = await this.authorizationRepository.findOneBy({ memberId });
+    if (!authorizedMemberInfo) {
+      throw new NotFoundException('해당 인증을 찾을 수 없습니다.');
+    }
+    await this.authorizationRepository.remove(authorizedMemberInfo);
+
+  }
 }

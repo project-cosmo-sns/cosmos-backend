@@ -34,4 +34,11 @@ export class AdminController {
   async postAuthorizationAcception(@Req() req, @Param('memberId') memberId: number): Promise<void> {
     await this.authorizationService.acceptAuthorization(req.user.id, memberId);
   }
+
+  @ApiOperation({ summary: '인증 거절' })
+  @ApiParam({ name: 'memberId', required: true, description: '멤버 id' })
+  @Post(':memberId/decline')
+  async postAuthorizationDecline(@Req() req, @Param('memberId') memberId: number): Promise<void> {
+    await this.authorizationService.declineAuthorization(req.user.id, memberId);
+  }
 }
