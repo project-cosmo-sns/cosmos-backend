@@ -63,6 +63,8 @@ import { AuthorizationController } from './controller/authorization.controller';
 import { AuthorizationService } from './service/authorization.service';
 import { NotificationDomainService } from './domain-service/notification.domain-service';
 import { MemberDomainService } from './domain-service/member.domain-service';
+import { AdminController } from './controller/admin.controller';
+import { AuthorizationQueryRepository } from './repository/authorization.query-repository';
 
 @Module({
   imports: [
@@ -105,6 +107,7 @@ import { MemberDomainService } from './domain-service/member.domain-service';
     ProfileController,
     MemberController,
     AuthorizationController,
+    AdminController,
   ],
   providers: [
     // Service
@@ -140,6 +143,7 @@ import { MemberDomainService } from './domain-service/member.domain-service';
     PostHashTagQueryRepository,
     FeedEmojiQueryRepository,
     PostEmojiQueryRepository,
+    AuthorizationQueryRepository,
 
     // Strategy
     GithubStrategy,
@@ -152,4 +156,4 @@ import { MemberDomainService } from './domain-service/member.domain-service';
     Logger,
   ],
 })
-export class AppModule {}
+export class AppModule { }
