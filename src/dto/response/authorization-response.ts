@@ -3,6 +3,8 @@ import { GetAuthorizationLists } from '../get-authorization.dto';
 
 export class AuthorizationResponse {
   @ApiProperty()
+  memberId!: number;
+  @ApiProperty()
   nickname!: string;
   @ApiProperty()
   generation!: number;
@@ -12,11 +14,13 @@ export class AuthorizationResponse {
   createdAt!: Date;
 
   constructor(
+    memberId: number,
     nickname: string,
     generation: number,
     imageUrl: string,
     createdAt: Date,
   ) {
+    this.memberId = memberId;
     this.nickname = nickname;
     this.generation = generation;
     this.imageUrl = imageUrl;
@@ -27,6 +31,7 @@ export class AuthorizationResponse {
     return dto.map(
       (getAuthorizationLists) =>
         new AuthorizationResponse(
+          getAuthorizationLists.memberId,
           getAuthorizationLists.nickname,
           getAuthorizationLists.generation,
           getAuthorizationLists.imageUrl,

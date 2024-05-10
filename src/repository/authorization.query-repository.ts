@@ -13,6 +13,7 @@ export class AuthorizationQueryRepository {
     : Promise<GetAuthorizationListTuple[]> {
     const list = await this.getAuthorizationListBaseQuery()
       .select([
+        'member.id as memberId',
         'member.nickname as nickname',
         'authorization.generation as generation',
         'authorization.image_url as imageUrl',
@@ -40,6 +41,7 @@ export class AuthorizationQueryRepository {
 }
 
 export class GetAuthorizationListTuple {
+  memberId: number;
   nickname: string;
   generation: number;
   imageUrl: string;
