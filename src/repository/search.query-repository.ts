@@ -38,16 +38,16 @@ export class SearchQueryRepository {
     return plainToInstance(GetSearchPostByHashTagTuple, postList);
   }
 
-  async searchPostByHashTagTotalCount(keyword: string) {
+  async searchPostByHashTagTotalCount(keyword: string): Promise<number> {
     return await this.searchPostByHashTagBaseQuery(keyword).getCount();
   }
 
   private searchPostByHashTagBaseQuery(keyword: string) {
     return this.dataSource
       .createQueryBuilder()
-      .from(HashTag, 'hashTag')
-      .innerJoin(PostHashTag, 'postHashTag', 'postHashTag.hashTagId = hashTag.id')
-      .innerJoin(Post, 'post', 'post.id = postHashTag.postId')
+      .from(Post, 'post')
+      .innerJoin(PostHashTag, 'postHashTag', 'postHashTag.postId = post.id')
+      .innerJoin(HashTag, 'hashTag', 'hashTag.id = postHashTag.hashTagId')
       .innerJoin(Member, 'member', 'member.id = post.memberId')
       .where('hashTag.tagName LIKE :keyword', { keyword: `%${keyword}%` })
       .andWhere('post.deletedAt IS NULL')
