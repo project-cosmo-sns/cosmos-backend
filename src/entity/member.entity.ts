@@ -89,4 +89,8 @@ export class Member {
         break;
     }
   }
+
+  setIsAuthorized() {
+    this.isAuthorized = true;
+  }
 }

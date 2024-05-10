@@ -1,17 +1,20 @@
 import { GetAuthorizationListTuple } from 'src/repository/authorization.query-repository';
 
 export class GetAuthorizationLists {
+  memberId!: number;
   nickname!: string;
   generation!: number;
   imageUrl!: string;
   createdAt!: Date;
 
   constructor(
+    memberId: number,
     nickname: string,
     generation: number,
     imageUrl: string,
     createdAt: Date
   ) {
+    this.memberId = memberId;
     this.nickname = nickname;
     this.generation = generation;
     this.imageUrl = imageUrl;
@@ -20,6 +23,7 @@ export class GetAuthorizationLists {
 
   static from(tuple: GetAuthorizationListTuple) {
     return new GetAuthorizationLists(
+      tuple.memberId,
       tuple.nickname,
       tuple.generation,
       tuple.imageUrl,
