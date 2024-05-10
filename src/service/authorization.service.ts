@@ -1,10 +1,11 @@
-import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { MemberDomainService } from 'src/domain-service/member.domain-service';
 import { GetAuthorizationLists } from 'src/dto/get-authorization.dto';
 import { AuthorizationRequest } from "src/dto/request/authorization.request";
 import { Authorization } from "src/entity/authorization.entity";
+import { Member } from 'src/entity/member.entity';
 import { AuthorizationQueryRepository } from 'src/repository/authorization.query-repository';
 import { Repository } from "typeorm";
 
@@ -12,6 +13,7 @@ import { Repository } from "typeorm";
 export class AuthorizationService {
   constructor(
     @InjectRepository(Authorization) private readonly authorizationRepository: Repository<Authorization>,
+    @InjectRepository(Member) private readonly memberRepository: Repository<Member>,
     private readonly memberDomainService: MemberDomainService,
     private readonly authorizationQueryRepository: AuthorizationQueryRepository,
   ) { }
@@ -44,5 +46,22 @@ export class AuthorizationService {
     })
 
     return { authorizationInfo, totalCount };
+  }
+
+  async acceptAuthorization(adminId: number, memberId: number) {
+    await this.memberDomainService.getMemberIsAdmin(adminId);
+
+    const memberInfo = await this.memberDomainService.getMemberIsNotDeletedById(memberId);
+    if (memberInfo.isAuthorized) {
+      throw new NotFoundException('이미 인증된 사용자입니다.');
+    }
+    memberInfo.setIsAuthorized();
+    await this.memberRepository.save(memberInfo);
+    const authorizedMemberInfo = await this.authorizationRepository.findOneBy({ memberId });
+    if (!authorizedMemberInfo) {
+      throw new NotFoundException('해당 인증을 찾을 수 없습니다.');
+    }
+    await this.authorizationRepository.remove(authorizedMemberInfo);
+
   }
 }

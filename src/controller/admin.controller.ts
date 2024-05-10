@@ -1,5 +1,5 @@
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PaginationResponse } from 'src/common/pagination/pagination-response';
 import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator';
@@ -26,5 +26,12 @@ export class AdminController {
       options: paginationRequest,
       totalCount,
     });
+  }
+
+  @ApiOperation({ summary: '인증 승인' })
+  @ApiParam({ name: 'memberId', required: true, description: '멤버 id' })
+  @Post(':memberId/accept')
+  async postAuthorizationAcception(@Req() req, @Param('memberId') memberId: number): Promise<void> {
+    await this.authorizationService.acceptAuthorization(req.user.id, memberId);
   }
 }
