@@ -6,7 +6,7 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class MemberQueryRepository {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
+  constructor(@InjectDataSource() private readonly dataSource: DataSource) { }
 
   async getMember(externalId: string): Promise<Member | undefined> {
     const member = await this.dataSource
@@ -47,6 +47,18 @@ export class MemberQueryRepository {
 
     return plainToInstance(GetNotificationSettingTuple, notificationSetting);
   }
+
+  async getMemberIsAdmin(memberId: number): Promise<Member | undefined> {
+    const member = await this.dataSource
+      .createQueryBuilder()
+      .from(Member, 'member')
+      .where('member.id = :memberId', { memberId })
+      .andWhere('member.isAdmin = TRUE')
+      .select('member')
+      .getOne();
+    return plainToInstance(Member, member);
+  }
+
 }
 
 class GetNotificationSettingTuple {
