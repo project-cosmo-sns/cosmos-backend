@@ -35,9 +35,7 @@ export class AuthorizationService {
   }
 
   async getAuthorizationList(memberId: number, request: PaginationRequest) {
-    if (!(memberId === 1 || (memberId >= 3 && memberId <= 8) || memberId === 21)) {
-      throw new UnauthorizedException('권한이 없습니다.');
-    }
+    await this.memberDomainService.getMemberIsAdmin(memberId);
     const authorizationLists = await this.authorizationQueryRepository.getAuthorizationList(request);
     const totalCount = await this.authorizationQueryRepository.getAuthorizationListCount();
 

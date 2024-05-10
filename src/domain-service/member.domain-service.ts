@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { MemberQueryRepository } from 'src/repository/member.query-repository';
 
 @Injectable()
 export class MemberDomainService {
-  constructor(private readonly memberQueryRepository: MemberQueryRepository) {}
+  constructor(private readonly memberQueryRepository: MemberQueryRepository) { }
 
   async getMemberIsNotDeletedById(memberId: number) {
     const member = await this.memberQueryRepository.getMemberIsNotDeletedById(memberId);
@@ -13,5 +13,12 @@ export class MemberDomainService {
     }
 
     return member;
+  }
+
+  async getMemberIsAdmin(memberId: number) {
+    const member = await this.memberQueryRepository.getMemberIsAdmin(memberId);
+    if (!member) {
+      throw new UnauthorizedException('권한이 없습니다.');
+    }
   }
 }

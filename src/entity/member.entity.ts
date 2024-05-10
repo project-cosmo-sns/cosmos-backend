@@ -33,6 +33,9 @@ export class Member {
   @Column({ name: 'is_authorized', type: 'boolean', nullable: false })
   isAuthorized: boolean;
 
+  @Column({ name: 'is_admin', type: 'boolean', nullable: false })
+  isAdmin: boolean;
+
   @Column({ name: 'social_provider', type: 'enum', enum: SocialProvider, nullable: false })
   socialProvider!: SocialProvider;
 
