@@ -8,9 +8,9 @@ import { RolesGuard } from 'src/guard/roles.guard';
 @Controller('member')
 @UseGuards(RolesGuard)
 export class MemberController {
-  constructor(private readonly configService: ConfigService) { }
+  constructor(private readonly configService: ConfigService) {}
 
-  @ApiOperation({ summary: '본인 프로필 이미지' })
+  @ApiOperation({ summary: '로그인 멤버 요약' })
   @ApiResponse({ type: GetMyProfileImageUrlResponse })
   @Get('/summary')
   async getMyProfileImageUrl(@Req() req): Promise<GetMyProfileImageUrlResponse> {
