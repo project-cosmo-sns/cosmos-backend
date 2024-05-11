@@ -2,13 +2,16 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class GetMyProfileImageUrlResponse {
   @ApiProperty()
+  isLogin: boolean;
+  @ApiProperty()
   profileImageUrl?: string;
 
-  constructor(profileImageUrl) {
+  constructor(isLogin, profileImageUrl) {
+    this.isLogin = isLogin;
     this.profileImageUrl = profileImageUrl;
   }
 
-  static from(profileImageUrl: string) {
-    return new GetMyProfileImageUrlResponse(profileImageUrl);
+  static from(isLogin: boolean, profileImageUrl?: string) {
+    return new GetMyProfileImageUrlResponse(isLogin, profileImageUrl);
   }
 }

@@ -12,9 +12,13 @@ export class MemberController {
 
   @ApiOperation({ summary: '본인 프로필 이미지' })
   @ApiResponse({ type: GetMyProfileImageUrlResponse })
-  @Get('/profile-image-url')
+  @Get('/summary')
   async getMyProfileImageUrl(@Req() req): Promise<GetMyProfileImageUrlResponse> {
-    return GetMyProfileImageUrlResponse.from(req.user.profileImageUrl);
+    if (req.user) {
+      return GetMyProfileImageUrlResponse.from(true, req.user.profileImageUrl);
+    } else {
+      return GetMyProfileImageUrlResponse.from(false, undefined);
+    }
   }
 
   @ApiOperation({ summary: '유저 로그아웃' })
