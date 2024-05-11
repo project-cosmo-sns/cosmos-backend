@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { GetOthersProfileDto } from "../get-others-profile";
+import { AuthorizationStatusType } from 'src/entity/common/Enums';
 
 export class OthersProfileInfoResponse {
   @ApiProperty()
@@ -18,6 +19,8 @@ export class OthersProfileInfoResponse {
   followingCount!: number;
   @ApiProperty()
   isAuthorized!: boolean;
+  @ApiProperty({ enum: AuthorizationStatusType })
+  authorizationStatus!: AuthorizationStatusType;
   @ApiProperty()
   isFollowed!: boolean;
 
@@ -30,7 +33,8 @@ export class OthersProfileInfoResponse {
     followerCount: number,
     followingCount: number,
     isAuthorized: boolean,
-    isFollowed: boolean
+    authorizationStatus: AuthorizationStatusType,
+    isFollowed: boolean,
   ) {
     this.memberId = memberId;
     this.nickname = nickname;
@@ -40,6 +44,7 @@ export class OthersProfileInfoResponse {
     this.followerCount = followerCount;
     this.followingCount = followingCount;
     this.isAuthorized = isAuthorized;
+    this.authorizationStatus = authorizationStatus;
     this.isFollowed = isFollowed;
   }
 
@@ -53,7 +58,8 @@ export class OthersProfileInfoResponse {
       getOthersProfileDto.followerCount,
       getOthersProfileDto.followingCount,
       getOthersProfileDto.isAuthorized,
-      getOthersProfileDto.isFollowed
+      getOthersProfileDto.authorizationStatus,
+      getOthersProfileDto.isFollowed,
     )
   }
 

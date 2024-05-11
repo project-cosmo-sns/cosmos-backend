@@ -1,3 +1,4 @@
+import { AuthorizationStatusType } from 'src/entity/common/Enums';
 import { GetMyProfileTuple } from 'src/repository/profile.query-repository';
 
 export class GetMyProfileDto {
@@ -8,6 +9,7 @@ export class GetMyProfileDto {
   followerCount!: number;
   followingCount!: number;
   isAuthorized!: boolean;
+  authorizationStatus!: AuthorizationStatusType;
 
   constructor(
     nickname: string,
@@ -17,6 +19,7 @@ export class GetMyProfileDto {
     followerCount: number,
     followingCount: number,
     isAuthorized: boolean,
+    authorizationStatus: AuthorizationStatusType,
   ) {
     this.nickname = nickname;
     this.generation = generation;
@@ -25,6 +28,7 @@ export class GetMyProfileDto {
     this.followerCount = followerCount;
     this.followingCount = followingCount;
     this.isAuthorized = isAuthorized;
+    this.authorizationStatus = authorizationStatus;
   }
 
   static from(tuple: GetMyProfileTuple) {
@@ -36,6 +40,7 @@ export class GetMyProfileDto {
       tuple.followerCount,
       tuple.followingCount,
       tuple.isAuthorized,
+      tuple.authorizationStatus,
     );
   }
 }

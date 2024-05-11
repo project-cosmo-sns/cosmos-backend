@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { GetMyProfileDto } from '../get-my-profile';
+import { AuthorizationStatusType } from 'src/entity/common/Enums';
 
 export class MyProfileInfoResponse {
   @ApiProperty()
@@ -16,6 +17,8 @@ export class MyProfileInfoResponse {
   followingCount!: number;
   @ApiProperty()
   isAuthorized!: boolean;
+  @ApiProperty({ enum: AuthorizationStatusType })
+  authorizationStatus!: AuthorizationStatusType;
 
   constructor(
     nickname: string,
@@ -25,6 +28,7 @@ export class MyProfileInfoResponse {
     followerCount: number,
     followingCount: number,
     isAuthorized: boolean,
+    authorizationStatus: AuthorizationStatusType,
   ) {
     this.nickname = nickname;
     this.generation = generation;
@@ -33,6 +37,7 @@ export class MyProfileInfoResponse {
     this.followerCount = followerCount;
     this.followingCount = followingCount;
     this.isAuthorized = isAuthorized;
+    this.authorizationStatus = authorizationStatus;
   }
 
   static from(getMyProfileDto: GetMyProfileDto) {
@@ -44,6 +49,7 @@ export class MyProfileInfoResponse {
       getMyProfileDto.followerCount,
       getMyProfileDto.followingCount,
       getMyProfileDto.isAuthorized,
+      getMyProfileDto.authorizationStatus,
     );
   }
 }
