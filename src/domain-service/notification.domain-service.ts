@@ -27,9 +27,7 @@ export class NotificationDomainService {
 
       notification.memberId = receivedMemberId;
       notification.sendMemberId = sendMemberId;
-      notification.notificationType = JSON.stringify({
-        notificationType,
-      });
+      notification.notificationType = JSON.stringify(notificationType);
       notification.content = content;
 
       await this.notificationRepository.save(notification);
