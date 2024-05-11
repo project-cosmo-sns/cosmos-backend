@@ -79,10 +79,10 @@ export class FollowService {
     await this.notificationDomainService.saveNotification({
       receivedMemberId: followerMemberId,
       sendMemberId: followingMemberId,
-      notificationType: JSON.stringify({
+      notificationType: {
         type: NotificationType.FOLLOW,
         followerMemberId,
-      }),
+      },
       content: `${followingMember.nickname}님이 회원님을 팔로우했습니다.`,
     });
   }

@@ -334,11 +334,11 @@ export class PostService {
     await this.notificationDomainService.saveNotification({
       receivedMemberId,
       sendMemberId,
-      notificationType: JSON.stringify({
+      notificationType: {
         type: NotificationType.CREATE_FEED_COMMENT,
         postId,
         commentId,
-      }),
+      },
       content: `${sendMember.nickname}님이 회원님의 포스트에 댓글을 남겼습니다.`,
     });
   }
@@ -349,10 +349,10 @@ export class PostService {
     await this.notificationDomainService.saveNotification({
       receivedMemberId,
       sendMemberId,
-      notificationType: JSON.stringify({
+      notificationType: {
         type: NotificationType.CREATE_POST_EMOJI,
         postId,
-      }),
+      },
       content: `${sendMember.nickname}님이 회원님의 포스트에 이모지를 남겼습니다.`,
     });
   }

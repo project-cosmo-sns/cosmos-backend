@@ -181,10 +181,10 @@ export class FeedService {
     await this.notificationDomainService.saveNotification({
       receivedMemberId,
       sendMemberId,
-      notificationType: JSON.stringify({
+      notificationType: {
         type: NotificationType.CREATE_FEED_EMOJI,
         feedId,
-      }),
+      },
       content: `${sendMember.nickname}님이 회원님의 피드에 이모지를 남겼습니다.`,
     });
   }

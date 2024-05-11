@@ -162,11 +162,11 @@ export class FeedCommentService {
     await this.notificationDomainService.saveNotification({
       receivedMemberId,
       sendMemberId,
-      notificationType: JSON.stringify({
+      notificationType: {
         type: NotificationType.CREATE_FEED_COMMENT,
         feedId,
         commentId,
-      }),
+      },
       content: `${sendMember.nickname}님이 회원님의 피드에 댓글을 남겼습니다.`,
     });
   }
