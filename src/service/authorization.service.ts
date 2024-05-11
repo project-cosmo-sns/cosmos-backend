@@ -5,6 +5,7 @@ import { MemberDomainService } from 'src/domain-service/member.domain-service';
 import { GetAuthorizationLists } from 'src/dto/get-authorization.dto';
 import { AuthorizationRequest } from "src/dto/request/authorization.request";
 import { Authorization } from "src/entity/authorization.entity";
+import { AuthorizationStatusType } from "src/entity/common/Enums";
 import { Member } from 'src/entity/member.entity';
 import { AuthorizationQueryRepository } from 'src/repository/authorization.query-repository';
 import { Repository } from "typeorm";
@@ -20,8 +21,16 @@ export class AuthorizationService {
 
   async postAuthorizationInfo(memberId: number, request: AuthorizationRequest): Promise<void> {
     const memberInfo = await this.memberDomainService.getMemberIsNotDeletedById(memberId);
+    //기존 인증
     if (memberInfo.isAuthorized === true) {
       throw new BadRequestException('이미 승인된 유저입니다.');
+    }
+
+    if (memberInfo.authorizationStatus === AuthorizationStatusType.ACCEPT) {
+      throw new BadRequestException('이미 승인된 유저입니다.');
+    }
+    if (memberInfo.authorizationStatus === AuthorizationStatusType.PENDING) {
+      throw new BadRequestException('승인 대기중입니다.');
     }
 
     const authorizationInfo = await this.authorizationRepository.findOneBy({ memberId });
@@ -52,10 +61,19 @@ export class AuthorizationService {
     await this.memberDomainService.getMemberIsAdmin(adminId);
 
     const memberInfo = await this.memberDomainService.getMemberIsNotDeletedById(memberId);
+    //기존 인증
     if (memberInfo.isAuthorized) {
       throw new NotFoundException('이미 인증된 사용자입니다.');
     }
+
+    if (memberInfo.authorizationStatus === AuthorizationStatusType.ACCEPT) {
+      throw new NotFoundException('이미 인증된 사용자입니다.');
+    }
+
+    //기존 인증
     memberInfo.setIsAuthorized();
+
+    memberInfo.setAuthorizationAccept();
     await this.memberRepository.save(memberInfo);
     const authorizedMemberInfo = await this.authorizationRepository.findOneBy({ memberId });
     if (!authorizedMemberInfo) {
@@ -69,9 +87,18 @@ export class AuthorizationService {
     await this.memberDomainService.getMemberIsAdmin(adminId);
 
     const memberInfo = await this.memberDomainService.getMemberIsNotDeletedById(memberId);
+    //기존 인증
     if (memberInfo.isAuthorized) {
       throw new NotFoundException('이미 인증된 사용자입니다.');
     }
+
+    if (memberInfo.authorizationStatus === AuthorizationStatusType.ACCEPT) {
+      throw new NotFoundException('이미 인증된 사용자입니다.');
+    }
+
+    memberInfo.setAuthorizationDecline();
+    await this.memberRepository.save(memberInfo);
+
     const authorizedMemberInfo = await this.authorizationRepository.findOneBy({ memberId });
     if (!authorizedMemberInfo) {
       throw new NotFoundException('해당 인증을 찾을 수 없습니다.');
