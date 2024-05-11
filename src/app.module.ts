@@ -65,6 +65,8 @@ import { NotificationDomainService } from './domain-service/notification.domain-
 import { MemberDomainService } from './domain-service/member.domain-service';
 import { AdminController } from './controller/admin.controller';
 import { AuthorizationQueryRepository } from './repository/authorization.query-repository';
+import { GoogleStrategy } from './strategy/google-strategy';
+import { GoogleAuthGuard } from './guard/google-auth.guard';
 
 @Module({
   imports: [
@@ -147,9 +149,11 @@ import { AuthorizationQueryRepository } from './repository/authorization.query-r
 
     // Strategy
     GithubStrategy,
+    GoogleStrategy,
 
     // Guard
     GithubAuthGuard,
+    GoogleAuthGuard,
     RolesGuard,
 
     // ETC
