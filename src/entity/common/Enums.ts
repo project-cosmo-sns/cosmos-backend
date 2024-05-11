@@ -37,3 +37,9 @@ export enum CategoryType {
   INFORMATION_SHARING = 'INFORMATION_SHARING',
   TODAYS_QUESTION = 'TODAYS_QUESTION',
 }
+
+export enum AuthorizationStatusType {
+  NONE = 'NONE',
+  PENDING = 'PENDING',
+  ACCEPT = 'ACCEPT',
+}

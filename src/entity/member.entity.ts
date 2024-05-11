@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { SocialProvider } from './common/SocialProvider';
-import { NotificationSettingType } from './common/Enums';
+import { AuthorizationStatusType, NotificationSettingType } from './common/Enums';
 
 @Entity({
   name: 'member',
@@ -32,6 +32,9 @@ export class Member {
 
   @Column({ name: 'is_authorized', type: 'boolean', nullable: false })
   isAuthorized: boolean;
+
+  @Column({ name: 'authorization_status', type: 'enum', enum: AuthorizationStatusType, nullable: false })
+  authorizationStatus: AuthorizationStatusType;
 
   @Column({ name: 'is_admin', type: 'boolean', nullable: false })
   isAdmin: boolean;
@@ -92,5 +95,13 @@ export class Member {
 
   setIsAuthorized() {
     this.isAuthorized = true;
+  }
+
+  setAuthorizationAccept() {
+    this.authorizationStatus = AuthorizationStatusType.ACCEPT;
+  }
+
+  setAuthorizationDecline() {
+    this.authorizationStatus = AuthorizationStatusType.NONE;
   }
 }

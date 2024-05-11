@@ -8,6 +8,7 @@ import { GetPostTuple } from './post.query-repository';
 import { Post } from 'src/entity/post.entity';
 import { Feed } from 'src/entity/feed.entity';
 import { GetFeedTuple } from './feed.query-repository';
+import { AuthorizationStatusType } from 'src/entity/common/Enums';
 
 @Injectable()
 export class ProfileQueryRepository {
@@ -30,6 +31,7 @@ export class ProfileQueryRepository {
         'member.profile_image_url as profileImageUrl',
         'member.introduce as introduce',
         'member.is_authorized as isAuthorized',
+        'member.authorization_status as authorizationStatus',
         'CASE WHEN follow.following_member_id IS NOT NULL THEN true ELSE false END as isFollowed',
       ])
       .where('member.id = :memberId', { memberId })
@@ -47,6 +49,7 @@ export class ProfileQueryRepository {
         'member.profile_image_url as profileImageUrl',
         'member.introduce as introduce',
         'member.is_authorized as isAuthorized',
+        'member.authorization_status as authorizationStatus'
       ])
       .where('member.id = :memberId', { memberId })
       .getRawOne();
@@ -151,6 +154,7 @@ export class GetOthersProfileTuple {
   followingCount!: number;
   @Transform(({ value }) => Boolean(value))
   isAuthorized!: boolean;
+  authorizationStatus!: AuthorizationStatusType;
   @Transform(({ value }) => value === '1')
   isFollowed!: boolean;
 }
@@ -164,6 +168,7 @@ export class GetMyProfileTuple {
   followingCount!: number;
   @Transform(({ value }) => Boolean(value))
   isAuthorized!: boolean;
+  authorizationStatus!: AuthorizationStatusType;
 }
 
 export class FollowerCountTuple {
