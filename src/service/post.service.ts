@@ -57,7 +57,7 @@ export class PostService {
     private readonly postDomainService: PostDomainService,
     private readonly memberDomainService: MemberDomainService,
     private readonly notificationDomainService: NotificationDomainService,
-  ) {}
+  ) { }
 
   async createPost(memberId: number, dto: CreatePostInfoDto): Promise<CreatePostResponse> {
     const member = await this.memberRepository.findOneBy({ id: memberId });
@@ -306,10 +306,9 @@ export class PostService {
 
   private async saveHashTags(postId: number, hashTags: HashTagDto[]): Promise<void> {
     await Promise.all(
-      hashTags.map(async (hashTagDto) => {
+      hashTags.map(async (hashTagDto, index) => {
         const hashTag = await this.hashTagRepository.findOneBy({ tagName: hashTagDto.tagName });
         let hashTagId = 0;
-
         if (!hashTag) {
           const newHashTag = await this.hashTagRepository.save({
             tagName: hashTagDto.tagName,
@@ -319,10 +318,10 @@ export class PostService {
         } else {
           hashTagId = hashTag.id;
         }
-
         await this.postHashTagRepository.save({
           postId,
           hashTagId,
+          order: index + 1
         });
       }),
     );

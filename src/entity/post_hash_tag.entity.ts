@@ -11,6 +11,9 @@ export class PostHashTag {
   @Column({ name: 'hash_tag_id', nullable: false })
   hashTagId!: number;
 
+  @Column({ name: 'order', nullable: false })
+  order!: number;
+
   @CreateDateColumn({ type: 'timestamp', name: 'created_at', nullable: false })
   createdAt!: Date;
 
