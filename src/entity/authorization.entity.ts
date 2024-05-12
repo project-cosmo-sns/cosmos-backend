@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity({ name: 'authorization' })
 export class Authorization {
@@ -14,9 +14,16 @@ export class Authorization {
   @Column({ name: 'image_url', nullable: false, length: 200 })
   imageUrl!: string;
 
+  @Column({ name: 'is_checked', type: 'boolean', nullable: false })
+  isChecked: boolean;
+
   @CreateDateColumn({ type: 'timestamp', name: 'created_at', nullable: false })
   createdAt!: Date;
 
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', nullable: false })
   updatedAt!: Date;
+
+  setIsChecked() {
+    this.isChecked = true;
+  }
 }
