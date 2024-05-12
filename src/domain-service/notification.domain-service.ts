@@ -1,9 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NotificationType } from 'src/entity/common/Enums';
 import { Member } from 'src/entity/member.entity';
 import { Notification } from 'src/entity/notification.entity';
-import { MemberQueryRepository } from 'src/repository/member.query-repository';
 import { Repository } from 'typeorm';
 import { MemberDomainService } from './member.domain-service';
 

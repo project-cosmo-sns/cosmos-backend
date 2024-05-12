@@ -97,7 +97,8 @@ export class Member {
     this.isAuthorized = true;
   }
 
-  setAuthorizationAccept() {
+  setAuthorizationAccept(generation: number) {
+    this.generation = generation;
     this.authorizationStatus = AuthorizationStatusType.ACCEPT;
   }
 
