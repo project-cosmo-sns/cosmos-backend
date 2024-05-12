@@ -5,7 +5,7 @@ export class HashTag {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ name: 'tag_name', nullable: false, length: 45 })
+  @Column({ name: 'tag_name', nullable: false, length: 15 })
   tagName!: string;
 
   @Column({ nullable: false, length: 10 })

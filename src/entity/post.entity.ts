@@ -8,7 +8,7 @@ export class Post {
   @Column({ name: 'member_id', nullable: false })
   memberId!: number;
 
-  @Column({ nullable: false, length: 100 })
+  @Column({ nullable: false, length: 50 })
   title!: string;
 
   @Column({ type: 'text', nullable: false })
