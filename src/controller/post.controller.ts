@@ -50,7 +50,7 @@ export class PostController {
     private readonly postService: PostService,
     private readonly imageService: ImageService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: '포스트 작성' })
   @ApiResponse({ type: CreatePostResponse })
@@ -288,6 +288,7 @@ export class PostController {
     return new ImageResponse(uploadUrl);
   }
 
+  @Roles('anyone')
   @ApiOperation({ summary: '오늘의 질문 불러오기' })
   @ApiResponse({ type: TodayQuestionResponse })
   @Get('today-question')
