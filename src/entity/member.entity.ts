@@ -30,9 +30,6 @@ export class Member {
   @Column({ name: 'is_follow_notification', type: 'boolean', nullable: false })
   isFollowNotification: boolean;
 
-  @Column({ name: 'is_authorized', type: 'boolean', nullable: false })
-  isAuthorized: boolean;
-
   @Column({ name: 'authorization_status', type: 'enum', enum: AuthorizationStatusType, nullable: false })
   authorizationStatus: AuthorizationStatusType;
 
@@ -91,10 +88,6 @@ export class Member {
         this.isFollowNotification = false;
         break;
     }
-  }
-
-  setIsAuthorized() {
-    this.isAuthorized = true;
   }
 
   setAuthorizationAccept(generation: number) {
