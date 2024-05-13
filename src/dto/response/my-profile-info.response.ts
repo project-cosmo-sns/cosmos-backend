@@ -15,8 +15,6 @@ export class MyProfileInfoResponse {
   followerCount!: number;
   @ApiProperty()
   followingCount!: number;
-  @ApiProperty()
-  isAuthorized!: boolean;
   @ApiProperty({ enum: AuthorizationStatusType })
   authorizationStatus!: AuthorizationStatusType;
 
@@ -27,7 +25,6 @@ export class MyProfileInfoResponse {
     introduce: string,
     followerCount: number,
     followingCount: number,
-    isAuthorized: boolean,
     authorizationStatus: AuthorizationStatusType,
   ) {
     this.nickname = nickname;
@@ -36,7 +33,6 @@ export class MyProfileInfoResponse {
     this.introduce = introduce;
     this.followerCount = followerCount;
     this.followingCount = followingCount;
-    this.isAuthorized = isAuthorized;
     this.authorizationStatus = authorizationStatus;
   }
 
@@ -48,7 +44,6 @@ export class MyProfileInfoResponse {
       getMyProfileDto.introduce,
       getMyProfileDto.followerCount,
       getMyProfileDto.followingCount,
-      getMyProfileDto.isAuthorized,
       getMyProfileDto.authorizationStatus,
     );
   }

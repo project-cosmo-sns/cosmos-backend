@@ -9,7 +9,6 @@ export class GetOthersProfileDto {
   introduce!: string;
   followerCount!: number;
   followingCount!: number;
-  isAuthorized!: boolean;
   authorizationStatus!: AuthorizationStatusType;
   isFollowed!: boolean;
 
@@ -22,7 +21,6 @@ export class GetOthersProfileDto {
     introduce: string,
     followerCount: number,
     followingCount: number,
-    isAuthorized: boolean,
     authorizationStatus: AuthorizationStatusType,
     isFollowed: boolean,
   ) {
@@ -33,7 +31,6 @@ export class GetOthersProfileDto {
     this.introduce = introduce;
     this.followerCount = followerCount;
     this.followingCount = followingCount;
-    this.isAuthorized = isAuthorized;
     this.authorizationStatus = authorizationStatus;
     this.isFollowed = isFollowed;
   }
@@ -47,7 +44,6 @@ export class GetOthersProfileDto {
       tuple.introduce,
       tuple.followerCount,
       tuple.followingCount,
-      tuple.isAuthorized,
       tuple.authorizationStatus,
       tuple.isFollowed,
     );
