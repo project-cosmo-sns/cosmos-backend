@@ -334,7 +334,7 @@ export class PostService {
       receivedMemberId,
       sendMemberId,
       notificationType: {
-        type: NotificationType.CREATE_FEED_COMMENT,
+        type: NotificationType.CREATE_POST_COMMENT,
         postId,
         commentId,
       },
