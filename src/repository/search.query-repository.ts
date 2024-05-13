@@ -30,6 +30,7 @@ export class SearchQueryRepository {
         'post.emojiCount as postEmojiCount',
         'post.createdAt as postCreatedAt',
       ])
+      .groupBy('post.id')
       .limit(requestDto.take)
       .offset(requestDto.getSkip())
       .orderBy('post.created_at', requestDto.order)
