@@ -81,7 +81,7 @@ export class FollowService {
       sendMemberId: followingMemberId,
       notificationType: {
         type: NotificationType.FOLLOW,
-        followerMemberId,
+        followingMemberId,
       },
       content: `${followingMember.nickname}님이 회원님을 팔로우했습니다.`,
     });
