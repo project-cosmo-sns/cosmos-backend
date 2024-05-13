@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/common/roles/roles.decorator';
 import { GetMyProfileImageUrlResponse } from 'src/dto/response/get-my-profile-image-url.response';
 import { RolesGuard } from 'src/guard/roles.guard';
 
@@ -10,6 +11,7 @@ import { RolesGuard } from 'src/guard/roles.guard';
 export class MemberController {
   constructor(private readonly configService: ConfigService) {}
 
+  @Roles('anyone')
   @ApiOperation({ summary: '로그인 멤버 요약' })
   @ApiResponse({ type: GetMyProfileImageUrlResponse })
   @Get('/summary')
