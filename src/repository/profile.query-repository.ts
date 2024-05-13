@@ -48,7 +48,6 @@ export class ProfileQueryRepository {
         'member.generation as generation',
         'member.profile_image_url as profileImageUrl',
         'member.introduce as introduce',
-        'member.is_authorized as isAuthorized',
         'member.authorization_status as authorizationStatus'
       ])
       .where('member.id = :memberId', { memberId })
@@ -166,8 +165,6 @@ export class GetMyProfileTuple {
   introduce!: string;
   followerCount!: number;
   followingCount!: number;
-  @Transform(({ value }) => Boolean(value))
-  isAuthorized!: boolean;
   authorizationStatus!: AuthorizationStatusType;
 }
 
