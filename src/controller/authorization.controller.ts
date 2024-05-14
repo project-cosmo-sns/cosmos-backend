@@ -4,13 +4,13 @@ import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/roles/roles.decorator';
 import { AuthorizationRequest } from 'src/dto/request/authorization.request';
 import { ImageResponse } from 'src/dto/response/image.response';
-import { RolesGuard } from 'src/guard/roles.guard';
+import { LoginGuard } from 'src/guard/login.guard';
 import { AuthorizationService } from 'src/service/authorization.service';
 import { ImageService } from 'src/service/image.service';
 
 @ApiTags('인증')
 @Controller('authorization')
-@UseGuards(RolesGuard)
+@UseGuards(LoginGuard)
 export class AuthorizationController {
   constructor(
     private readonly authorizationService: AuthorizationService,
@@ -18,14 +18,12 @@ export class AuthorizationController {
     private readonly imageService: ImageService,
   ) { }
 
-  @Roles('anyone')
   @ApiOperation({ summary: '인증 보내기' })
   @Post('')
   async postAuthorizationInfo(@Req() req, @Body() authorizationRequest: AuthorizationRequest): Promise<void> {
     return this.authorizationService.postAuthorizationInfo(req.user.id, authorizationRequest);
   }
 
-  @Roles('anyone')
   @ApiOperation({ summary: '인증 이미지 url 불러오기' })
   @Get('/image/create')
   async createUploadURL(): Promise<ImageResponse> {
@@ -35,7 +33,6 @@ export class AuthorizationController {
     return new ImageResponse(uploadUrl);
   }
 
-  @Roles('anyone')
   @ApiOperation({ summary: '인증 이미지 삭제' })
   @ApiParam({ name: 'imageUrls', required: true, description: '이미지 urls' })
   @Delete('/image/delete')
