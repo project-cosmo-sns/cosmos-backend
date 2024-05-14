@@ -98,4 +98,8 @@ export class Member {
   setAuthorizationDecline() {
     this.authorizationStatus = AuthorizationStatusType.NONE;
   }
+
+  setAuthorizationPending() {
+    this.authorizationStatus = AuthorizationStatusType.PENDING;
+  }
 }

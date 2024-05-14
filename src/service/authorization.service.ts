@@ -17,7 +17,7 @@ export class AuthorizationService {
     @InjectRepository(Member) private readonly memberRepository: Repository<Member>,
     private readonly memberDomainService: MemberDomainService,
     private readonly authorizationQueryRepository: AuthorizationQueryRepository,
-  ) {}
+  ) { }
 
   async postAuthorizationInfo(memberId: number, request: AuthorizationRequest): Promise<void> {
     const memberInfo = await this.memberDomainService.getMemberIsNotDeletedById(memberId);
@@ -33,6 +33,9 @@ export class AuthorizationService {
     if (authorizationInfo) {
       throw new BadRequestException('인증 대기중입니다.');
     }
+
+    memberInfo.setAuthorizationPending();
+    await this.memberRepository.save(memberInfo);
 
     await this.authorizationRepository.save({
       memberId,
