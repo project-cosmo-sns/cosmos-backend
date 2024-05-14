@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Transform, plainToInstance } from 'class-transformer';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
+import { ListSortBy } from 'src/entity/common/Enums';
 import { Feed } from 'src/entity/feed.entity';
+import { Follow } from 'src/entity/follow.entity';
 import { Member } from 'src/entity/member.entity';
 import { DataSource } from 'typeorm';
 
@@ -10,8 +12,13 @@ import { DataSource } from 'typeorm';
 export class FeedQueryRepository {
   constructor(@InjectDataSource() private readonly dataSource: DataSource) { }
 
-  async getFeedList(paginationRequest: PaginationRequest): Promise<GetFeedTuple[]> {
-    const feedList = await this.getFeedBaseQuery()
+  async getFeedList(
+    paginationRequest: PaginationRequest,
+    memberId: number,
+    sortBy: ListSortBy,
+    generation?: number,
+  ): Promise<GetFeedTuple[]> {
+    const feedList = await this.getFeedListBaseQuery(memberId, sortBy, generation)
       .select([
         'member.id as writerId',
         'member.nickname as writerNickname',
@@ -32,8 +39,12 @@ export class FeedQueryRepository {
     return plainToInstance(GetFeedTuple, feedList);
   }
 
-  async getFeedListCount(): Promise<number> {
-    return await this.getFeedBaseQuery().getCount();
+  async getFeedListCount(
+    memberId: number,
+    sortBy: ListSortBy,
+    generation?: number,
+  ): Promise<number> {
+    return await this.getFeedListBaseQuery(memberId, sortBy, generation).getCount();
   }
 
   async getFeedDetail(feedId: number, memberId: number): Promise<GetFeedTuple> {
@@ -58,6 +69,24 @@ export class FeedQueryRepository {
     return plainToInstance(GetFeedTuple, feed);
   }
 
+  private getFeedListBaseQuery(
+    memberId: number,
+    sortBy: ListSortBy,
+    generation?: number
+  ) {
+    let query = this.getFeedBaseQuery()
+
+    if (sortBy === ListSortBy.BY_FOLLOW) {
+      query = query
+        .innerJoin(Follow, 'follow', 'follower_member_id=member.id')
+        .andWhere('following_member_id = :memberId', { memberId });
+    }
+    else if (sortBy === ListSortBy.BY_GENERATION) {
+      query = query.andWhere('member.generation = :generation', { generation });
+    }
+    return query;
+  }
+
   private getFeedBaseQuery() {
     return this.dataSource
       .createQueryBuilder()
@@ -66,6 +95,7 @@ export class FeedQueryRepository {
       .where('feed.deletedAt IS NULL')
       .andWhere('member.deletedAt IS NULL');
   }
+
 
   async getIsNotDeletedFeed(feedId: number): Promise<Feed | undefined> {
     const feed = this.dataSource

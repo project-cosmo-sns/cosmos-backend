@@ -30,6 +30,7 @@ import { ApiPaginatedResponse } from 'src/common/pagination/pagination.decorator
 import { Roles } from 'src/common/roles/roles.decorator';
 import { PostFeedCommentRequestDto } from 'src/dto/request/post-feed-comment.request';
 import { PostFeedRequestDto } from 'src/dto/request/post-feed.request.dto';
+import { SortFeedList } from 'src/dto/request/sort-feed-list.request';
 import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
 import { GetFeedDetailResponseDto } from 'src/dto/response/get-feed-detail.response.dto';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
@@ -90,14 +91,15 @@ export class FeedController {
   @Get('/list')
   async getFeedList(
     @Req() req,
-    @Query() paginationRequest: PaginationRequest
+    @Query() sortFeedList: SortFeedList
   ): Promise<PaginationResponse<GetFeedResponseDto>> {
     const userId = req.user?.id;
-    const { feedList, totalCount } = await this.feedService.getFeedList(paginationRequest, userId);
+    const userGeneration = req.user?.generation;
+    const { feedList, totalCount } = await this.feedService.getFeedList(sortFeedList, userId, userGeneration);
 
     return PaginationResponse.of({
       data: feedList,
-      options: paginationRequest,
+      options: sortFeedList,
       totalCount,
     });
   }
