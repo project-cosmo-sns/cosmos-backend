@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Query, Redirect, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
@@ -40,9 +40,14 @@ export class ProfileController {
   async getOthersProfileInfo(
     @Param('memberId', ParseIntPipe) memberId: number,
     @Req() req,
-  ): Promise<OthersProfileInfoResponse> {
+    @Res() res,
+  ): Promise<void> {
+    if (memberId === req.user.id) {
+      return res.redirect('mine');
+    }
     const othersProfileInfo = await this.profileService.getOthersProfileInfo(memberId, req.user.id);
-    return OthersProfileInfoResponse.from(othersProfileInfo);
+    const response = OthersProfileInfoResponse.from(othersProfileInfo);
+    res.send(response);
   }
 
   @ApiOperation({ summary: '나의 프로필 수정' })
