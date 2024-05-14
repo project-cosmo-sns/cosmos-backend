@@ -67,6 +67,8 @@ import { AdminController } from './controller/admin.controller';
 import { AuthorizationQueryRepository } from './repository/authorization.query-repository';
 import { GoogleStrategy } from './strategy/google-strategy';
 import { GoogleAuthGuard } from './guard/google-auth.guard';
+import { AdminGuard } from './guard/admin.guard';
+import { LoginGuard } from './guard/login.guard';
 
 @Module({
   imports: [
@@ -155,6 +157,8 @@ import { GoogleAuthGuard } from './guard/google-auth.guard';
     GithubAuthGuard,
     GoogleAuthGuard,
     RolesGuard,
+    AdminGuard,
+    LoginGuard,
 
     // ETC
     Logger,
