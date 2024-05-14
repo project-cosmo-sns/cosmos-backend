@@ -4,9 +4,11 @@ import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { FeedDomainService } from 'src/domain-service/feed.domain-service';
 import { MemberDomainService } from 'src/domain-service/member.domain-service';
 import { NotificationDomainService } from 'src/domain-service/notification.domain-service';
+import { SortFeedList } from 'src/dto/request/sort-feed-list.request';
+import { SortPostList } from 'src/dto/request/sort-post-list.request';
 import { GetFeedDetailResponseDto } from 'src/dto/response/get-feed-detail.response.dto';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
-import { EmojiType, NotificationType } from 'src/entity/common/Enums';
+import { EmojiType, ListSortBy, NotificationType } from 'src/entity/common/Enums';
 import { Feed } from 'src/entity/feed.entity';
 import { FeedEmoji } from 'src/entity/feed_emoji.entity';
 import { FeedImage } from 'src/entity/feed_image.entity';
@@ -25,7 +27,7 @@ export class FeedService {
     private readonly feedDomainService: FeedDomainService,
     private readonly memberDomainService: MemberDomainService,
     private readonly notificationDomainService: NotificationDomainService,
-  ) {}
+  ) { }
 
   async postFeed(memberId: number, content: string, imageUrls: string[]): Promise<void> {
     const feed = new Feed();
@@ -71,11 +73,17 @@ export class FeedService {
   }
 
   async getFeedList(
-    paginationRequest: PaginationRequest,
+    sortFeedList: SortFeedList,
     memberId: number,
+    userGeneration: number,
   ): Promise<{ feedList: GetFeedResponseDto[]; totalCount: number }> {
-    const getFeedListTuple = await this.feedQueryRepository.getFeedList(paginationRequest);
-    const totalCount = await this.feedQueryRepository.getFeedListCount();
+    const sortBy = sortFeedList.sortBy;
+    if (typeof memberId === 'undefined' && (sortBy === ListSortBy.BY_FOLLOW || sortBy === ListSortBy.BY_GENERATION)) {
+      throw new UnauthorizedException('로그인이 필요합니다.');
+    }
+
+    const getFeedListTuple = await this.feedQueryRepository.getFeedList(sortFeedList, memberId, sortBy, userGeneration);
+    const totalCount = await this.feedQueryRepository.getFeedListCount(memberId, sortBy, userGeneration);
 
     const feedList = await Promise.all(
       getFeedListTuple.map(async (item) => {
