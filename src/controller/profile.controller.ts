@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Query, Redirect, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
@@ -23,8 +35,9 @@ export class ProfileController {
     private readonly profileService: ProfileService,
     private readonly imageService: ImageService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
+  @Roles('login')
   @ApiOperation({ summary: '나의 프로필 조회' })
   @ApiResponse({ type: MyProfileInfoResponse })
   @Get('mine')
@@ -37,11 +50,7 @@ export class ProfileController {
   @ApiParam({ name: 'memberId', required: true, description: '유저 id' })
   @ApiResponse({ type: OthersProfileInfoResponse })
   @Get(':memberId')
-  async getOthersProfileInfo(
-    @Param('memberId', ParseIntPipe) memberId: number,
-    @Req() req,
-    @Res() res,
-  ): Promise<void> {
+  async getOthersProfileInfo(@Param('memberId', ParseIntPipe) memberId: number, @Req() req, @Res() res): Promise<void> {
     if (memberId === req.user.id) {
       return res.redirect('mine');
     }
@@ -102,7 +111,11 @@ export class ProfileController {
     @Query() paginationRequest: PaginationRequest,
     @Req() req,
   ): Promise<PaginationResponse<GetFeedResponseDto>> {
-    const { feedList, totalCount } = await this.profileService.getOthersFeedList(memberId, paginationRequest, req.user.id);
+    const { feedList, totalCount } = await this.profileService.getOthersFeedList(
+      memberId,
+      paginationRequest,
+      req.user.id,
+    );
 
     return PaginationResponse.of({
       data: feedList,
@@ -120,7 +133,11 @@ export class ProfileController {
     @Query() paginationRequest: PaginationRequest,
     @Req() req,
   ): Promise<PaginationResponse<ProfilePostResponse>> {
-    const { postInfo, totalCount } = await this.profileService.getOthersPostList(memberId, paginationRequest, req.user.id);
+    const { postInfo, totalCount } = await this.profileService.getOthersPostList(
+      memberId,
+      paginationRequest,
+      req.user.id,
+    );
     const postData = postInfo.map((info) => ProfilePostResponse.from(info));
     return PaginationResponse.of({
       data: postData,
