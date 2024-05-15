@@ -76,12 +76,18 @@ export class FollowService {
   private async followNotification(followingMemberId, followerMemberId) {
     const followingMember = await this.memberDomainService.getMemberIsNotDeletedById(followingMemberId);
 
+    const followerInfo = await this.followRepository.findOneBy({
+      followingMemberId: followerMemberId,
+      followerMemberId: followingMemberId,
+    });
+
     await this.notificationDomainService.saveNotification({
       receivedMemberId: followerMemberId,
       sendMemberId: followingMemberId,
       notificationType: {
         type: NotificationType.FOLLOW,
         followingMemberId,
+        isFollowing: !followerInfo ? false : true,
       },
       content: `${followingMember.nickname}님이 회원님을 팔로우했습니다.`,
     });
