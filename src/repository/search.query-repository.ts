@@ -87,6 +87,7 @@ export class SearchQueryRepository {
       .innerJoin(PostHashTag, 'post_hash_tag', 'post_hash_tag.hash_tag_id = hash_tag.id')
       .where('post_hash_tag.post_id = :postId', { postId })
       .select(['hash_tag.tagName as tagName', 'hash_tag.color as color'])
+      .orderBy('post_hash_tag.order', 'ASC')
       .getRawMany();
     return plainToInstance(GetSearchedPostHashTagTuple, searchedPostHashTag);
   }
