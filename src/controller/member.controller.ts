@@ -2,7 +2,9 @@ import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/roles/roles.decorator';
+import { GetMemberStatusResponse } from 'src/dto/response/get-member-status.response';
 import { GetMyProfileImageUrlResponse } from 'src/dto/response/get-my-profile-image-url.response';
+import { AuthorizationStatusType } from 'src/entity/common/Enums';
 import { RolesGuard } from 'src/guard/roles.guard';
 
 @ApiTags('멤버')
@@ -20,6 +22,25 @@ export class MemberController {
       return GetMyProfileImageUrlResponse.from(true, req.user.profileImageUrl);
     } else {
       return GetMyProfileImageUrlResponse.from(false, undefined);
+    }
+  }
+
+  @Roles('anyone')
+  @ApiOperation({ summary: '멤버 상태' })
+  @ApiResponse({ type: GetMemberStatusResponse })
+  @Get('/status')
+  async getMemberStatus(@Req() req): Promise<GetMemberStatusResponse> {
+    if (req.user) {
+      if (req.user.authorizationStatus === AuthorizationStatusType.ACCEPT) {
+        // 로그인 됐고, 승인된 경우
+        return GetMemberStatusResponse.from(true, true);
+      } else {
+        // 로그인 됐고, 승인된 안된 경우
+        return GetMemberStatusResponse.from(true, false);
+      }
+    } else {
+      // 로그인 안된 경우
+      return GetMemberStatusResponse.from(false, false);
     }
   }
 
