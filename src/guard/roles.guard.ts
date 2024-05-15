@@ -17,6 +17,12 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
+    if (role === 'login') {
+      if (user) {
+        return true;
+      }
+    }
+
     if (!user || user.authorizationStatus !== AuthorizationStatusType.ACCEPT) {
       throw new UnauthorizedException('인증되지 않은 사용자 입니다.');
     }

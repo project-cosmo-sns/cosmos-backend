@@ -68,7 +68,6 @@ import { AuthorizationQueryRepository } from './repository/authorization.query-r
 import { GoogleStrategy } from './strategy/google-strategy';
 import { GoogleAuthGuard } from './guard/google-auth.guard';
 import { AdminGuard } from './guard/admin.guard';
-import { LoginGuard } from './guard/login.guard';
 
 @Module({
   imports: [
@@ -158,10 +157,9 @@ import { LoginGuard } from './guard/login.guard';
     GoogleAuthGuard,
     RolesGuard,
     AdminGuard,
-    LoginGuard,
 
     // ETC
     Logger,
   ],
 })
-export class AppModule { }
+export class AppModule {}
