@@ -29,11 +29,6 @@ export class AuthorizationService {
       throw new BadRequestException('승인 대기중입니다.');
     }
 
-    const authorizationInfo = await this.authorizationRepository.findOneBy({ memberId });
-    if (authorizationInfo) {
-      throw new BadRequestException('인증 대기중입니다.');
-    }
-
     memberInfo.setAuthorizationPending();
     await this.memberRepository.save(memberInfo);
 
