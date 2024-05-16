@@ -62,7 +62,7 @@ async function bootstrap() {
       'https://localhost',
       'https://local.cosmo-sns.com:3000',
       'https://alpha.cosmo-sns.com',
-      'https://cosmo-sns.com',
+      'https://www.cosmo-sns.com',
     ],
     credentials: true,
   });
