@@ -5,7 +5,7 @@ import { MemberDomainService } from 'src/domain-service/member.domain-service';
 import { GetAuthorizationLists } from 'src/dto/get-authorization.dto';
 import { AuthorizationRequest } from 'src/dto/request/authorization.request';
 import { Authorization } from 'src/entity/authorization.entity';
-import { AuthorizationStatusType } from 'src/entity/common/Enums';
+import { AuthorizationJudgeType, AuthorizationStatusType } from 'src/entity/common/Enums';
 import { Member } from 'src/entity/member.entity';
 import { AuthorizationQueryRepository } from 'src/repository/authorization.query-repository';
 import { Repository } from 'typeorm';
@@ -60,7 +60,7 @@ export class AuthorizationService {
       throw new NotFoundException('이미 인증된 사용자입니다.');
     }
 
-    const authorizedMemberInfo = await this.authorizationRepository.findOneBy({ memberId });
+    const authorizedMemberInfo = await this.authorizationRepository.findOneBy({ memberId, checkStatus: AuthorizationJudgeType.NONE });
 
     if (!authorizedMemberInfo) {
       throw new NotFoundException('해당 인증을 찾을 수 없습니다.');
@@ -69,7 +69,7 @@ export class AuthorizationService {
     memberInfo.setAuthorizationAccept(authorizedMemberInfo.generation);
     await this.memberRepository.save(memberInfo);
 
-    authorizedMemberInfo.setIsChecked();
+    authorizedMemberInfo.setCheckStatusAccept();
     await this.authorizationRepository.save(authorizedMemberInfo);
   }
 
@@ -86,12 +86,12 @@ export class AuthorizationService {
 
     await this.memberRepository.save(memberInfo);
 
-    const authorizedMemberInfo = await this.authorizationRepository.findOneBy({ memberId });
+    const authorizedMemberInfo = await this.authorizationRepository.findOneBy({ memberId, checkStatus: AuthorizationJudgeType.NONE });
     if (!authorizedMemberInfo) {
       throw new NotFoundException('해당 인증을 찾을 수 없습니다.');
     }
 
-    authorizedMemberInfo.setIsChecked();
+    authorizedMemberInfo.setCheckStatusDecline();
 
     await this.authorizationRepository.save(authorizedMemberInfo);
   }
