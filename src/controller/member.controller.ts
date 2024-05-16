@@ -11,7 +11,7 @@ import { RolesGuard } from 'src/guard/roles.guard';
 @Controller('member')
 @UseGuards(RolesGuard)
 export class MemberController {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) { }
 
   @Roles('anyone')
   @ApiOperation({ summary: '로그인 멤버 요약' })
@@ -44,6 +44,7 @@ export class MemberController {
     }
   }
 
+  @Roles('login')
   @ApiOperation({ summary: '유저 로그아웃' })
   @Post('/logout')
   async handleRedirect(@Res() res) {
