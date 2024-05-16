@@ -1,4 +1,5 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { AuthorizationJudgeType } from './common/Enums';
 
 @Entity({ name: 'authorization' })
 export class Authorization {
@@ -14,8 +15,8 @@ export class Authorization {
   @Column({ name: 'image_url', nullable: false, length: 200 })
   imageUrl!: string;
 
-  @Column({ name: 'is_checked', type: 'boolean', nullable: false })
-  isChecked: boolean;
+  @Column({ name: 'check_status', type: 'enum', enum: AuthorizationJudgeType, nullable: false })
+  checkStatus: AuthorizationJudgeType;
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at', nullable: false })
   createdAt!: Date;
@@ -23,7 +24,11 @@ export class Authorization {
   @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', nullable: false })
   updatedAt!: Date;
 
-  setIsChecked() {
-    this.isChecked = true;
+  setCheckStatusAccept() {
+    this.checkStatus = AuthorizationJudgeType.ACCEPT;
+  }
+
+  setCheckStatusDecline() {
+    this.checkStatus = AuthorizationJudgeType.DECLINE;
   }
 }
