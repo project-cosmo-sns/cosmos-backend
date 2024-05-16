@@ -3,7 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { Transform, plainToInstance } from 'class-transformer';
 import { GetSearchMemberByNameRequestDto } from 'src/dto/request/get-search-member-by-name.request.dto';
 import { GetSearchPostByHashTagRequestDto } from 'src/dto/request/get-search-post-by-hash-tag.request.dto';
-import { EmojiType } from 'src/entity/common/Enums';
+import { AuthorizationStatusType, EmojiType } from 'src/entity/common/Enums';
 import { HashTag } from 'src/entity/hash_tag.entity';
 import { Member } from 'src/entity/member.entity';
 import { Post } from 'src/entity/post.entity';
@@ -119,7 +119,8 @@ export class SearchQueryRepository {
         'follow.following_member_id = :memberId AND follow.follower_member_id = member.id',
         { memberId },
       )
-      .where('member.nickname LIKE :keyword', { keyword: `%${keyword}%` });
+      .where('member.nickname LIKE :keyword', { keyword: `%${keyword}%` })
+      .andWhere('member.authorization_status = :status', { status: AuthorizationStatusType.ACCEPT });
   }
 }
 
