@@ -35,7 +35,8 @@ export class AuthorizationQueryRepository {
       .createQueryBuilder()
       .from(Authorization, 'authorization')
       .innerJoin(Member, 'member', 'member.id = authorization.member_id')
-      .where('member.deleted_at IS NULL');
+      .where('member.deleted_at IS NULL')
+      .where('authorization.is_checked = false');
     return query;
   }
 }
