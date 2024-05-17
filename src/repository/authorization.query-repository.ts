@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { Authorization } from 'src/entity/authorization.entity';
-import { AuthorizationJudgeType } from 'src/entity/common/Enums';
 import { Member } from 'src/entity/member.entity';
 import { DataSource } from 'typeorm';
 
@@ -37,7 +36,7 @@ export class AuthorizationQueryRepository {
       .from(Authorization, 'authorization')
       .innerJoin(Member, 'member', 'member.id = authorization.member_id')
       .where('member.deleted_at IS NULL')
-      .andWhere('authorization.check_status = :status', { status: AuthorizationJudgeType.NONE });
+      .andWhere('authorization.is_checked = FALSE');
     return query;
   }
 }
