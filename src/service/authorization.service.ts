@@ -5,7 +5,7 @@ import { MemberDomainService } from 'src/domain-service/member.domain-service';
 import { GetAuthorizationLists } from 'src/dto/get-authorization.dto';
 import { AuthorizationRequest } from 'src/dto/request/authorization.request';
 import { Authorization } from 'src/entity/authorization.entity';
-import { AuthorizationJudgeType, AuthorizationStatusType } from 'src/entity/common/Enums';
+import { AuthorizationStatusType } from 'src/entity/common/Enums';
 import { Member } from 'src/entity/member.entity';
 import { AuthorizationQueryRepository } from 'src/repository/authorization.query-repository';
 import { Repository } from 'typeorm';
@@ -27,6 +27,11 @@ export class AuthorizationService {
     }
     if (memberInfo.authorizationStatus === AuthorizationStatusType.PENDING) {
       throw new BadRequestException('승인 대기중입니다.');
+    }
+
+    const authorizationInfo = await this.authorizationRepository.findOneBy({ memberId });
+    if (authorizationInfo) {
+      throw new BadRequestException('거절된 인증이 존재합니다.');
     }
 
     memberInfo.setAuthorizationPending();
@@ -60,7 +65,7 @@ export class AuthorizationService {
       throw new NotFoundException('이미 인증된 사용자입니다.');
     }
 
-    const authorizedMemberInfo = await this.authorizationRepository.findOneBy({ memberId, checkStatus: AuthorizationJudgeType.NONE });
+    const authorizedMemberInfo = await this.authorizationRepository.findOneBy({ memberId, isChecked: false });
 
     if (!authorizedMemberInfo) {
       throw new NotFoundException('해당 인증을 찾을 수 없습니다.');
@@ -69,7 +74,7 @@ export class AuthorizationService {
     memberInfo.setAuthorizationAccept(authorizedMemberInfo.generation);
     await this.memberRepository.save(memberInfo);
 
-    authorizedMemberInfo.setCheckStatusAccept();
+    authorizedMemberInfo.setIsChecked();
     await this.authorizationRepository.save(authorizedMemberInfo);
   }
 
@@ -86,12 +91,12 @@ export class AuthorizationService {
 
     await this.memberRepository.save(memberInfo);
 
-    const authorizedMemberInfo = await this.authorizationRepository.findOneBy({ memberId, checkStatus: AuthorizationJudgeType.NONE });
+    const authorizedMemberInfo = await this.authorizationRepository.findOneBy({ memberId, isChecked: false });
     if (!authorizedMemberInfo) {
       throw new NotFoundException('해당 인증을 찾을 수 없습니다.');
     }
 
-    authorizedMemberInfo.setCheckStatusDecline();
+    authorizedMemberInfo.setIsChecked();
 
     await this.authorizationRepository.save(authorizedMemberInfo);
   }

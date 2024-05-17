@@ -43,9 +43,3 @@ export enum AuthorizationStatusType {
   PENDING = 'PENDING',
   ACCEPT = 'ACCEPT',
 }
-
-export enum AuthorizationJudgeType {
-  NONE = 'NONE',
-  DECLINE = 'DECLINE',
-  ACCEPT = 'ACCEPT',
-}
