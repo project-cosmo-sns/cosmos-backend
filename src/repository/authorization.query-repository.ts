@@ -37,7 +37,7 @@ export class AuthorizationQueryRepository {
       .from(Authorization, 'authorization')
       .innerJoin(Member, 'member', 'member.id = authorization.member_id')
       .where('member.deleted_at IS NULL')
-      .where('authorization.checkStatus = status', { status: AuthorizationJudgeType.NONE });
+      .andWhere('authorization.check_status = :status', { status: AuthorizationJudgeType.NONE });
     return query;
   }
 }
