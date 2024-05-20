@@ -39,6 +39,7 @@ export class AuthorizationService {
 
     await this.authorizationRepository.save({
       memberId,
+      name: request.name,
       generation: request.generation,
       imageUrl: request.imageUrl,
     });
