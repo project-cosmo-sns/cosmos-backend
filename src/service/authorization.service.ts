@@ -73,6 +73,7 @@ export class AuthorizationService {
     }
 
     memberInfo.setAuthorizationAccept(authorizedMemberInfo.generation);
+    memberInfo.setName(authorizedMemberInfo.name);
     await this.memberRepository.save(memberInfo);
 
     authorizedMemberInfo.setIsChecked();
