@@ -7,6 +7,8 @@ export class AuthorizationResponse {
   @ApiProperty()
   nickname!: string;
   @ApiProperty()
+  realName!: string;
+  @ApiProperty()
   generation!: number;
   @ApiProperty()
   imageUrl!: string;
@@ -16,12 +18,14 @@ export class AuthorizationResponse {
   constructor(
     memberId: number,
     nickname: string,
+    realName: string,
     generation: number,
     imageUrl: string,
     createdAt: Date,
   ) {
     this.memberId = memberId;
     this.nickname = nickname;
+    this.realName = realName;
     this.generation = generation;
     this.imageUrl = imageUrl;
     this.createdAt = createdAt;
@@ -33,6 +37,7 @@ export class AuthorizationResponse {
         new AuthorizationResponse(
           getAuthorizationLists.memberId,
           getAuthorizationLists.nickname,
+          getAuthorizationLists.realName,
           getAuthorizationLists.generation,
           getAuthorizationLists.imageUrl,
           getAuthorizationLists.createdAt,

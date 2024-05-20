@@ -8,6 +8,9 @@ export class Authorization {
   @Column({ name: 'member_id', nullable: false })
   memberId!: number;
 
+  @Column({ name: 'name', nullable: false, length: 45 })
+  name!: string;
+
   @Column({ name: 'generation', nullable: false })
   generation!: number;
 

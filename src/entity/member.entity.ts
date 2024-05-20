@@ -102,4 +102,8 @@ export class Member {
   setAuthorizationPending() {
     this.authorizationStatus = AuthorizationStatusType.PENDING;
   }
+
+  setName(name: string) {
+    this.nickname = name;
+  }
 }

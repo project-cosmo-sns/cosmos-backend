@@ -39,6 +39,7 @@ export class AuthorizationService {
 
     await this.authorizationRepository.save({
       memberId,
+      name: request.name,
       generation: request.generation,
       imageUrl: request.imageUrl,
     });
@@ -72,6 +73,7 @@ export class AuthorizationService {
     }
 
     memberInfo.setAuthorizationAccept(authorizedMemberInfo.generation);
+    memberInfo.setName(authorizedMemberInfo.name);
     await this.memberRepository.save(memberInfo);
 
     authorizedMemberInfo.setIsChecked();

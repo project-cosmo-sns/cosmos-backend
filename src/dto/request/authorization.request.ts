@@ -8,10 +8,15 @@ export class AuthorizationRequest {
 
   @ApiProperty()
   @IsString()
+  name!: string;
+
+  @ApiProperty()
+  @IsString()
   imageUrl!: string;
 
-  constructor(generation: number, imageUrl: string) {
+  constructor(generation: number, name: string, imageUrl: string) {
     this.generation = generation;
+    this.name = name;
     this.imageUrl = imageUrl;
   }
 }

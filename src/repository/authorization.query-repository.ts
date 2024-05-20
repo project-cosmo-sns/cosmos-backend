@@ -15,6 +15,7 @@ export class AuthorizationQueryRepository {
       .select([
         'member.id as memberId',
         'member.nickname as nickname',
+        'authorization.name as realName',
         'authorization.generation as generation',
         'authorization.image_url as imageUrl',
         'authorization.created_at as createdAt'
@@ -44,6 +45,7 @@ export class AuthorizationQueryRepository {
 export class GetAuthorizationListTuple {
   memberId: number;
   nickname: string;
+  realName: string;
   generation: number;
   imageUrl: string;
   createdAt: Date;
