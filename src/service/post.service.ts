@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   GoneException,
   Injectable,
   InternalServerErrorException,
@@ -36,6 +37,7 @@ import { PostDomainService } from 'src/domain-service/post.domain-service';
 import { TodayQuestionResponse } from 'src/dto/response/today-question.response';
 import { NotificationDomainService } from 'src/domain-service/notification.domain-service';
 import { MemberDomainService } from 'src/domain-service/member.domain-service';
+import { PostScrap } from 'src/entity/post_scrap.entity';
 
 @Injectable()
 export class PostService {
@@ -49,6 +51,7 @@ export class PostService {
     @InjectRepository(PostCommentHeart) private readonly postCommentHeartRepository: Repository<PostCommentHeart>,
     @InjectRepository(PostEmoji) private readonly postEmojiRepository: Repository<PostEmoji>,
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
+    @InjectRepository(PostScrap) private readonly postScrapRepository: Repository<PostScrap>,
     private readonly postQueryRepository: PostQueryRepository,
     private readonly postCommentQueryRepository: PostCommentQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
@@ -302,6 +305,21 @@ export class PostService {
       return new TodayQuestionResponse(0, '');
     }
     return randomQuestion;
+  }
+
+  async postScrap(memberId: number, postId: number): Promise<void> {
+    await this.postDomainService.getPostIsNotDeleted(postId);
+    await this.memberDomainService.getMemberIsNotDeletedById(memberId);
+
+    const scrap = await this.postScrapRepository.findOneBy({ postId, memberId });
+    if (scrap) {
+      throw new BadRequestException('이미 스크랩 중입니다.');
+    }
+
+    await this.postScrapRepository.save({
+      postId,
+      memberId,
+    })
   }
 
   private async saveHashTags(postId: number, hashTags: HashTagDto[]): Promise<void> {
