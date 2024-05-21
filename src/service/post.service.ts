@@ -322,6 +322,17 @@ export class PostService {
     })
   }
 
+  async deleteScrap(memberId: number, postId: number): Promise<void> {
+    await this.postDomainService.getPostIsNotDeleted(postId);
+    await this.memberDomainService.getMemberIsNotDeletedById(memberId);
+
+    const scrap = await this.postScrapRepository.findOneBy({ postId, memberId });
+    if (!scrap) {
+      throw new NotFoundException('해당 스크랩이 존재하지 않습니다.');
+    }
+    await this.postScrapRepository.remove(scrap);
+  }
+
   private async saveHashTags(postId: number, hashTags: HashTagDto[]): Promise<void> {
     await Promise.all(
       hashTags.map(async (hashTagDto, index) => {

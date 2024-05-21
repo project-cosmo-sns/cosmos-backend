@@ -303,4 +303,11 @@ export class PostController {
   async postArticleScrap(@Req() req, @Param('postId', ParseIntPipe) postId: number): Promise<void> {
     return await this.postService.postScrap(req.user.id, postId);
   }
+
+  @ApiOperation({ summary: '포스트 스크랩 취소' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @Delete(':postId/scrap')
+  async deleteArticleScrap(@Req() req, @Param('postId', ParseIntPipe) postId: number): Promise<void> {
+    return await this.postService.deleteScrap(req.user.id, postId);
+  }
 }
