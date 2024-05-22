@@ -41,6 +41,7 @@ export class PostQueryRepository {
         'post.comment_count as commentCount',
         'post.view_count as viewCount',
         'post.created_at as createdAt',
+        'CASE WHEN post_scrap.id IS NOT NULL THEN \'1\' ELSE \'0\' END as isScraped',
       ])
       .limit(paginationRequest.take)
       .offset(paginationRequest.getSkip())
@@ -78,6 +79,7 @@ export class PostQueryRepository {
       .createQueryBuilder()
       .from(Post, 'post')
       .innerJoin(Member, 'member', 'post.member_id = member.id')
+      .leftJoin(PostScrap, 'post_scrap', 'post_scrap.post_id = post.id AND post_scrap.member_id = :memberId', { memberId })
       .where('post.deleted_at IS NULL')
       .andWhere('member.deleted_at IS NULL');
 
@@ -130,7 +132,7 @@ export class PostQueryRepository {
         'member.deleted_at as memberDeletedAt',
         'post.created_at as createdAt',
         'CASE WHEN post.member_id = :memberId THEN 1 ELSE 0 END as isMine',
-        'CASE WHEN post_scrap.id IS NOT NULL THEN 1 ELSE 0 END as isScraped',
+        'CASE WHEN post_scrap.id IS NOT NULL THEN TRUE ELSE FALSE END as isScraped',
       ])
       .setParameters({ memberId })
       .getRawOne();

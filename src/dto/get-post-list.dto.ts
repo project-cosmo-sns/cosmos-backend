@@ -29,6 +29,7 @@ export class GetPostList {
     emojiCount: number,
     commentCount: number,
     viewCount: number,
+    isScraped: boolean,
     hashTags: GetHashTagListInfo[],
     emojis: GetEmojiListInfo[],
   ) {
@@ -47,6 +48,7 @@ export class GetPostList {
       commentCount,
       viewCount,
       createdAt,
+      isScraped,
       hashTags,
       emojis
     };
@@ -68,6 +70,7 @@ export class GetPostList {
       tuple.emojiCount,
       tuple.commentCount,
       tuple.viewCount,
+      tuple.isScraped,
       hashTags,
       emojis
     );

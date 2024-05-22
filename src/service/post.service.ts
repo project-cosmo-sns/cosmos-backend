@@ -402,6 +402,7 @@ export class PostListDto {
   commentCount: number;
   emojiCount: number;
   createdAt: Date;
+  isScraped: boolean;
   hashTags: GetHashTagListInfo[];
   emojis: GetEmojiListInfo[];
 }
