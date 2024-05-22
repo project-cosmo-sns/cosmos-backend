@@ -68,6 +68,7 @@ import { AuthorizationQueryRepository } from './repository/authorization.query-r
 import { GoogleStrategy } from './strategy/google-strategy';
 import { GoogleAuthGuard } from './guard/google-auth.guard';
 import { AdminGuard } from './guard/admin.guard';
+import { PostScrap } from './entity/post_scrap.entity';
 
 @Module({
   imports: [
@@ -87,6 +88,7 @@ import { AdminGuard } from './guard/admin.guard';
       Post,
       PostComment,
       PostCommentHeart,
+      PostScrap,
       PostHashTag,
       HashTag,
       Follow,
@@ -162,4 +164,4 @@ import { AdminGuard } from './guard/admin.guard';
     Logger,
   ],
 })
-export class AppModule {}
+export class AppModule { }

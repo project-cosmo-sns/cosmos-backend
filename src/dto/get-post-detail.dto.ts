@@ -29,6 +29,7 @@ export class GetPostDetail {
     commentCount: number,
     viewCount: number,
     isMine: boolean,
+    isScraped: boolean,
     hashTags: GetHashTagDetailInfo[],
     emojis: GetEmojiDetailInfo[],
   ) {
@@ -48,6 +49,7 @@ export class GetPostDetail {
       viewCount,
       createdAt,
       isMine,
+      isScraped,
       hashTags,
       emojis
     };
@@ -70,6 +72,7 @@ export class GetPostDetail {
       tuple.commentCount,
       tuple.viewCount,
       tuple.isMine,
+      tuple.isScraped,
       hashTags,
       emojis
     );

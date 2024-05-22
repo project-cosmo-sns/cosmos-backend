@@ -66,8 +66,8 @@ export class ProfileService {
   }
 
   async getMyPostList(memberId: number, paginationRequest: PaginationRequest) {
-    const postListTuples = await this.profileQueryRepository.getPostList(memberId, paginationRequest);
-    const totalCount = await this.profileQueryRepository.getAllPostListTotalCount(memberId);
+    const postListTuples = await this.profileQueryRepository.getPostList(memberId, paginationRequest, memberId);
+    const totalCount = await this.profileQueryRepository.getAllPostListTotalCount(memberId, memberId);
 
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
@@ -83,8 +83,8 @@ export class ProfileService {
   }
 
   async getOthersPostList(memberId: number, paginationRequest: PaginationRequest, myId: number) {
-    const postListTuples = await this.profileQueryRepository.getPostList(memberId, paginationRequest);
-    const totalCount = await this.profileQueryRepository.getAllPostListTotalCount(memberId);
+    const postListTuples = await this.profileQueryRepository.getPostList(memberId, paginationRequest, myId);
+    const totalCount = await this.profileQueryRepository.getAllPostListTotalCount(memberId, myId);
 
     const postInfo = await Promise.all(
       postListTuples.map(async (postList) => {
@@ -197,6 +197,7 @@ export class ProfilePostListDto {
   commentCount: number;
   emojiCount: number;
   createdAt: Date;
+  isScraped: boolean;
   hashTags: GetProfileHashTagListInfo[];
   emojis: GetProfileEmojiListInfo[];
 }

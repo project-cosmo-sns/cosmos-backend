@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   GoneException,
   Injectable,
   InternalServerErrorException,
@@ -36,6 +37,7 @@ import { PostDomainService } from 'src/domain-service/post.domain-service';
 import { TodayQuestionResponse } from 'src/dto/response/today-question.response';
 import { NotificationDomainService } from 'src/domain-service/notification.domain-service';
 import { MemberDomainService } from 'src/domain-service/member.domain-service';
+import { PostScrap } from 'src/entity/post_scrap.entity';
 
 @Injectable()
 export class PostService {
@@ -49,6 +51,7 @@ export class PostService {
     @InjectRepository(PostCommentHeart) private readonly postCommentHeartRepository: Repository<PostCommentHeart>,
     @InjectRepository(PostEmoji) private readonly postEmojiRepository: Repository<PostEmoji>,
     @InjectRepository(Notification) private readonly notificationRepository: Repository<Notification>,
+    @InjectRepository(PostScrap) private readonly postScrapRepository: Repository<PostScrap>,
     private readonly postQueryRepository: PostQueryRepository,
     private readonly postCommentQueryRepository: PostCommentQueryRepository,
     private readonly memberQueryRepository: MemberQueryRepository,
@@ -304,6 +307,32 @@ export class PostService {
     return randomQuestion;
   }
 
+  async postScrap(memberId: number, postId: number): Promise<void> {
+    await this.postDomainService.getPostIsNotDeleted(postId);
+    await this.memberDomainService.getMemberIsNotDeletedById(memberId);
+
+    const scrap = await this.postScrapRepository.findOneBy({ postId, memberId });
+    if (scrap) {
+      throw new BadRequestException('이미 스크랩 중입니다.');
+    }
+
+    await this.postScrapRepository.save({
+      postId,
+      memberId,
+    })
+  }
+
+  async deleteScrap(memberId: number, postId: number): Promise<void> {
+    await this.postDomainService.getPostIsNotDeleted(postId);
+    await this.memberDomainService.getMemberIsNotDeletedById(memberId);
+
+    const scrap = await this.postScrapRepository.findOneBy({ postId, memberId });
+    if (!scrap) {
+      throw new NotFoundException('해당 스크랩이 존재하지 않습니다.');
+    }
+    await this.postScrapRepository.remove(scrap);
+  }
+
   private async saveHashTags(postId: number, hashTags: HashTagDto[]): Promise<void> {
     await Promise.all(
       hashTags.map(async (hashTagDto, index) => {
@@ -373,6 +402,7 @@ export class PostListDto {
   commentCount: number;
   emojiCount: number;
   createdAt: Date;
+  isScraped: boolean;
   hashTags: GetHashTagListInfo[];
   emojis: GetEmojiListInfo[];
 }
@@ -387,6 +417,7 @@ export class PostDetailDto {
   emojiCount: number;
   createdAt: Date;
   isMine: boolean;
+  isScraped: boolean;
   hashTags: GetHashTagDetailInfo[];
   emojis: GetEmojiDetailInfo[];
 
@@ -400,6 +431,7 @@ export class PostDetailDto {
     emojiCount: number,
     createdAt: Date,
     isMine: boolean,
+    isScraped: boolean,
     hashTags: GetHashTagDetailInfo[],
     emojis: GetEmojiDetailInfo[],
   ) {
@@ -412,6 +444,7 @@ export class PostDetailDto {
     this.emojiCount = emojiCount;
     this.createdAt = createdAt;
     this.isMine = isMine;
+    this.isScraped = isScraped;
     this.hashTags = hashTags;
     this.emojis = emojis;
   }

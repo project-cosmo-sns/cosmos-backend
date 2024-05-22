@@ -48,6 +48,7 @@ export class PostListInfo {
       commentCount: { type: 'number' },
       emojiCount: { type: 'number' },
       createdAt: { type: 'string' },
+      isScraped: { type: 'boolean' },
       hashTags: { type: [PostListHashTag] },
       emojis: { type: [PostListEmoji] }
     },

@@ -49,6 +49,7 @@ export class ProfilePostListInfo {
       commentCount: { type: 'number' },
       emojiCount: { type: 'number' },
       createdAt: { type: 'string' },
+      isScrpaed: { type: 'boolean' },
       hashTags: { type: [ProfilePostListHashTag] },
       emojis: { type: [ProfilePostListEmoji] }
     },
