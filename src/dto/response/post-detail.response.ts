@@ -48,6 +48,7 @@ export class PostDetail {
       emojiCount: { type: 'number' },
       createdAt: { type: 'string' },
       isMine: { type: 'boolean' },
+      isScrpaed: { type: 'boolean' },
       hashTags: { type: [PostDetailHashTag] },
       emojis: { type: [PostDetailEmoji] }
     },

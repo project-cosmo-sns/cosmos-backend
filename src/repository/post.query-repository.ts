@@ -7,6 +7,7 @@ import { CategoryType, ListSortBy } from 'src/entity/common/Enums';
 import { Follow } from 'src/entity/follow.entity';
 import { Member } from 'src/entity/member.entity';
 import { Post } from 'src/entity/post.entity';
+import { PostScrap } from 'src/entity/post_scrap.entity';
 import { DataSource } from 'typeorm';
 
 @Injectable()
@@ -112,6 +113,7 @@ export class PostQueryRepository {
       .createQueryBuilder()
       .from(Post, 'post')
       .innerJoin(Member, 'member', 'post.member_id = member.id')
+      .leftJoin(PostScrap, 'post_scrap', 'post_scrap.post_id = post.id AND post_scrap.member_id = :memberId', { memberId })
       .where('post.id = :postId', { postId })
       .select([
         'member.id as memberId',
@@ -128,6 +130,7 @@ export class PostQueryRepository {
         'member.deleted_at as memberDeletedAt',
         'post.created_at as createdAt',
         'CASE WHEN post.member_id = :memberId THEN 1 ELSE 0 END as isMine',
+        'CASE WHEN post_scrap.id IS NOT NULL THEN 1 ELSE 0 END as isScraped',
       ])
       .setParameters({ memberId })
       .getRawOne();
@@ -176,6 +179,8 @@ export class GetPostTuple {
   emojiCount!: number;
   commentCount!: number;
   viewCount!: number;
+  @Transform(({ value }) => value === '1')
+  isScraped!: boolean;
 }
 
 export class GetPostDetailTuple extends GetPostTuple {

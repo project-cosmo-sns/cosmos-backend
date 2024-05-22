@@ -416,6 +416,7 @@ export class PostDetailDto {
   emojiCount: number;
   createdAt: Date;
   isMine: boolean;
+  isScraped: boolean;
   hashTags: GetHashTagDetailInfo[];
   emojis: GetEmojiDetailInfo[];
 
@@ -429,6 +430,7 @@ export class PostDetailDto {
     emojiCount: number,
     createdAt: Date,
     isMine: boolean,
+    isScraped: boolean,
     hashTags: GetHashTagDetailInfo[],
     emojis: GetEmojiDetailInfo[],
   ) {
@@ -441,6 +443,7 @@ export class PostDetailDto {
     this.emojiCount = emojiCount;
     this.createdAt = createdAt;
     this.isMine = isMine;
+    this.isScraped = isScraped;
     this.hashTags = hashTags;
     this.emojis = emojis;
   }
