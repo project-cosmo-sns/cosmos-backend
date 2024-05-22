@@ -104,7 +104,7 @@ export class ProfileController {
 
   @ApiOperation({ summary: '타 유저 프로필 피드 목록' })
   @ApiPaginatedResponse(GetFeedResponseDto)
-  @ApiParam({ name: 'postId', required: true, description: '멤버 id' })
+  @ApiParam({ name: 'memberId', required: true, description: '멤버 id' })
   @Get(':memberId/feed')
   async getOthersFeedList(
     @Param('memberId', ParseIntPipe) memberId: number,
@@ -126,7 +126,7 @@ export class ProfileController {
 
   @ApiOperation({ summary: '타 유저 프로필 포스트 목록' })
   @ApiPaginatedResponse(ProfilePostResponse)
-  @ApiParam({ name: 'postId', required: true, description: '멤버 id' })
+  @ApiParam({ name: 'memberId', required: true, description: '멤버 id' })
   @Get(':memberId/post')
   async othersProifilePost(
     @Param('memberId', ParseIntPipe) memberId: number,
@@ -163,4 +163,5 @@ export class ProfileController {
 
     await this.imageService.deleteImage(imageUrls, bucket);
   }
+
 }
