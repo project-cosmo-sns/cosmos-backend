@@ -128,6 +128,44 @@ export class ProfileQueryRepository {
       .andWhere('member.deletedAt IS NULL')
       .andWhere('feed.member_id = :memberId', { memberId });
   }
+
+  async getScrapedPostList(memberId: number, paginationRequest: PaginationRequest): Promise<GetProfilePostTuple[]> {
+    const query = await this.getScrapedPostListBaseQuery(memberId)
+      .select([
+        'member.id as memberId',
+        'member.nickname as nickname',
+        'member.generation as generation',
+        'member.profile_image_url as profileImageUrl',
+        'post.id as postId',
+        'post.title as title',
+        'post.content as content',
+        'post.emoji_count as emojiCount',
+        'post.comment_count as commentCount',
+        'post.view_count as viewCount',
+        'post.created_at as createdAt',
+        'CASE WHEN post_scrap.id IS NOT NULL THEN \'1\' ELSE \'0\' END as isScraped',
+      ])
+      .limit(paginationRequest.take)
+      .offset(paginationRequest.getSkip())
+      .orderBy('post.created_at', paginationRequest.order)
+      .getRawMany();
+    return plainToInstance(GetProfilePostTuple, query);
+  }
+
+  async getAllScrapedPostListTotalCount(memberId: number): Promise<number> {
+    return await this.getScrapedPostListBaseQuery(memberId).getCount();
+  }
+
+  private getScrapedPostListBaseQuery(memberId: number) {
+    return this.dataSource
+      .createQueryBuilder()
+      .from(Post, 'post')
+      .innerJoin(Member, 'member', 'post.member_id = member.id')
+      .innerJoin(PostScrap, 'post_scrap', 'post_scrap.post_id = post.id')
+      .where('post.deleted_at IS NULL')
+      .andWhere('member.deleted_at IS NULL')
+      .andWhere('post_scrap.member_id = :memberId', { memberId })
+  }
 }
 
 export class GetProfilePostTuple {
@@ -177,5 +215,3 @@ export class FollowerCountTuple {
 export class FollowingCountTuple {
   followingCount!: number;
 }
-
-

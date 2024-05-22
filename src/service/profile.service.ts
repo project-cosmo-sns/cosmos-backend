@@ -179,6 +179,22 @@ export class ProfileService {
 
     return { feedList, totalCount };
   }
+
+  async getMyScrapList(memberId: number, paginationRequest: PaginationRequest) {
+    const postListTuples = await this.profileQueryRepository.getScrapedPostList(memberId, paginationRequest);
+    const totalCount = await this.profileQueryRepository.getAllScrapedPostListTotalCount(memberId);
+
+    const postInfo = await Promise.all(
+      postListTuples.map(async (postList) => {
+        const hashTagInfo = await this.postHashTagQueryRepository.getPostHashTag(postList.postId);
+        const postListEmojiInfo = await this.postEmojiQueryRepository.getPostEmoji(postList.postId, memberId);
+        const post = GetProfilePostList.from(postList, hashTagInfo, postListEmojiInfo);
+
+        return new GetProfilePostDto(post);
+      }),
+    );
+    return { postInfo, totalCount };
+  }
 }
 
 export class ProfilePostWriterDto {
