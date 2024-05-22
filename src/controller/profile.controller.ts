@@ -35,7 +35,7 @@ export class ProfileController {
     private readonly profileService: ProfileService,
     private readonly imageService: ImageService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   @Roles('login')
   @ApiOperation({ summary: '나의 프로필 조회' })
@@ -164,4 +164,18 @@ export class ProfileController {
     await this.imageService.deleteImage(imageUrls, bucket);
   }
 
+  @ApiOperation({ summary: '마이 프로필 스크랩된 포스트 목록' })
+  @ApiPaginatedResponse(ProfilePostResponse)
+  @Get('mine/scrap')
+  async getMyScrap(
+    @Req() req, @Query() paginationRequest: PaginationRequest,
+  ): Promise<PaginationResponse<ProfilePostResponse>> {
+    const { postInfo, totalCount } = await this.profileService.getMyScrapList(req.user.id, paginationRequest);
+    const postData = postInfo.map((info) => ProfilePostResponse.from(info));
+    return PaginationResponse.of({
+      data: postData,
+      options: paginationRequest,
+      totalCount,
+    })
+  }
 }
