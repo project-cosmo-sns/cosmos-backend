@@ -9,6 +9,7 @@ import { Post } from 'src/entity/post.entity';
 import { Feed } from 'src/entity/feed.entity';
 import { GetFeedTuple } from './feed.query-repository';
 import { AuthorizationStatusType } from 'src/entity/common/Enums';
+import { PostScrap } from 'src/entity/post_scrap.entity';
 
 @Injectable()
 export class ProfileQueryRepository {
@@ -54,8 +55,8 @@ export class ProfileQueryRepository {
     return plainToInstance(GetMyProfileTuple, myProfile);
   }
 
-  async getPostList(memberId: number, paginationRequest: PaginationRequest): Promise<GetPostTuple[]> {
-    const postListQuery = await this.getPostListBaseQuery(memberId)
+  async getPostList(memberId: number, paginationRequest: PaginationRequest, myId: number): Promise<GetPostTuple[]> {
+    const postListQuery = await this.getPostListBaseQuery(memberId, myId)
       .select([
         'member.id as memberId',
         'member.nickname as nickname',
@@ -67,7 +68,8 @@ export class ProfileQueryRepository {
         'post.emoji_count as emojiCount',
         'post.comment_count as commentCount',
         'post.view_count as viewCount',
-        'post.created_at as createdAt'
+        'post.created_at as createdAt',
+        'CASE WHEN post_scrap.id IS NOT NULL THEN \'1\' ELSE \'0\' END as isScraped',
       ])
       .limit(paginationRequest.take)
       .offset(paginationRequest.getSkip())
@@ -76,15 +78,16 @@ export class ProfileQueryRepository {
     return plainToInstance(GetPostTuple, postListQuery);
   }
 
-  async getAllPostListTotalCount(memberId: number): Promise<number> {
-    return await this.getPostListBaseQuery(memberId).getCount();
+  async getAllPostListTotalCount(memberId: number, myId: number): Promise<number> {
+    return await this.getPostListBaseQuery(memberId, myId).getCount();
   }
 
-  private getPostListBaseQuery(memberId: number) {
+  private getPostListBaseQuery(memberId: number, myId: number) {
     return this.dataSource
       .createQueryBuilder()
       .from(Post, 'post')
       .innerJoin(Member, 'member', 'post.member_id=member.id')
+      .leftJoin(PostScrap, 'post_scrap', 'post_scrap.post_id = post.id AND post_scrap.member_id = :myId', { myId })
       .where('post.deleted_at IS NULL')
       .andWhere('member.deleted_at IS NULL')
       .andWhere('post.member_id = :memberId', { memberId });
@@ -140,6 +143,8 @@ export class GetProfilePostTuple {
   emojiCount!: number;
   commentCount!: number;
   viewCount!: number;
+  @Transform(({ value }) => value === '1')
+  isScraped!: boolean;
 }
 
 export class GetOthersProfileTuple {
