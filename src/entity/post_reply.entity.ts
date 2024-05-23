@@ -5,11 +5,14 @@ export class PostReply {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Column({ name: 'post_id', nullable: false })
+  postId!: number;
+
   @Column({ name: 'comment_id', nullable: false })
   commentId!: number;
 
   @Column({ name: 'member_id', nullable: false })
-  memberID!: number;
+  memberId!: number;
 
   @Column({ name: 'content', nullable: false, length: 300 })
   content!: string;

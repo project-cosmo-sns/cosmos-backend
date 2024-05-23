@@ -5,6 +5,9 @@ export class PostReplyHeart {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Column({ name: 'post_id', nullable: false })
+  postId!: number;
+
   @Column({ name: 'reply_id', nullable: false })
   replyId!: number;
 

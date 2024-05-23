@@ -5,6 +5,9 @@ export class FeedReplyHeart {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Column({ name: 'feed_id', nullable: false })
+  feedId!: number;
+
   @Column({ name: 'reply_id', nullable: false })
   replyId!: number;
 

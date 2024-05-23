@@ -5,11 +5,14 @@ export class FeedReply {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @Column({ name: 'feed_id', nullable: false })
+  feedId!: number;
+
   @Column({ name: 'comment_id', nullable: false })
   commentId!: number;
 
   @Column({ name: 'member_id', nullable: false })
-  memberID!: number;
+  memberId!: number;
 
   @Column({ name: 'content', nullable: false, length: 300 })
   content!: string;
