@@ -74,6 +74,7 @@ import { PostReplyHeart } from './entity/post_reply_heart.entity';
 import { FeedReply } from './entity/feed_reply.entity';
 import { FeedReplyHeart } from './entity/feed_reply_heart.entity';
 import { PostReplyService } from './service/post-reply.service';
+import { FeedReplyService } from './service/feed-reply.service';
 
 @Module({
   imports: [
@@ -130,6 +131,7 @@ import { PostReplyService } from './service/post-reply.service';
     OauthAuthenticationService,
     FeedService,
     FeedCommentService,
+    FeedReplyService,
     PostService,
     PostReplyService,
     ImageService,

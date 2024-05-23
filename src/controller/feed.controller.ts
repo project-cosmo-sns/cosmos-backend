@@ -37,6 +37,7 @@ import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
 import { ImageResponse } from 'src/dto/response/image.response';
 import { RolesGuard } from 'src/guard/roles.guard';
 import { FeedCommentService } from 'src/service/feed-comment.service';
+import { FeedReplyService } from 'src/service/feed-reply.service';
 import { FeedService } from 'src/service/feed.service';
 import { ImageService } from 'src/service/image.service';
 
@@ -47,6 +48,7 @@ export class FeedController {
   constructor(
     private readonly feedService: FeedService,
     private readonly feedCommentService: FeedCommentService,
+    private readonly feedReplyService: FeedReplyService,
     private readonly imageService: ImageService,
     private readonly configService: ConfigService,
   ) { }
@@ -269,5 +271,19 @@ export class FeedController {
     const bucket = this.configService.get('AWS_S3_UPLOAD_BUCKET_FEED');
 
     await this.imageService.deleteImage(imageUrls, bucket);
+  }
+
+  @ApiOperation({ summary: '피드 대댓글 쓰기' })
+  @ApiParam({ name: 'postId', required: true, description: '피드 id' })
+  @ApiParam({ name: 'commentId', required: true, description: '댓글 id' })
+  @ApiBody({ description: '대댓글 내용', schema: { type: 'object', properties: { content: { type: 'string' } } } })
+  @Post(':feedId/comment/:commentId/write')
+  async writeFeedReply(
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Req() req,
+    @Body('content') content: string,
+  ): Promise<void> {
+    return this.feedReplyService.writeFeedReply(feedId, commentId, req.user.id, content);
   }
 }
