@@ -69,6 +69,10 @@ import { GoogleStrategy } from './strategy/google-strategy';
 import { GoogleAuthGuard } from './guard/google-auth.guard';
 import { AdminGuard } from './guard/admin.guard';
 import { PostScrap } from './entity/post_scrap.entity';
+import { PostReply } from './entity/post_reply.entity';
+import { PostReplyHeart } from './entity/post_reply_heart.entity';
+import { FeedReply } from './entity/feed_reply.entity';
+import { FeedReplyHeart } from './entity/feed_reply_heart.entity';
 
 @Module({
   imports: [
@@ -85,9 +89,13 @@ import { PostScrap } from './entity/post_scrap.entity';
       FeedEmoji,
       FeedComment,
       FeedCommentHeart,
+      FeedReply,
+      FeedReplyHeart,
       Post,
       PostComment,
       PostCommentHeart,
+      PostReply,
+      PostReplyHeart,
       PostScrap,
       PostHashTag,
       HashTag,
