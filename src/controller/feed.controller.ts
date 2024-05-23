@@ -274,7 +274,7 @@ export class FeedController {
   }
 
   @ApiOperation({ summary: '피드 대댓글 쓰기' })
-  @ApiParam({ name: 'postId', required: true, description: '피드 id' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
   @ApiParam({ name: 'commentId', required: true, description: '댓글 id' })
   @ApiBody({ description: '대댓글 내용', schema: { type: 'object', properties: { content: { type: 'string' } } } })
   @Post(':feedId/comment/:commentId/write')
