@@ -40,6 +40,7 @@ import { PostListResponse } from 'src/dto/response/post-list.response';
 import { TodayQuestionResponse } from 'src/dto/response/today-question.response';
 import { RolesGuard } from 'src/guard/roles.guard';
 import { ImageService } from 'src/service/image.service';
+import { PostReplyService } from 'src/service/post-reply.service';
 import { PostService } from 'src/service/post.service';
 
 @ApiTags('포스트')
@@ -48,6 +49,7 @@ import { PostService } from 'src/service/post.service';
 export class PostController {
   constructor(
     private readonly postService: PostService,
+    private readonly postReplyService: PostReplyService,
     private readonly imageService: ImageService,
     private readonly configService: ConfigService,
   ) { }
@@ -309,5 +311,19 @@ export class PostController {
   @Delete(':postId/scrap')
   async deleteArticleScrap(@Req() req, @Param('postId', ParseIntPipe) postId: number): Promise<void> {
     return await this.postService.deleteScrap(req.user.id, postId);
+  }
+
+  @ApiOperation({ summary: '포스트 대댓글 쓰기' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @ApiParam({ name: 'commentId', required: true, description: '댓글 id' })
+  @ApiBody({ description: '대댓글 내용', schema: { type: 'object', properties: { content: { type: 'string' } } } })
+  @Post(':postId/comment/:commentId/write')
+  async writePostReply(
+    @Param('postId', ParseIntPipe) postId: number,
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Req() req,
+    @Body('content') content: string,
+  ): Promise<void> {
+    return this.postReplyService.writePostReply(postId, commentId, req.user.id, content);
   }
 }
