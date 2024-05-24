@@ -326,4 +326,18 @@ export class PostController {
   ): Promise<void> {
     return this.postReplyService.writePostReply(postId, commentId, req.user.id, content);
   }
+
+  @ApiOperation({ summary: '포스트 대댓글 수정' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @ApiParam({ name: 'replyId', required: true, description: '포스트 대댓글 id' })
+  @ApiBody({ description: '대댓글 내용', schema: { type: 'object', properties: { content: { type: 'string' } } } })
+  @Patch(':postId/reply/:replyId/modify')
+  async modifyPostReply(
+    @Param('postId', ParseIntPipe) postId: number,
+    @Param('replyId', ParseIntPipe) replyId: number,
+    @Req() req,
+    @Body('content') content: string,
+  ): Promise<void> {
+    return this.postReplyService.patchPostReply(postId, replyId, req.user.id, content);
+  }
 }

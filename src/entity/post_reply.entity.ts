@@ -22,4 +22,8 @@ export class PostReply {
 
   @UpdateDateColumn({ name: 'updated_at', nullable: false })
   updatedAt!: Date;
+
+  setPostReplyContent(content: string) {
+    this.content = content;
+  }
 }

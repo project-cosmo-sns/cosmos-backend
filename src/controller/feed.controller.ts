@@ -286,4 +286,18 @@ export class FeedController {
   ): Promise<void> {
     return this.feedReplyService.writeFeedReply(feedId, commentId, req.user.id, content);
   }
+
+  @ApiOperation({ summary: '피드 대댓글 수정' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
+  @ApiParam({ name: 'replyId', required: true, description: '피드 대댓글 id' })
+  @ApiBody({ description: '대댓글 내용', schema: { type: 'object', properties: { content: { type: 'string' } } } })
+  @Patch(':feedId/reply/:replyId/modify')
+  async modifyFeedReply(
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @Param('replyId', ParseIntPipe) replyId: number,
+    @Req() req,
+    @Body('content') content: string,
+  ): Promise<void> {
+    return this.feedReplyService.patchFeedReply(feedId, replyId, req.user.id, content);
+  }
 }

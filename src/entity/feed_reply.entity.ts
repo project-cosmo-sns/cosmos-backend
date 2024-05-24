@@ -22,4 +22,8 @@ export class FeedReply {
 
   @UpdateDateColumn({ name: 'updated_at', nullable: false })
   updatedAt!: Date;
+
+  setFeedReplyContent(content: string) {
+    this.content = content;
+  }
 }
