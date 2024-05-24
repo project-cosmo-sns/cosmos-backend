@@ -32,7 +32,7 @@ export class FeedReplyService {
   async patchFeedReply(feedId: number, replyId: number, memberId: number, content: string): Promise<void> {
     await this.feedDomainService.getFeedIsNotDeleted(feedId);
     const replyInfo = await this.feedReplyRepository.findOneBy({ id: replyId, feedId });
-    if (!replyInfo) {
+    if (!replyInfo || replyInfo.deletedAt !== null) {
       throw new NotFoundException('해당 답글을 찾을 수 없습니다.');
     }
     if (replyInfo.memberId !== memberId) {

@@ -33,7 +33,7 @@ export class PostReplyService {
   async patchPostReply(postId: number, replyId: number, memberId: number, content: string): Promise<void> {
     await this.postDomainService.getPostIsNotDeleted(postId);
     const replyInfo = await this.postReplyRepository.findOneBy({ id: replyId, postId });
-    if (!replyInfo) {
+    if (!replyInfo || replyInfo.deletedAt !== null) {
       throw new NotFoundException('해당 답글을 찾을 수 없습니다.');
     }
     if (replyInfo.memberId !== memberId) {
