@@ -43,4 +43,20 @@ export class PostReplyService {
     replyInfo.setPostReplyContent(content);
     await this.postReplyRepository.save(replyInfo);
   }
+
+  async deletePostReply(postId: number, replyId: number, memberId: number): Promise<void> {
+    await this.postDomainService.getPostIsNotDeleted(postId);
+    const replyInfo = await this.postReplyRepository.findOneBy({ id: replyId, postId });
+    if (!replyInfo || replyInfo.deletedAt !== null) {
+      throw new NotFoundException('해당 답글을 찾을 수 없습니다.');
+    }
+
+    if (replyInfo.memberId !== memberId) {
+      throw new UnauthorizedException('권한이 없습니다.');
+    }
+
+    replyInfo.setPostReplyDeleted(new Date());
+    await this.postReplyRepository.save(replyInfo);
+
+  }
 }

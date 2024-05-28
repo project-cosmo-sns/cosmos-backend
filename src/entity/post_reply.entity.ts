@@ -29,4 +29,8 @@ export class PostReply {
   setPostReplyContent(content: string) {
     this.content = content;
   }
+
+  setPostReplyDeleted(deletedAt: Date) {
+    this.deletedAt = deletedAt;
+  }
 }

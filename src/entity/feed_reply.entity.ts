@@ -29,4 +29,8 @@ export class FeedReply {
   setFeedReplyContent(content: string) {
     this.content = content;
   }
+
+  setFeedReplyDeleted(deletedAt: Date) {
+    this.deletedAt = deletedAt;
+  }
 }

@@ -300,4 +300,16 @@ export class FeedController {
   ): Promise<void> {
     return this.feedReplyService.patchFeedReply(feedId, replyId, req.user.id, content);
   }
+
+  @ApiOperation({ summary: '피드 대댓글 삭제' })
+  @ApiParam({ name: 'feedId', required: true, description: '피드 id' })
+  @ApiParam({ name: 'replyId', required: true, description: '피드 대댓글 id' })
+  @Delete(':feedId/reply/:replyId/')
+  async removeFeedReply(
+    @Param('feedId', ParseIntPipe) feedId: number,
+    @Param('replyId', ParseIntPipe) replyId: number,
+    @Req() req,
+  ): Promise<void> {
+    return this.feedReplyService.deleteFeedReply(feedId, replyId, req.user.id);
+  }
 }

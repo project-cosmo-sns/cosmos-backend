@@ -340,4 +340,16 @@ export class PostController {
   ): Promise<void> {
     return this.postReplyService.patchPostReply(postId, replyId, req.user.id, content);
   }
+
+  @ApiOperation({ summary: '포스트 대댓글 삭제' })
+  @ApiParam({ name: 'postId', required: true, description: '포스트 id' })
+  @ApiParam({ name: 'replyId', required: true, description: '포스트 대댓글 id' })
+  @Delete(':postId/reply/:replyId/')
+  async removePostReply(
+    @Param('postId', ParseIntPipe) postId: number,
+    @Param('replyId', ParseIntPipe) replyId: number,
+    @Req() req,
+  ): Promise<void> {
+    return this.postReplyService.deletePostReply(postId, replyId, req.user.id);
+  }
 }
