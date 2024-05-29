@@ -17,9 +17,20 @@ export class FeedReply {
   @Column({ name: 'content', nullable: false, length: 300 })
   content!: string;
 
-  @CreateDateColumn({ name: 'created_at', nullable: false })
+  @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
+  deletedAt?: Date;
+
+  @CreateDateColumn({ type: 'timestamp', name: 'created_at', nullable: false })
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: 'updated_at', nullable: false })
+  @UpdateDateColumn({ type: 'timestamp', name: 'updated_at', nullable: false })
   updatedAt!: Date;
+
+  setFeedReplyContent(content: string) {
+    this.content = content;
+  }
+
+  setFeedReplyDeleted(deletedAt: Date) {
+    this.deletedAt = deletedAt;
+  }
 }

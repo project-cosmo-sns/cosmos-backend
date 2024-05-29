@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FeedDomainService } from 'src/domain-service/feed.domain-service';
 import { FeedComment } from 'src/entity/feed_comment.entity';
@@ -26,6 +26,36 @@ export class FeedReplyService {
       memberId,
       content,
     });
+
+  }
+
+  async patchFeedReply(feedId: number, replyId: number, memberId: number, content: string): Promise<void> {
+    await this.feedDomainService.getFeedIsNotDeleted(feedId);
+    const replyInfo = await this.feedReplyRepository.findOneBy({ id: replyId, feedId });
+    if (!replyInfo || replyInfo.deletedAt !== null) {
+      throw new NotFoundException('해당 답글을 찾을 수 없습니다.');
+    }
+    if (replyInfo.memberId !== memberId) {
+      throw new UnauthorizedException('권한이 없습니다.');
+    }
+
+    replyInfo.setFeedReplyContent(content);
+    await this.feedReplyRepository.save(replyInfo);
+  }
+  
+  async deleteFeedReply(feedId: number, replyId: number, memberId: number): Promise<void> {
+    await this.feedDomainService.getFeedIsNotDeleted(feedId);
+    const replyInfo = await this.feedReplyRepository.findOneBy({ id: replyId, feedId });
+    if (!replyInfo || replyInfo.deletedAt !== null) {
+      throw new NotFoundException('해당 답글을 찾을 수 없습니다.');
+    }
+
+    if (replyInfo.memberId !== memberId) {
+      throw new UnauthorizedException('권한이 없습니다.');
+    }
+
+    replyInfo.setFeedReplyDeleted(new Date());
+    await this.feedReplyRepository.save(replyInfo);
 
   }
 }
