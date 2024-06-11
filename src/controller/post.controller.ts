@@ -37,6 +37,7 @@ import { ImageResponse } from 'src/dto/response/image.response';
 import { PostCommentListResponse } from 'src/dto/response/post-comment-list.response';
 import { PostDetailResponse } from 'src/dto/response/post-detail.response';
 import { PostListResponse } from 'src/dto/response/post-list.response';
+import { PostReplyListResponse } from 'src/dto/response/post-reply-list.response';
 import { TodayQuestionResponse } from 'src/dto/response/today-question.response';
 import { RolesGuard } from 'src/guard/roles.guard';
 import { ImageService } from 'src/service/image.service';
@@ -351,5 +352,26 @@ export class PostController {
     @Req() req,
   ): Promise<void> {
     return this.postReplyService.deletePostReply(postId, replyId, req.user.id);
+  }
+
+  @ApiOperation({ summary: '포스트 대댓글 조회' })
+  @ApiParam({ name: 'commentId', required: true, description: '포스트 댓글 id' })
+  @Get('comment/:commentId/reply/list')
+  async viewPostReply(
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Req() req,
+    @Query() PaginationRequest: PaginationRequest,
+  ): Promise<PaginationResponse<PostReplyListResponse>> {
+    const { postReplyInfo, totalCount } = await this.postReplyService.getPostReplyList(
+      commentId,
+      req.user.id,
+      PaginationRequest,
+    )
+    const postReplyData = postReplyInfo.map((info) => PostReplyListResponse.from(info));
+    return PaginationResponse.of({
+      data: postReplyData,
+      options: PaginationRequest,
+      totalCount,
+    });
   }
 }

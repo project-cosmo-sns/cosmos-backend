@@ -1,22 +1,21 @@
-import { GetPostCommentTuple } from 'src/repository/post-comment.query-repository';
-import { PostCommentDto, PostCommentWriterDto } from 'src/service/post.service';
+import { GetFeedReplyTuple } from 'src/repository/feed-comment.query-repository';
+import { FeedReplyDto, FeedReplyWriterDto } from 'src/service/feed-reply.service';
 
-export class GetPostCommentList {
-  writer: PostCommentWriterDto;
-  comment: PostCommentDto;
+export class GetFeedReplyList {
+  writer: FeedReplyWriterDto;
+  reply: FeedReplyDto;
 
   constructor(
     memberId: number,
     nickname: string,
     generation: number,
     profileImageUrl: string,
-    commentId: number,
+    replyId: number,
     content: string,
     heartCount: number,
     createdAt: Date,
     isHearted: boolean,
     isMine: boolean,
-    isReplied: boolean,
   ) {
     this.writer = {
       id: memberId,
@@ -24,30 +23,28 @@ export class GetPostCommentList {
       generation,
       profileImageUrl,
     };
-    this.comment = {
-      id: commentId,
+    this.reply = {
+      id: replyId,
       content,
       heartCount,
       createdAt,
       isHearted,
       isMine,
-      isReplied,
     };
   }
 
-  static from(tuple: GetPostCommentTuple) {
-    return new GetPostCommentList(
+  static from(tuple: GetFeedReplyTuple) {
+    return new GetFeedReplyList(
       tuple.memberId,
       tuple.nickname,
       tuple.generation,
       tuple.profileImageUrl,
-      tuple.commentId,
+      tuple.replyId,
       tuple.content,
       tuple.heartCount,
       tuple.createdAt,
       tuple.isHearted,
       tuple.isMine,
-      tuple.isReplied,
     );
   }
 }

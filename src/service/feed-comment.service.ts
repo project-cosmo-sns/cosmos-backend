@@ -28,7 +28,7 @@ export class FeedCommentService {
     private readonly memberQueryRepository: MemberQueryRepository,
     private readonly memberDomainService: MemberDomainService,
     private readonly notificationDomainService: NotificationDomainService,
-  ) {}
+  ) { }
 
   async getFeedCommentList(
     feedId: number,
@@ -58,6 +58,7 @@ export class FeedCommentService {
         isHearted: item.isHearted,
         createdAt: item.createdAt,
         isMine: item.isMine,
+        isReplied: item.isReplied,
       };
 
       return GetFeedCommentResponseDto.from({ writer, comment });
@@ -186,4 +187,5 @@ export class FeedCommentDto {
   isHearted: boolean;
   createdAt: Date;
   isMine: boolean;
+  isReplied: boolean;
 }

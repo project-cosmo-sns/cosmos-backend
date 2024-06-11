@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PostCommentDto, PostCommentWriterDto } from 'src/service/post.service';
+import { PostReplyDto, PostReplyWriterDto } from 'src/service/post-reply.service';
 
-export class PostCommentListResponse {
+export class PostReplyListResponse {
   @ApiProperty({
     type: {
       id: { type: 'number' },
@@ -10,7 +10,7 @@ export class PostCommentListResponse {
       profileImageUrl: { type: 'string' },
     },
   })
-  writer: PostCommentWriterDto;
+  writer: PostReplyWriterDto;
   @ApiProperty({
     type: {
       id: { type: 'number' },
@@ -19,16 +19,16 @@ export class PostCommentListResponse {
       isHearted: { type: 'boolean' },
       createdAt: { type: 'string' },
       isMine: { type: 'boolean' },
-      isReplied: { type: 'boolean' },
     },
   })
-  comment: PostCommentDto;
-  constructor(writer: PostCommentWriterDto, comment: PostCommentDto) {
+  reply: PostReplyDto;
+
+  constructor(writer: PostReplyWriterDto, reply: PostReplyDto) {
     this.writer = writer;
-    this.comment = comment;
+    this.reply = reply;
   }
 
-  static from({ writer, comment }: { writer: PostCommentWriterDto; comment: PostCommentDto }) {
-    return new PostCommentListResponse(writer, comment);
+  static from({ writer, reply }: { writer: PostReplyWriterDto; reply: PostReplyDto; }) {
+    return new PostReplyListResponse(writer, reply);
   }
 }

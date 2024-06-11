@@ -17,6 +17,9 @@ export class FeedReply {
   @Column({ name: 'content', nullable: false, length: 300 })
   content!: string;
 
+  @Column({ name: 'heart_count', nullable: false })
+  heartCount!: number;
+
   @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deletedAt?: Date;
 

@@ -31,6 +31,7 @@ import { Roles } from 'src/common/roles/roles.decorator';
 import { PostFeedCommentRequestDto } from 'src/dto/request/post-feed-comment.request';
 import { PostFeedRequestDto } from 'src/dto/request/post-feed.request.dto';
 import { SortFeedList } from 'src/dto/request/sort-feed-list.request';
+import { FeedReplyListResponse } from 'src/dto/response/feed-reply-list.response';
 import { GetFeedCommentResponseDto } from 'src/dto/response/get-feed-comment.response.dto';
 import { GetFeedDetailResponseDto } from 'src/dto/response/get-feed-detail.response.dto';
 import { GetFeedResponseDto } from 'src/dto/response/get-feed.response.dto';
@@ -311,5 +312,26 @@ export class FeedController {
     @Req() req,
   ): Promise<void> {
     return this.feedReplyService.deleteFeedReply(feedId, replyId, req.user.id);
+  }
+
+  @ApiOperation({ summary: '피드 대댓글 조회' })
+  @ApiParam({ name: 'commentId', required: true, description: '피드 댓글 id' })
+  @Get('comment/:commentId/reply/list')
+  async viewFeedReply(
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Req() req,
+    @Query() PaginationRequest: PaginationRequest,
+  ): Promise<PaginationResponse<FeedReplyListResponse>> {
+    const { feedReplyInfo, totalCount } = await this.feedReplyService.getFeedReplyList(
+      commentId,
+      req.user.id,
+      PaginationRequest,
+    )
+    const feedReplyData = feedReplyInfo.map((info) => FeedReplyListResponse.from(info));
+    return PaginationResponse.of({
+      data: feedReplyData,
+      options: PaginationRequest,
+      totalCount,
+    });
   }
 }

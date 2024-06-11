@@ -1,14 +1,18 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationRequest } from 'src/common/pagination/pagination-request';
 import { PostDomainService } from 'src/domain-service/post.domain-service';
+import { GetPostReplyList } from 'src/dto/get-post-reply-list.dto';
 import { PostComment } from 'src/entity/post_comment.entity';
 import { PostReply } from 'src/entity/post_reply.entity';
+import { PostCommentQueryRepository } from 'src/repository/post-comment.query-repository';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class PostReplyService {
   constructor(
     private readonly postDomainService: PostDomainService,
+    private readonly postCommentQueryRepository: PostCommentQueryRepository,
     @InjectRepository(PostComment) private readonly postCommentRepository: Repository<PostComment>,
     @InjectRepository(PostReply) private readonly postReplyRepository: Repository<PostReply>,
   ) { }
@@ -59,4 +63,27 @@ export class PostReplyService {
     await this.postReplyRepository.save(replyInfo);
 
   }
+
+  async getPostReplyList(commentId: number, memberId: number, paginationRequest: PaginationRequest) {
+    const postReplyList = await this.postCommentQueryRepository.getPostReplyList(commentId, memberId, paginationRequest);
+    const totalCount = await this.postCommentQueryRepository.getPostReplyListCount(commentId);
+    const postReplyInfo = postReplyList.map((replyList) => GetPostReplyList.from(replyList));
+    return { postReplyInfo, totalCount };
+  }
+}
+
+export class PostReplyWriterDto {
+  id: number;
+  nickname: string;
+  generation: number;
+  profileImageUrl: string;
+}
+
+export class PostReplyDto {
+  id: number;
+  content: string;
+  heartCount: number;
+  isHearted: boolean;
+  createdAt: Date;
+  isMine: boolean;
 }
