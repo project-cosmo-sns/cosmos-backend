@@ -24,6 +24,11 @@ export class FeedCommentQueryRepository {
         'feedCommentHeart',
         'feedComment.id = feedCommentHeart.commentId AND feedCommentHeart.memberId = :memberId',
       )
+      .leftJoin(
+        FeedReply,
+        'feed_reply',
+        'feed_reply.comment_id = feedComment.id'
+      )
       .select([
         'member.id as writerId',
         'member.nickname as nickname',
@@ -35,7 +40,9 @@ export class FeedCommentQueryRepository {
         'CASE WHEN ISNULL(feedCommentHeart.id) THEN false ELSE true END as isHearted',
         'feedComment.createdAt as createdAt',
         'CASE WHEN feedComment.member_id = :memberId THEN 1 ELSE 0 END as isMine',
+        'CASE WHEN feed_reply.id IS NOT NULL THEN true ELSE false END as isReplied',
       ])
+      .groupBy('feedComment.id')
       .limit(paginationRequest.take)
       .offset(paginationRequest.getSkip())
       .orderBy('feedComment.createdAt', paginationRequest.order)
@@ -131,6 +138,8 @@ export class GetFeedCommentTuple {
   createdAt: Date;
   @Transform(({ value }) => Boolean(value))
   isMine: boolean;
+  @Transform(({ value }) => Boolean(value))
+  isReplied: boolean;
 }
 
 export class GetFeedReplyTuple {
