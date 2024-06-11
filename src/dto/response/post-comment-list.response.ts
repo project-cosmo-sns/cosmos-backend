@@ -19,6 +19,7 @@ export class PostCommentListResponse {
       isHearted: { type: 'boolean' },
       createdAt: { type: 'string' },
       isMine: { type: 'boolean' },
+      isReplied: { type: 'boolean' },
     },
   })
   comment: PostCommentDto;

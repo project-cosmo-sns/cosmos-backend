@@ -24,6 +24,11 @@ export class PostCommentQueryRepository {
         'post_comment_heart',
         'post_comment_heart.comment_id = post_comment.id AND post_comment_heart.member_id = :memberId',
       )
+      .leftJoin(
+        PostReply,
+        'post_reply',
+        'post_reply.comment_id = post_comment.id'
+      )
       .select([
         'member.id as memberId',
         'member.nickname as nickname',
@@ -35,7 +40,9 @@ export class PostCommentQueryRepository {
         'post_comment.created_at as createdAt',
         'CASE WHEN post_comment_heart.id IS NOT NULL THEN true ELSE false END as isHearted',
         'CASE WHEN post_comment.member_id = :memberId THEN 1 ELSE 0 END as isMine',
+        'CASE WHEN post_reply.id IS NOT NULL THEN true ELSE false END as isReplied'
       ])
+      .groupBy('post_comment.id')
       .limit(paginationRequest.take)
       .offset(paginationRequest.getSkip())
       .orderBy('post_comment.createdAt', paginationRequest.order)
@@ -119,6 +126,8 @@ export class GetPostCommentTuple {
   isHearted: boolean;
   @Transform(({ value }) => Boolean(value))
   isMine: boolean;
+  @Transform(({ value }) => Boolean(value))
+  isReplied: boolean;
 }
 
 export class GetPostReplyTuple {

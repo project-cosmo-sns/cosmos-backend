@@ -16,6 +16,7 @@ export class GetPostCommentList {
     createdAt: Date,
     isHearted: boolean,
     isMine: boolean,
+    isReplied: boolean,
   ) {
     this.writer = {
       id: memberId,
@@ -30,6 +31,7 @@ export class GetPostCommentList {
       createdAt,
       isHearted,
       isMine,
+      isReplied,
     };
   }
 
@@ -45,6 +47,7 @@ export class GetPostCommentList {
       tuple.createdAt,
       tuple.isHearted,
       tuple.isMine,
+      tuple.isReplied,
     );
   }
 }

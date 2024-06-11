@@ -464,4 +464,5 @@ export class PostCommentDto {
   isHearted: boolean;
   createdAt: Date;
   isMine: boolean;
+  isReplied: boolean;
 }
