@@ -316,7 +316,7 @@ export class FeedController {
 
   @ApiOperation({ summary: '피드 대댓글 조회' })
   @ApiParam({ name: 'commentId', required: true, description: '피드 댓글 id' })
-  @Get('comment/:commentId/reply')
+  @Get('comment/:commentId/reply/list')
   async viewFeedReply(
     @Param('commentId', ParseIntPipe) commentId: number,
     @Req() req,

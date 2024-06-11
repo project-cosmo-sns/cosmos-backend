@@ -356,7 +356,7 @@ export class PostController {
 
   @ApiOperation({ summary: '포스트 대댓글 조회' })
   @ApiParam({ name: 'commentId', required: true, description: '포스트 댓글 id' })
-  @Get('comment/:commentId/reply')
+  @Get('comment/:commentId/reply/list')
   async viewPostReply(
     @Param('commentId', ParseIntPipe) commentId: number,
     @Req() req,
