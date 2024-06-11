@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity({ name: 'Post_reply_heart' })
+@Entity({ name: 'post_reply_heart' })
 export class PostReplyHeart {
   @PrimaryGeneratedColumn()
   id!: number;
